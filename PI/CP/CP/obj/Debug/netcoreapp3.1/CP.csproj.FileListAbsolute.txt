@@ -1,0 +1,11 @@
+D:\Course_Projects_3_2\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.csprojAssemblyReference.cache
+D:\Course_Projects_3_2\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.AssemblyInfoInputs.cache
+D:\Course_Projects_3_2\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.AssemblyInfo.cs
+D:\Course_Projects_3_2\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.exe
+D:\Course_Projects_3_2\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.deps.json
+D:\Course_Projects_3_2\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.runtimeconfig.json
+D:\Course_Projects_3_2\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.runtimeconfig.dev.json
+D:\Course_Projects_3_2\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.dll
+D:\Course_Projects_3_2\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.pdb
+D:\Course_Projects_3_2\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.dll
+D:\Course_Projects_3_2\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.pdb
