@@ -53,14 +53,11 @@ namespace CP
         }
         static void Main(string[] args)
         {
-            uint[] P = new uint[1024];
-            uint[] Q = new uint[1024];
-            GenerateArr(ref P);
-            GenerateArr(ref Q);   
-            HC256 hc256 = new HC256(P,Q);
-            WriteLine("Генерация P и Q прошла успешно"+" ");
-            string binTestKey = GetTest256BitKey();
-            string binTestVector = GetTest256BitKey();
+
+            HC256 hc256 = new HC256();
+            
+            string binTestKey = GetTestZero256BitKey();
+            string binTestVector = GetTestZero256BitKey();
             WriteLine("Генерация ключа и вектора прошла успешно" + " ");
             WriteLine("Процесс инициализации...");
             hc256.InitializaionProcess(binTestKey, binTestVector);

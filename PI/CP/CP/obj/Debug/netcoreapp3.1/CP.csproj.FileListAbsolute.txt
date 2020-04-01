@@ -9,3 +9,14 @@ D:\Course_Projects_3_2\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.dll
 D:\Course_Projects_3_2\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.pdb
 D:\Course_Projects_3_2\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.dll
 D:\Course_Projects_3_2\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.pdb
+D:\CourseProjects32\Repository\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.exe
+D:\CourseProjects32\Repository\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.deps.json
+D:\CourseProjects32\Repository\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.runtimeconfig.json
+D:\CourseProjects32\Repository\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.runtimeconfig.dev.json
+D:\CourseProjects32\Repository\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.dll
+D:\CourseProjects32\Repository\PI\CP\CP\bin\Debug\netcoreapp3.1\CP.pdb
+D:\CourseProjects32\Repository\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.csprojAssemblyReference.cache
+D:\CourseProjects32\Repository\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.AssemblyInfoInputs.cache
+D:\CourseProjects32\Repository\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.AssemblyInfo.cs
+D:\CourseProjects32\Repository\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.dll
+D:\CourseProjects32\Repository\PI\CP\CP\obj\Debug\netcoreapp3.1\CP.pdb

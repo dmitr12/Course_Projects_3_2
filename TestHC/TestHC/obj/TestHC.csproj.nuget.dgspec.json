@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\CourseProjects32\\Repository\\PI\\CP\\CP\\CP.csproj": {}
+    "D:\\CourseProjects32\\Repository\\TestHC\\TestHC\\TestHC.csproj": {}
   },
   "projects": {
-    "D:\\CourseProjects32\\Repository\\PI\\CP\\CP\\CP.csproj": {
+    "D:\\CourseProjects32\\Repository\\TestHC\\TestHC\\TestHC.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\CourseProjects32\\Repository\\PI\\CP\\CP\\CP.csproj",
-        "projectName": "CP",
-        "projectPath": "D:\\CourseProjects32\\Repository\\PI\\CP\\CP\\CP.csproj",
+        "projectUniqueName": "D:\\CourseProjects32\\Repository\\TestHC\\TestHC\\TestHC.csproj",
+        "projectName": "TestHC",
+        "projectPath": "D:\\CourseProjects32\\Repository\\TestHC\\TestHC\\TestHC.csproj",
         "packagesPath": "C:\\Users\\Dyrda Dmitriy\\.nuget\\packages\\",
-        "outputPath": "D:\\CourseProjects32\\Repository\\PI\\CP\\CP\\obj\\",
+        "outputPath": "D:\\CourseProjects32\\Repository\\TestHC\\TestHC\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

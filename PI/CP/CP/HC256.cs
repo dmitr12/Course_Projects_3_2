@@ -11,12 +11,11 @@ namespace CP
         uint[] W = new uint[2560];
         ulong key256Bit, vector256Bit;
 
-        public HC256(uint[] P, uint[] Q)
+        public HC256()
         {
-            this.P = P;
-            this.Q = Q;
-            //P = new uint[1024];
-            //Q = new uint[1024];
+
+            P = new uint[1024];
+            Q = new uint[1024];
         }
 
         public uint Plus(uint x, uint y) => (uint)((x + y) % Math.Pow(2, 32));
@@ -37,7 +36,8 @@ namespace CP
 
         public uint SdvigRight(uint x, int n) => x >> n;
 
-        public uint CycleSdvigRight(uint x, int n)=> Xor(SdvigRight(x, n), SdvigLeft(x, 32 - n));
+        public uint CycleSdvigRight(uint x, int n)
+            => Xor(SdvigRight(x, n), SdvigLeft(x, 32 - n));
 
         public uint FuncF1(uint x) => Xor(Xor(CycleSdvigRight(x,7), CycleSdvigRight(x, 18)), SdvigRight(x, 3));
 
