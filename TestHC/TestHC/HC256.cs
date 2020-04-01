@@ -116,5 +116,44 @@ namespace TestHC
             }
             return keStream;
         }
+
+        public List<byte> GetBytesFromKeyStream(List<uint> keyStream)
+        {
+            List<byte> bytes = new List<byte>();
+            foreach(uint item in keyStream)
+            {
+                bytes.AddRange(new byte[]
+                {
+                    (byte)(item >> 24), (byte)(item >> 16),
+                    (byte)(item >> 8), (byte)item
+                });
+            }
+            return bytes;
+        }
+
+        public List<byte> XorBytes(List<byte> bytes1, List<byte> bytes2)
+        {
+            List<byte> xoredBytes = new List<byte>();
+            if (bytes1.Count < bytes2.Count)
+                while (bytes1.Count != bytes2.Count)
+                    bytes1.Add(0);
+            else
+                while (bytes2.Count != bytes1.Count)
+                    bytes2.Add(0);
+            for (int i = 0; i < bytes1.Count; i++)
+                xoredBytes.Add((byte)(bytes1[i] ^ bytes2[i]));
+            return xoredBytes;
+        }
+
+        public List<byte> Encrypt(List<byte> bytesTxt, List<uint> keyStream)
+        {
+            List<byte> xoredBytes = XorBytes(bytesTxt, GetBytesFromKeyStream(keyStream));
+            Console.WriteLine($"Текст: {Encoding.Unicode.GetString(xoredBytes.ToArray())}");
+            return xoredBytes;
+        }
+
+        public List<byte> Decrypt(List<byte> bytesTxt, List<uint> keyStream)
+            => Encrypt(bytesTxt, keyStream);
+
     }
 }
