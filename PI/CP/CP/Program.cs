@@ -1,75 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using static System.Console;
 
-namespace CP
+namespace TestHC
 {
     class Program
     {
-        public static double GetDecFromBin(string strBin)
+        public static string GetBinNWord(uint x, int n)
         {
-            double dec = 0;
-            for (int i = 0; i < strBin.Length; i++)
-                if (strBin[i] == '1')
-                    dec += Math.Pow(2, strBin.Length - 1 - i);
-            return dec;
+            string bin = "";
+            while (x != 1)
+            {
+                bin = (x % 2).ToString() + bin;
+                x /= 2;
+            }
+            bin = "1" + bin;
+            while (bin.Length != n)
+                bin = "0" + bin;
+            return bin;
         }
 
-        //В КАЧЕСТВЕ ПРИМЕРА
-        public static void GenerateArr(ref uint[] arr)
+        public static byte[] GetBytesFromKeyStream(uint keyStream)
         {
-            Random random = new Random();
-            for (int i = 0; i < 1024; i++)
-                arr[i] = (uint)GetDecFromBin(GetTest32Bit());
+            return new byte[]
+            {
+                (byte)(keyStream >> 24), (byte)(keyStream >> 16),
+                (byte)(keyStream >> 8), (byte)keyStream
+            };
         }
 
-        //В КАЧЕСТВЕ ПРИМЕРА
-        public static string GetTest256BitKey()
-        {
-            Random rand = new Random();
-            string binKey = "";
-            for (int i = 0; i < 255; i++)
-                binKey = rand.Next(0, 2).ToString() + binKey;
-            binKey = "1" + binKey;
-            return binKey;
-        }
-
-        public static string GetTestZero256BitKey()
-        {
-            string binKey = "";
-            for (int i = 0; i < 256; i++)
-                binKey = "0" + binKey;
-            return binKey;
-        }
-
-        //В КАЧЕСТВЕ ПРИМЕРА
-        public static string GetTest32Bit()
-        {
-            Random rand = new Random();
-            string binKey = "";
-            for (int i = 0; i < 32; i++)
-                binKey = rand.Next(0, 2).ToString() + binKey;
-            return binKey;
-        }
         static void Main(string[] args)
         {
+            //example
+            HC256 pr = new HC256();
+            uint[] key = new uint[8];
+            uint[] iv = new uint[8];
+            for (int i = 0; i < key.Length; i++)
+            {
+                key[i] = 0;
+                iv[i] = 0;
+            }
+            pr.InitializationProcess(key, iv);
+            while (true)
+            {
+                WriteLine("Введите текст");
+                string s = ReadLine();
+                List<uint> keyStream = pr.GenerateKeyStream((uint)Math.Ceiling((decimal)(s.Length * 16) / 32));
+                WriteLine("KeyStream:");
+                foreach (var k in keyStream)
+                    WriteLine(k);
+                List<byte> word = new List<byte>();
+                word.AddRange(Encoding.Unicode.GetBytes(s));
+                List<byte> encrypted = pr.Encrypt(word, keyStream);
+                List<byte> decrypted = pr.Decrypt(encrypted, keyStream);
 
-            HC256 hc256 = new HC256();
-            
-            string binTestKey = GetTestZero256BitKey();
-            string binTestVector = GetTestZero256BitKey();
-            WriteLine("Генерация ключа и вектора прошла успешно" + " ");
-            WriteLine("Процесс инициализации...");
-            hc256.InitializaionProcess(binTestKey, binTestVector);
-            WriteLine("Инициализация завершена");
-            List<uint> keyStream = hc256.KeyStreamGenaretion(16);
-            foreach (var item in keyStream)
-                WriteLine($"{Convert.ToString(item,16)}");
-            
-            //string binTestKey = hc256.GetTest256BitKey();dfgklkoikgtfrdeswaqaesrdtfgiokpii
-            //WriteLine($"{binTestKey}-{binTestKey.Length}");
-            //foreach (uint s in hc256.GetNBlocksFromYBitWord(binTestKey, 8, 256))
-            //    WriteLine($"{s}-{hc256.GetBinNWord(s,32)}-{hc256.GetBinNWord(s, 32).Length}");
+            }
         }
     }
 }

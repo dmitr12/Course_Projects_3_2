@@ -2,179 +2,156 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CP
+namespace TestHC
 {
-    public class HC256
+    class HC256
     {
-        uint[] P;
-        uint[] Q;
+        uint[] P = new uint[1024];
+        uint[] Q = new uint[1024];
         uint[] W = new uint[2560];
-        ulong key256Bit, vector256Bit;
 
-        public HC256()
+        public uint CycleSdvigRight(uint x, int n) => ((x >> n) ^ (x << (32 - n)));
+
+        public uint Minus(uint x, uint y) => ((x - y) % 1024);
+
+        public uint f1(uint x) => (CycleSdvigRight(x, 7) ^ CycleSdvigRight(x, 18) ^ (x >> 3));
+
+        public uint f2(uint x) => (CycleSdvigRight(x, 17) ^ CycleSdvigRight(x, 19) ^ (x >> 10));
+
+        public uint g1(uint x, uint y) => ((CycleSdvigRight(x, 10) ^ CycleSdvigRight(y, 23)) + Q[(x ^ y) % 1024]);
+
+        public uint g2(uint x, uint y) => ((CycleSdvigRight(x, 10) ^ CycleSdvigRight(y, 23)) + P[(x ^ y) % 1024]);
+
+        public uint h1(uint x)
         {
-
-            P = new uint[1024];
-            Q = new uint[1024];
+            byte a = (byte)x;
+            byte b = (byte)(x >> 8);
+            byte c = (byte)(x >> 16);
+            byte d = (byte)(x >> 24);
+            return Q[a] + Q[256 + b] + Q[512 + c] + Q[768 + d];
         }
 
-        public uint Plus(uint x, uint y) => (uint)((x + y) % Math.Pow(2, 32));
-
-        public uint Minus(uint x, uint y) => (x - y) % 1024;
-
-        public uint Xor(uint x, uint y) => x ^ y;
-
-        //public ulong Concatanation(IEnumerable<string> arr)
-        //{
-        //    string result = "";
-        //    foreach (string item in arr)
-        //        result += arr = item;
-
-        //}
-
-        public uint SdvigLeft(uint x, int n) => x << n;
-
-        public uint SdvigRight(uint x, int n) => x >> n;
-
-        public uint CycleSdvigRight(uint x, int n)
-            => Xor(SdvigRight(x, n), SdvigLeft(x, 32 - n));
-
-        public uint FuncF1(uint x) => Xor(Xor(CycleSdvigRight(x,7), CycleSdvigRight(x, 18)), SdvigRight(x, 3));
-
-        public uint FuncF2(uint x) => Xor(Xor(CycleSdvigRight(x, 17), CycleSdvigRight(x, 19)), SdvigRight(x, 10));
-
-        public uint FuncG1(uint x, uint y)
-            => Plus(Xor(CycleSdvigRight(x,10), CycleSdvigRight(y,23)), Q[(Xor(x, y)) % 1024]);
-
-        public uint FuncG2(uint x, uint y)
-            => Plus(Xor(CycleSdvigRight(x, 10), CycleSdvigRight(y, 23)), P[(Xor(x, y)) % 1024]);
-
-        public uint FuncH1(uint x)
+        public uint h2(uint x)
         {
-            List<uint> listX = GetNBlocksFromYBitWord(x,4,32);
-            uint operand1 = Plus(Q[listX[3]], Q[Plus(256, listX[2])]);
-            uint operand2 = Plus(Q[Plus(512, listX[1])], Q[Plus(768, listX[0])]);
-            return Plus(operand1, operand2);
+            byte a = (byte)x;
+            byte b = (byte)(x >> 8);
+            byte c = (byte)(x >> 16);
+            byte d = (byte)(x >> 24);
+            return P[a] + P[256 + b] + P[512 + c] + P[768 + d];
         }
 
-        public uint FuncH2(uint x)
+        public void feedback_1(ref uint u, uint v, uint b, uint c)
         {
-            List<uint> listX = GetNBlocksFromYBitWord(x,4,32);
-            uint operand1 = Plus(P[listX[3]], P[Plus(256, listX[2])]);
-            uint operand2 = Plus(P[Plus(512, listX[1])], P[Plus(768, listX[0])]);
-            return Plus(operand1, operand2);
+            uint tem0, tem1, tem2;
+            tem0 = CycleSdvigRight(v, 23);
+            tem1 = CycleSdvigRight(c, 10);
+            tem2 = (v ^ c) & 0x3ff;
+            u += b + (tem0 ^ tem1) + Q[tem2];
         }
 
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //ИЗМЕНИТЬ МЕТОД, НЕ ТАК РАБОТАЕТ ПРИ n=8 и y=256
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        public List<uint> GetNBlocksFromYBitWord(uint x, int n, int y)
+        public void feedback_2(ref uint u, uint v, uint b, uint c)
         {
-            return GetNBlocksFromYBitWord(GetBinNWord(x, y), n, y);
+            uint tem0, tem1, tem2;
+            tem0 = CycleSdvigRight(v, 23);
+            tem1 = CycleSdvigRight(c, 10);
+            tem2 = (v ^ c) & 0x3ff;
+            u += b + (tem0 ^ tem1) + P[tem2];
         }
 
-        public List<uint> GetNBlocksFromYBitWord(string binW, int n, int y)
+        public void InitializationProcess(uint[] key, uint[] iv)
         {
-            string binBlock = "";
-            List<string> binBlocks = new List<string>();
-            List<uint> result = new List<uint>();
-            for (int i = 0; i < y; i++)
-            {
-                binBlock += binW[i];
-                if ((i + 1) % (y / n) == 0)
-                {
-                    binBlocks.Add(binBlock);
-                    binBlock = "";
-                }
-            }
-            foreach (string bt in binBlocks)
-                result.Add((uint)GetDecFromBin(bt));
-            return result;
-        }
-
-        public double GetDecFromBin(string strBin)
-        {
-            double dec = 0;
-            for (int i = 0; i < strBin.Length; i++)
-                if (strBin[i] == '1')
-                    dec += Math.Pow(2, strBin.Length - 1 - i);
-            return dec;
-        }
-
-        public string GetBinNWord(uint x, int n)
-        {
-            string bin = "";
-            while (x != 1)
-            {
-                bin = (x % 2).ToString() + bin;
-                x /= 2;
-            }
-            bin = "1" + bin;
-            while (bin.Length != n)
-                bin = "0" + bin;
-            return bin;
-        }
-
-        //Процесс инициализации
-        public void InitializaionProcess(string key256Bit, string vector256Bit)
-        {
-            List<uint> list32BitBlocksKey = GetNBlocksFromYBitWord(key256Bit, 8, 256);
-            List<uint> list32BitBlocksVector = GetNBlocksFromYBitWord(vector256Bit, 8, 256);
-            //1) Составление массива W
-            for(int i=0;i<=2559;i++)
+            //1)
+            for (int i = 0; i <= 2559; i++)
             {
                 if (i >= 0 && i <= 7)
-                    W[i] = list32BitBlocksKey[i];
+                    W[i] = key[i];
                 else if (i >= 8 && i <= 15)
-                    W[i] = list32BitBlocksVector[i - 8];
+                    W[i] = iv[i - 8];
                 else
-                    W[i] = Plus(Plus(Plus(FuncF2(W[i - 2]), W[i - 7]), Plus(FuncF1(W[i - 15]), W[i - 16])), (uint)i);
+                    W[i] = f2(W[i - 2]) + W[i - 7] + f1(W[i - 15]) + W[i - 16] + (uint)i;
             }
-            //2) Обновление таблиц P и Q с помощью массива W
-            for(int i = 0; i <= 1023; i++)
+            //2)
+            for (int i = 0; i <= 1023; i++)
             {
                 P[i] = W[i + 512];
-                Q[i] = W[i + 1535];
+                Q[i] = W[i + 1536];
             }
-            //3) 3. Run the cipher (the keystream generation algorithm) 4096
-            //steps without generating output.
-            KeyStreamGenaretion();
-            
-        }
-
-        public List<uint> KeyStreamGenaretion(uint countOfKeyStream32BitBlocks=128)
-        {
-            uint j;
-            List<uint> sKey = new List<uint>();
-            for(int i=0;i< countOfKeyStream32BitBlocks; i++)
+            //3)
+            //for(int i=0;i<4096;i++)
+            //    GenerateKeyStream(16);
+            //run the cipher 4096 steps without generating output
+            for (int i = 0; i < 2; i++)
             {
-                j =(uint)i % 1024;
+                for (int j = 0; j < 10; j++)
+                    feedback_1(ref P[j], P[j + 1], P[(j - 10) & 0x3ff], P[(j - 3) & 0x3ff]);
+                for (int j = 10; j < 1023; j++)
+                    feedback_1(ref P[j], P[j + 1], P[j - 10], P[j - 3]);
+                feedback_1(ref P[1023], P[0], P[1013], P[1020]);
+                for (int j = 0; j < 10; j++)
+                    feedback_2(ref Q[j], Q[j + 1], Q[(j - 10) & 0x3ff], Q[(j - 3) & 0x3ff]);
+                for (int j = 10; j < 1023; j++)
+                    feedback_2(ref Q[j], Q[j + 1], Q[j - 10], Q[j - 3]);
+                feedback_2(ref Q[1023], Q[0], Q[1013], Q[1020]);
+            }
+        }
+        public List<uint> GenerateKeyStream(uint countOf32BitBlocksKeyStream)
+        {
+            List<uint> keStream = new List<uint>();
+            uint j;
+            for (uint i = 0; i < countOf32BitBlocksKeyStream; i++)
+            {
+                j = i % 1024;
                 if ((i % 2048) < 1024)
                 {
-                    P[j] = Plus(Plus(P[j], P[Minus(j, 10)]), FuncG1(P[Minus(j, 3)], P[Minus(j, 1023)]));
-                    sKey.Add(Xor(FuncH1(P[Minus(j,12)]), P[j]));
+                    P[j] = P[j] + P[Minus(j, 10)] + g1(P[Minus(j, 3)], P[Minus(j, 1023)]);
+                    keStream.Add(h1(P[Minus(j, 12)]) ^ P[j]);
                 }
                 else
                 {
-                    Q[j] = Plus(Plus(Q[j], Q[Minus(j, 10)]), FuncG2(Q[Minus(j, 3)], Q[Minus(j, 1023)]));
-                    sKey.Add(Xor(FuncH2(Q[Minus(j, 12)]), Q[j]));
+                    Q[j] = Q[j] + Q[Minus(j, 10)] + g2(Q[Minus(j, 3)], Q[Minus(j, 1023)]);
+                    keStream.Add(h2(Q[Minus(j, 12)]) ^ Q[j]);
                 }
             }
-            return sKey;
+            return keStream;
         }
 
-        public string encrypt(string txt, List<uint> keyStream)
+        public List<byte> GetBytesFromKeyStream(List<uint> keyStream)
         {
-            return null;
+            List<byte> bytes = new List<byte>();
+            foreach (uint item in keyStream)
+            {
+                bytes.AddRange(new byte[]
+                {
+                    (byte)(item >> 24), (byte)(item >> 16),
+                    (byte)(item >> 8), (byte)item
+                });
+            }
+            return bytes;
         }
 
-        //Ненужное
+        public List<byte> XorBytes(List<byte> bytes1, List<byte> bytes2)
+        {
+            List<byte> xoredBytes = new List<byte>();
+            if (bytes1.Count < bytes2.Count)
+                while (bytes1.Count != bytes2.Count)
+                    bytes1.Add(0);
+            else
+                while (bytes2.Count != bytes1.Count)
+                    bytes2.Add(0);
+            for (int i = 0; i < bytes1.Count; i++)
+                xoredBytes.Add((byte)(bytes1[i] ^ bytes2[i]));
+            return xoredBytes;
+        }
 
-        //public void GetMassW()
-        //{
-        //    for(int i=0;i<W.Length;i++)
-        //        Console.WriteLine($"{i}) r");
-        //}
+        public List<byte> Encrypt(List<byte> bytesTxt, List<uint> keyStream)
+        {
+            List<byte> xoredBytes = XorBytes(bytesTxt, GetBytesFromKeyStream(keyStream));
+            Console.WriteLine($"Текст: {Encoding.Unicode.GetString(xoredBytes.ToArray())}");
+            return xoredBytes;
+        }
+
+        public List<byte> Decrypt(List<byte> bytesTxt, List<uint> keyStream)
+            => Encrypt(bytesTxt, keyStream);
 
     }
 }
