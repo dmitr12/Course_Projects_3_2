@@ -20,7 +20,7 @@ namespace TestHC
                 bin = "0" + bin;
             return bin;
         }
-
+        
         public static byte[] GetBytesFromKeyStream(uint keyStream)
         {
             return new byte[]
@@ -33,6 +33,9 @@ namespace TestHC
         static void Main(string[] args)
         {
             //example
+            Console.InputEncoding = Encoding.Unicode;
+            Console.OutputEncoding = Encoding.Unicode;
+            WriteLine("\x89f4");
             HC256 pr = new HC256();
             uint[] key = new uint[8];
             uint[] iv = new uint[8];
@@ -54,8 +57,8 @@ namespace TestHC
                 word.AddRange(Encoding.Unicode.GetBytes(s));
                 List<byte> encrypted = pr.Encrypt(word, keyStream);
                 List<byte> decrypted = pr.Decrypt(encrypted, keyStream);
-
             }
+            //byte[] bt=Encoding.Unicode.GetBytes("")
         }
     }
 }

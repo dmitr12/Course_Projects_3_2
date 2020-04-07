@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace TestHC
@@ -146,7 +147,8 @@ namespace TestHC
         public List<byte> Encrypt(List<byte> bytesTxt, List<uint> keyStream)
         {
             List<byte> xoredBytes = XorBytes(bytesTxt, GetBytesFromKeyStream(keyStream));
-            Console.WriteLine($"Текст: {Encoding.Unicode.GetString(xoredBytes.ToArray())}");
+            string txt = Encoding.Unicode.GetString(xoredBytes.ToArray());
+            Console.WriteLine($"Текст: {txt}");
             return xoredBytes;
         }
 
