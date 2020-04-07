@@ -4,7 +4,7 @@ NameFilm varchar(300) not null,
 Country varchar(70) not null,
 DateIssue date not null,
 Genre varchar(100) not null,
-DurationFilm date not null,
+DurationMinutesFilm int not null,
 Poster blob not null
 ); 
 
@@ -14,9 +14,9 @@ DECLARE
   V_FILE      BFILE;
   V_FILE_SIZE INTEGER;
 BEGIN
-   insert into Films(NameFilm,Country,DateIssue,Genre,DurationFilm,Poster)
-values('aaaa','asdas','25.12.1993','sdsds','25.12.2000',EMPTY_BLOB) returning Poster into V_BLOB;
-   V_FILE := BFILENAME('IMAGES','StarWars.jpg');
+   insert into Films(NameFilm,Country,DateIssue,Genre,DurationMinutesFilm,Poster)
+values('Я-легенда','США','25.12.2007','фантастика',96,EMPTY_BLOB) returning Poster into V_BLOB;
+   V_FILE := BFILENAME('IMAGES','Legend.jpg');
    V_FILE_SIZE := DBMS_LOB.GETLENGTH(V_FILE);
    DBMS_LOB.FILEOPEN( V_FILE );
    DBMS_LOB.LOADFROMFILE(V_BLOB, V_FILE, V_FILE_SIZE);

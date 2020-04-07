@@ -1,0 +1,28 @@
+﻿@model IEnumerable<TestApp.Models.Film>
+@using TestApp.Models
+@using TestApp.Utils
+    <h2>Фильмы:</h2>
+    <table class="table table-bordered">
+        <tr>
+            <td>Id</td>
+            <td>Название</td>
+            <td>Страна</td>
+            <td>Дата выпуска</td>
+            <td>Жанр</td>
+            <td>Длительность фильма</td>
+            <td>Постер</td>
+        </tr>
+        @foreach(Film film in Model)
+        {
+            string src = $"data:image/jpg;base64,{Convert.ToBase64String(@film.Poster)}";
+            <tr>
+                <td>@film.IdFilm</td>
+                <td>@film.NameFilm</td>
+                <td>@film.Country</td>
+                <td>@film.DateIssue.ToShortDateString()</td>
+                <td>@film.Genre</td>
+                <td>@TimerUtil.GetTimeString(film.DurationMinutesFilm)</td>
+                <td><img src=@src width="200" height="300"></td>
+            </tr>
+        }
+    </table>
