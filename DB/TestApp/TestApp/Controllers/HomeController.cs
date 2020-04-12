@@ -1,6 +1,7 @@
 ﻿using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -17,14 +18,24 @@ namespace TestApp.Controllers
             return View(db.SelectAllFilms());
         }
 
-        public ActionResult About()
+        public ActionResult AddFilm()
         {
             return View();
         }
 
-        public ActionResult Contact()
+        [HttpPost]
+        public ActionResult AddFilm(Film film, HttpPostedFileBase uploadImage)
         {
-            return View();
+            if(ModelState.IsValid && uploadImage!=null)
+            {
+                using (var binaryReader = new BinaryReader(uploadImage.InputStream))
+                {
+                    film.Poster = binaryReader.ReadBytes(uploadImage.ContentLength);
+                }
+                db.AddFilm(film);
+                return RedirectToAction("Index");
+            }
+            return View(film);
         }
     }
 }

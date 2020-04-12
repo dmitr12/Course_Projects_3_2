@@ -6,9 +6,9 @@
         <tr>
             <td>Id</td>
             <td>Название</td>
+            <td>Описание</td>
             <td>Страна</td>
-            <td>Дата выпуска</td>
-            <td>Жанр</td>
+            <td>Год выпуска</td>
             <td>Длительность фильма</td>
             <td>Постер</td>
         </tr>
@@ -18,9 +18,9 @@
             <tr>
                 <td>@film.IdFilm</td>
                 <td>@film.NameFilm</td>
+                <td>@film.DescriptionFilm</td>
                 <td>@film.Country</td>
-                <td>@film.DateIssue.ToShortDateString()</td>
-                <td>@film.Genre</td>
+                <td>@film.YearIssue</td>
                 <td>@TimerUtil.GetTimeString(film.DurationMinutesFilm)</td>
                 <td><img src=@src width="200" height="300"></td>
             </tr>

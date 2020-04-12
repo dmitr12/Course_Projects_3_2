@@ -1,0 +1,12 @@
+﻿@model TestApp.Models.Genre
+@{
+    ViewBag.Title = "ShowGenre";
+}
+
+<h2>ShowGenre</h2>
+@Html.LabelFor(m=>m.NameGenre, "Жанр: ")
+<p>@Model.NameGenre</p>
+<br />
+@Html.LabelFor(m=>m.DescriptionGenre, "Описание: ")
+<p>@Model.DescriptionGenre</p>
+

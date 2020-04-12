@@ -1,0 +1,35 @@
+﻿@model TestApp.Models.Film
+@{
+    ViewBag.Title = "AddFilm";
+}
+
+<h2>AddFilm</h2>
+@using (Html.BeginForm("AddFilm", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.LabelFor(m => m.NameFilm)
+    @Html.EditorFor(m => m.NameFilm)
+    @Html.ValidationMessageFor(m => m.NameFilm)
+    <br />
+    @Html.LabelFor(m => m.DescriptionFilm)
+    @Html.TextAreaFor(m => m.DescriptionFilm)
+    @Html.ValidationMessageFor(m => m.DescriptionFilm)
+    <br />
+    @Html.LabelFor(m => m.Country)
+    @Html.EditorFor(m => m.Country)
+    @Html.ValidationMessageFor(m => m.Country)
+    <br />
+    @Html.LabelFor(m => m.YearIssue)
+    @Html.EditorFor(m => m.YearIssue)
+    @Html.ValidationMessageFor(m => m.YearIssue)
+    <br />
+    @Html.LabelFor(m => m.DurationMinutesFilm)
+    @Html.EditorFor(m => m.DurationMinutesFilm)
+    @Html.ValidationMessageFor(m => m.DurationMinutesFilm)
+    <br />
+    <label>Постер:</label>
+    <input type="file" name="uploadImage" />
+    <br />
+    <input type="submit" value="Добавить" />
+}
+

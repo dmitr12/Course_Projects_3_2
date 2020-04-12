@@ -1,0 +1,15 @@
+﻿@model List<TestApp.Models.Genre>
+@using TestApp.Models
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Жанры:</h2>
+@foreach (Genre genre in Model)
+{
+   <a href="~/Genre/ShowGenre/@genre.IdGenre">@genre.NameGenre</a>
+   <br />
+}
+
+
