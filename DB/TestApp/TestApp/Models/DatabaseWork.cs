@@ -39,7 +39,6 @@ namespace TestApp.Models
                 OracleDataReader reader = com.ExecuteReader();
                 genre = new Genre
                 {
-                    IdGenre=reader.GetInt32(0),
                     NameGenre = reader.GetString(1),
                     DescriptionGenre = reader.GetString(2)
                 };
@@ -88,6 +87,7 @@ namespace TestApp.Models
                     {
                         Genre genre = new Genre()
                         {
+                            IdGenre=reader.GetInt32(0),
                             NameGenre = reader["NameGenre"].ToString(),
                             DescriptionGenre = reader["DescriptionGenre"].ToString()
                         };

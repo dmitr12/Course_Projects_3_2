@@ -8,6 +8,7 @@
 <h2>Жанры:</h2>
 @foreach (Genre genre in Model)
 {
+    <p>@genre.IdGenre</p>
    <a href="~/Genre/ShowGenre/@genre.IdGenre">@genre.NameGenre</a>
    <br />
 }
