@@ -17,9 +17,74 @@ Poster blob not null
 create table FilmsGenres(
 IdF number not null,
 IdG number not null,
-constraint Film_Id foreign key(IdF) references Films(IdFilm),
-constraint Genre_Id foreign key(IdG) references Genres(IdGenre)
+constraint Film_Id_FilmsGenres foreign key(IdF) references Films(IdFilm),
+constraint Genre_Id_FilmsGenres foreign key(IdG) references Genres(IdGenre)
+); 
+
+create table CinemaAddresses(
+IdAddress number generated always as identity primary key,
+Street varchar(150) not null,
+NumberHouse number not null
 );
+
+create table MovieTheatres(
+IdCinema number generated always as identity primary key,
+NameCinema varchar(100) not null,
+Address number not null,
+constraint Address_Id_MovieTheatres foreign key(Address) references CinemaAddresses(IdAddress)
+); 
+
+create table Halls(
+IdHall number generated always as identity primary key,
+NameHall varchar(150) not null,
+Cinema number not null,
+constraint Cinema_Id_Halls foreign key(Cinema) references MovieTheatres(IdCinema)
+); 
+
+create table Sessions(
+IdSession number generated always as identity primary key,
+Film number not null,
+Hall number not null,
+StartSession date not null,
+constraint Film_Id_Sessions foreign key(Film) references Films(IdFilm),
+constraint Hall_Id_Sessions foreign key(Hall) references Halls(IdHall)
+);
+
+create table Users(
+IdUser number generated always as identity primary key,
+Login varchar(100) unique not null,
+Password clob not null,
+Status varchar(100) not null  ////Определение роли
+);
+
+create table SectorsHall(
+IdSector number generated always as identity primary key,
+Hall number not null,
+NameSector varchar(70) not null,
+StartRow number not null,
+EndRow number not null,
+CountSeatsRow number not null,
+CostSeat number not null,
+constraint Hall_Id_SectorsHall foreign key(Hall) references Halls(IdHall)
+);
+
+create table Seats(
+IdSeat number generated always as identity primary key,
+NumberSeat number not null,
+NumberRow number not null,
+SectorHall number not null,
+constraint SectorHall_Id_Seats foreign key(SectorHall) references SectorsHall(IdSector)
+);
+
+create table Tickets(
+IdTicket number generated always as identity primary key,
+Buyer number not null,
+SessionId number not null,
+SeatId number not null,
+constraint Buyer_Id_Tickets foreign key(Buyer) references Users(IdUser),
+constraint Session_Id_Tickets foreign key(SessionId) references Sessions(IdSession),
+constraint Seat_Id_Tickets foreign key(SeatId) references Seats(IdSeat)
+); 
 
 insert into Genres(NameGenre, DescriptionGenre) values ('Биографический','Биографический фильм – жанр кинематографа, повествующий о судьбе какой-либо известной, выдающейся личности, оставившей свой след в истории. Некоторые биографические фильмы уделяют внимание лишь ключевым моментам из жизни главного героя, другие же начинают вести повествование с момента его рождения, чтобы показать, как формировался его характер под влиянием его родителей, учителей, друзей, детских потрясений, потерь, первой любви и т.п.');
 insert into Genres(NameGenre, DescriptionGenre) values ('Боевик','Боевик – кинематографический жанр, в котором главный герои или герои сталкиваются с рядом проблем, решить которые, не прибегнув к насилию, не удается. Фильмы боевики изобилуют насилием во всех его проявлениях, безумными погонями, дорогостоящими спецэффектами и сложными каскадерскими трюками. Главные герои часто оказываются в, казалось бы, безвыходных, смертельно опасных ситуациях, выбраться живыми из которых им удается благодаря их профессиональной подготовке, находчивости и решительности. В абсолютном большинстве боевиков добро торжествует, а злодеи погибают или оказываются за решеткой. Жанр боевика легко «смешивается» с любым другим жанром, однако лучше всего сочетается с приключенческими фильмами и триллерами.');

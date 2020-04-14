@@ -30,19 +30,22 @@ namespace TestApp.Models
 
         public Genre GetGenre(int idGenre)
         {
-            Genre genre;
-            string strCommand = "select * from Genres where IdGenre=idGenre";
-            using(OracleConnection con=new OracleConnection(strCommand))
+            Genre genre=null;
+            string strCommand = $"select * from Genres where IdGenre={idGenre}";
+            OracleConnection con = new OracleConnection(conString);
+            con.Open();
+            OracleCommand com = new OracleCommand(strCommand, con);
+            OracleDataReader reader = com.ExecuteReader();
+            while (reader.Read())
             {
-                con.Open();
-                OracleCommand com = new OracleCommand(strCommand, con);
-                OracleDataReader reader = com.ExecuteReader();
                 genre = new Genre
                 {
+                    IdGenre = reader.GetInt32(0),
                     NameGenre = reader.GetString(1),
                     DescriptionGenre = reader.GetString(2)
                 };
             }
+            con.Close();
             return genre;
         }
 
@@ -112,6 +115,13 @@ namespace TestApp.Models
                     cmd.ExecuteNonQuery();
                 }
             }
+        }
+
+        public void AddCinema(Cinema cinema, Address address)
+        {
+            string addressCommand = "insert into CinemaAddresses(Street, NumberHouse) " +
+                $"values({address.Street}, {address.NumberHouse});";
+
         }
     }
 }
