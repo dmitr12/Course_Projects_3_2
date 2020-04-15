@@ -15,5 +15,11 @@ namespace TestApp.Models
 
         public int? AddressId { get; set; }
         public Address Address { get; set; }
+        public ICollection<Hall> Halls { get; set; }
+
+        public Cinema()
+        {
+            Halls = new List<Hall>();
+        }
     }
 }

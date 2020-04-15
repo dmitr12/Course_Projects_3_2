@@ -119,9 +119,45 @@ namespace TestApp.Models
 
         public void AddCinema(Cinema cinema, Address address)
         {
-            string addressCommand = "insert into CinemaAddresses(Street, NumberHouse) " +
-                $"values({address.Street}, {address.NumberHouse});";
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("AddCinemaAddress", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@street", address.Street);
+                com.Parameters.Add("@numberhouse", address.NumberHouse);
+                com.Parameters.Add("@idAddr", OracleDbType.Int32).Direction=ParameterDirection.Output;
+                com.ExecuteNonQuery();
+                var idAddr = com.Parameters["@idAddr"].Value;
+                com = new OracleCommand("AddCinema", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@namecinema", cinema.NameCinema);
+                com.Parameters.Add("@idAddr", idAddr);
+                com.ExecuteNonQuery();
+            }
+        }
 
+        public List<Hall> GetHallsByCinameName(string nameCinema)
+        {
+            List<Hall> halls = new List<Hall>();
+            string strCom= $"select * from Halls where Cinema=(select IdCinema from MovieTheatres where NameCinema='{nameCinema}')";
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand(strCom, con);
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    halls.Add(new Hall()
+                    {
+                        IdHall = reader.GetInt32(0),
+                        NameHall = reader.GetString(1),
+                        CinemaId = reader.GetInt32(2)
+                    });
+                }
+
+            }
+            return halls;
         }
     }
 }

@@ -1,0 +1,99 @@
+﻿
+@{
+    ViewBag.Title = "AddHall";
+}
+
+<h2>Добавление залов:</h2>
+<div class="row">
+    <div class="col-md-6">
+        @using (Html.BeginForm())
+        {
+            <label>Название кинотеатра:</label>
+            <br />
+            <input type="text" name="NameCinema" />
+            <br />
+            <label>Название зала:</label>
+            <br />
+            <input type="text" name="NameHall" />
+            <br />
+            <div id="sectors">
+                <div>
+                    <p style="color:red">Сектор:</p>
+                    <label>Название сектора:</label>
+                    <br />
+                    <input type="text" name="NameSector" />
+                    <br />
+                    <label>Первый ряд:</label>
+                    <br />
+                    <input type="number" name="StartRow" />
+                    <br />
+                    <label>Последний ряд:</label>
+                    <br />
+                    <input type="number" name="EndRow" />
+                    <br />
+                    <label>Мест в одном ряде:</label>
+                    <br />
+                    <input type="number" name="CountSeatsRow" />
+                    <br />
+                    <label>Стоимость одного места:</label>
+                    <br />
+                    <input type="number" name="CostSeat" />
+                    <br />
+                </div>
+            </div>
+        }
+        <input type="button" value="Еще сектор" onclick="addSector()"/>
+        <input type="button" value="Убрать сектор" onclick="subSector()"/>
+    </div>
+    <div class="col-md-6">
+        <div>
+            @using (Ajax.BeginForm("HallSearch", new AjaxOptions { UpdateTargetId = "result",
+            LoadingElementId="loading", LoadingElementDuration=500}))
+            {
+                <label>Кинотеатр:</label>
+                <input type="text" name="cinemaName"/>
+                <input type="submit" value="Вывести залы"/>
+            }
+            <div id="loading" style="display:none; color:red; font-weight:bold;">
+                <p>Поиск...</p>
+            </div>
+            <div id="result"></div>
+        </div>
+    </div>
+</div>
+<script>
+    function addSector() {
+        document.getElementById('sectors').innerHTML += "<div>" +
+                    "<p style='color:red'>Сектор:</p>" +
+                    "<label>Название сектора:</label>"+
+                    "<br />"+
+                    "<input type='text' name='NameSector' />"+
+                    "<br />"+
+                    "<label>Первый ряд:</label>"+
+                    "<br />"+
+                    "<input type='number' name='StartRow' />"+
+                    "<br />"+
+                    "<label>Последний ряд:</label>"+
+                    "<br />"+
+                    "<input type='number' name='EndRow' />"+
+                    "<br />"+
+                    "<label>Мест в одном ряде:</label>"+
+                    "<br />"+
+                    "<input type='number' name='CountSeatsRow' />"+
+                    "<br />"+
+                    "<label>Стоимость одного места:</label>"+
+                    "<br />"+
+                    "<input type='number' name='CostSeat' />"+
+                    "<br />"+
+                "</div>"
+    }
+    function subSector() {
+        var select = document.getElementById('sectors');
+        if (select.children.length > 1) {
+           select.removeChild(select.lastChild);
+        }
+    }
+</script>
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+

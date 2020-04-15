@@ -1,0 +1,9 @@
+﻿@model IEnumerable<TestApp.Models.Hall>
+    <div id="searchResult">
+        <ul>
+            @foreach(var hall in Model)
+            {
+                <li>@hall.NameHall</li>
+            }
+        </ul>
+    </div>

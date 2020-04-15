@@ -1,0 +1,22 @@
+﻿@model TestApp.Models.Cinema
+@{
+    ViewBag.Title = "AddCinema";
+}
+
+<h2>Добавление кинотеатра:</h2>
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+    @Html.Label("Название кинотеатра: ")
+    @Html.EditorFor(m => m.NameCinema)
+    @Html.ValidationMessageFor(m => m.NameCinema)
+    <br />
+    <label class="control-label">Улица: </label>
+    <input type="text" name="Street" required />
+    <br />
+    <label class="control-label">Номер дома: </label>
+    <input type="number" name="NumberHouse" required min="1" />
+    <br />
+    <input type="submit" value="Добавить" />
+}
+
