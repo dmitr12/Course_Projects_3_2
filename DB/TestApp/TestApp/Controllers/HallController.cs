@@ -13,7 +13,15 @@ namespace TestApp.Controllers
 
         public ActionResult AddHall()
         {
+            ViewBag.Cinemas = db.SelectAllCinemas();
             return View();
+        }
+
+        [HttpPost]
+        public ActionResult AddHall(int idCinema, Hall hall)
+        {
+            db.AddHall(idCinema, hall);
+            return Content("good");
         }
 
         [HttpPost]

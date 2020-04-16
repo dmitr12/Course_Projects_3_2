@@ -76,6 +76,30 @@ namespace TestApp.Models
             }
         }
 
+        public List<Cinema> SelectAllCinemas()
+        {
+            List<Cinema> cinemas = new List<Cinema>();
+            string strCommand = "select * from MovieTheatres";
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand(strCommand, con);
+                using (var reader = com.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Cinema cinema = new Cinema()
+                        {
+                            IdCinema=reader.GetInt32(0),
+                            NameCinema=reader.GetString(1)
+                        };
+                        cinemas.Add(cinema);
+                    }
+                }
+            }
+            return cinemas;
+        }
+
         public List<Genre> SelectAllGenre()
         {
             List<Genre> genres = new List<Genre>();
@@ -115,6 +139,42 @@ namespace TestApp.Models
                     cmd.ExecuteNonQuery();
                 }
             }
+        }
+
+
+        public void AddSector(object idHall, Sector sector)
+        {
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("AddSector", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@hall", idHall);
+                cmd.Parameters.Add("@namesector", sector.NameSector);
+                cmd.Parameters.Add("@startrow", sector.StartRow);
+                cmd.Parameters.Add("@endrow", sector.EndRow);
+                cmd.Parameters.Add("@countseatsrow", sector.CountSeatsRow);
+                cmd.Parameters.Add("@costseat", sector.CostSeat);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void AddHall(int idCinema, Hall hall)
+        {
+            object idHall=null;
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("AddHall", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@namehall", hall.NameHall);
+                cmd.Parameters.Add("@cinema", idCinema);
+                cmd.Parameters.Add("@idHall", OracleDbType.Int32).Direction = ParameterDirection.Output;
+                cmd.ExecuteNonQuery();
+                idHall = cmd.Parameters["@idHall"].Value;
+            }
+            foreach (Sector sector in hall.Sectors)
+                AddSector(idHall, sector);
         }
 
         public void AddCinema(Cinema cinema, Address address)
