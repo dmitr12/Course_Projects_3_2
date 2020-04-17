@@ -14,10 +14,11 @@ namespace TestApp.Models
         public int? CinemaId { get; set; }
         public Cinema Cinema { get; set; }
         public ICollection<Sector> Sectors { get; set; }
-
+        public ICollection<Session> Sessions { get; set; }
         public Hall()
         {
             Sectors = new List<Sector>();
+            Sessions = new List<Session>();
         }
     }
 }

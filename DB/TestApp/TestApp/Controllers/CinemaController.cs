@@ -25,5 +25,11 @@ namespace TestApp.Controllers
             }
             return View(cinema);
         }
+
+        [HttpPost]
+        public ActionResult GetAllCinemas()
+        {
+            return PartialView(db.SelectAllCinemas());
+        }
     }
 }

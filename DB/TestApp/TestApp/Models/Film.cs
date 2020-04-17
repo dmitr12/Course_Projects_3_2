@@ -25,9 +25,11 @@ namespace TestApp.Models
         public byte[] Poster { get; set; }
         
         public ICollection<Genre> Genres { get; set; }
+        public ICollection<Session> Sessions { get; set; }
         public Film()
         {
             Genres = new List<Genre>();
+            Sessions = new List<Session>();
         }
     }
 }

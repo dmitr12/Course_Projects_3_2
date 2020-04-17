@@ -1,0 +1,7 @@
+﻿@model IEnumerable<TestApp.Models.Cinema>
+    <ul>
+        @foreach(var cinema in Model.ToList().OrderBy(c=>c.NameCinema))
+        {
+            <li>@cinema.NameCinema</li>
+        }
+    </ul>

@@ -49,6 +49,26 @@ namespace TestApp.Models
             return genre;
         }
 
+        public Cinema GetCinema(int idCinema)
+        {
+            Cinema cinema = null;
+            string strCommand = $"select * from MovieTheatres where IdCinema={idCinema}";
+            OracleConnection con = new OracleConnection(conString);
+            con.Open();
+            OracleCommand com = new OracleCommand(strCommand, con);
+            OracleDataReader reader = com.ExecuteReader();
+            while (reader.Read())
+            {
+                cinema = new Cinema
+                {
+                    IdCinema = reader.GetInt32(0),
+                    NameCinema = reader.GetString(1)
+                };
+            }
+            con.Close();
+            return cinema;
+        }
+
         public List<Film> SelectAllFilms()
         {
             List<Film> films = new List<Film>();
@@ -123,6 +143,29 @@ namespace TestApp.Models
                 }
             }
             return genres;
+        }
+
+        public List<Hall> SelectAllHallsCinema(int idCinema)
+        {
+            List<Hall> halls = new List<Hall>();
+            string strCommand = $"select * from Halls where Cinema={idCinema}";
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand(strCommand, con);
+                using (OracleDataReader reader = com.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        halls.Add(new Hall
+                        {
+                            IdHall = reader.GetInt32(0),
+                            NameHall = reader.GetString(1)
+                        });
+                    }
+                }
+            }
+            return halls;
         }
 
         public void AddFilm(Film film/*, int[] selectedGenres*/)

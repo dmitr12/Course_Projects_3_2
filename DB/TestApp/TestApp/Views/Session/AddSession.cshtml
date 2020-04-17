@@ -1,0 +1,40 @@
+﻿@model IEnumerable<TestApp.Models.Hall>
+@{
+    ViewBag.Title = "AddSession";
+}
+
+<h2>Добавление сеанса для кинотеатра "@ViewBag.Cinema.NameCinema":</h2>
+<div class="row">
+    <div class="col-md-6">
+        @using (Html.BeginForm())
+        {
+            <label>Зал: </label>
+            <select required name="HallId">
+                <option hidden></option>
+                @foreach (var hall in Model)
+                {
+                    <option value="@hall.IdHall">@hall.NameHall</option>
+                }
+            </select>
+            <br />
+            <label>Фильм: </label>
+            <select required name="FilmId">
+                <option hidden></option>
+                @foreach (var film in ViewBag.Films)
+                {
+                    <option value="@film.IdFilm">@film.NameFilm</option>
+                }
+            </select>
+            <br />
+            <label>Начало проведения сеанса: </label>
+            <input type="datetime-local" name="StartSession"/>
+            <br />
+            <input type="submit" value="Добавить"/>
+        }
+
+    </div>
+    <div class="col-md-6">
+
+    </div>
+</div>
+
