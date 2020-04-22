@@ -1,0 +1,14 @@
+﻿@model IEnumerable<TestApp.Models.Session>
+    @using TestApp.Utils
+<div id="searchResult">
+    <ul>
+        @foreach (var session in Model)
+        {
+            DateTime begin = session.StartSession;
+            DateTime end = session.StartSession.AddMinutes(session.Film.DurationMinutesFilm);
+            <li style="color:red">@begin.Day.@begin.Month.@begin.Year @begin.Hour:@begin.Minute-@end.Hour:@end.Minute
+            <p style="color:black">@session.Film.NameFilm</p>
+            </li>
+        }
+    </ul>
+</div>

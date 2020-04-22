@@ -3,74 +3,88 @@
     ViewBag.Title = "AddHall";
 }
 
-<h2>Добавление зала:</h2>
-<div class="row">
-    <div class="col-md-6">
-        @using (Html.BeginForm())
-        {
-            <label>Название кинотеатра:</label>
-            <br />
-            <select required name="idCinema">
-                <option hidden></option>
-                @foreach (var cinema in ViewBag.Cinemas)
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.min.css" />
+    </head>
+    <body>
+        <h2>Добавление зала:</h2>
+        <div class="row">
+            <div class="col-md-6">
+                @using (Html.BeginForm())
                 {
-                    <option value="@cinema.IdCinema">@cinema.NameCinema</option>
+                    <label>Название кинотеатра:</label>
+                    <br />
+                    <select style="min-width:150px" class="search" required name="idCinema">
+                        <option hidden></option>
+                        @foreach (var cinema in ViewBag.Cinemas)
+                        {
+                            <option value="@cinema.IdCinema">@cinema.NameCinema</option>
+                        }
+                    </select>
+                    <br />
+                    <label>Название зала:</label>
+                    <br />
+                    <input type="text" name="NameHall" />
+                    <br />
+                    <div id="sectors">
+                        <div>
+                            <p style="color:red">Сектор:</p>
+                            <label>Название сектора:</label>
+                            <br />
+                            <input required type="text" name="Sectors[0].NameSector" />
+                            <br />
+                            <label>Первый ряд:</label>
+                            <br />
+                            <input required type="number" name="Sectors[0].StartRow" />
+                            <br />
+                            <label>Последний ряд:</label>
+                            <br />
+                            <input required type="number" name="Sectors[0].EndRow" />
+                            <br />
+                            <label>Мест в одном ряде:</label>
+                            <br />
+                            <input required type="number" name="Sectors[0].CountSeatsRow" />
+                            <br />
+                            <label>Стоимость одного места:</label>
+                            <br />
+                            <input required type="number" name="Sectors[0].CostSeat" />
+                            <br />
+                        </div>
+                    </div>
+                    <input type="button" value="Еще сектор" id="addSector" />
+                    <input type="submit" value="Добавить" />
                 }
-            </select>
-            <br />
-            <label>Название зала:</label>
-            <br />
-            <input type="text" name="NameHall" />
-            <br />
-            <div id="sectors">
+            </div>
+            <div class="col-md-6">
                 <div>
-                    <p style="color:red">Сектор:</p>
-                    <label>Название сектора:</label>
-                    <br />
-                    <input required type="text" name="Sectors[0].NameSector" />
-                    <br />
-                    <label>Первый ряд:</label>
-                    <br />
-                    <input required type="number" name="Sectors[0].StartRow" />
-                    <br />
-                    <label>Последний ряд:</label>
-                    <br />
-                    <input required type="number" name="Sectors[0].EndRow" />
-                    <br />
-                    <label>Мест в одном ряде:</label>
-                    <br />
-                    <input required type="number" name="Sectors[0].CountSeatsRow" />
-                    <br />
-                    <label>Стоимость одного места:</label>
-                    <br />
-                    <input required type="number" name="Sectors[0].CostSeat" />
-                    <br />
+                    @using (Ajax.BeginForm("HallSearch", new AjaxOptions
+                    {
+                        UpdateTargetId = "result",
+                        LoadingElementId = "loading",
+                        LoadingElementDuration = 500
+                    }))
+                    {
+                        <label>Кинотеатр:</label>
+                        <input type="text" name="cinemaName" />
+                        <input type="submit" value="Вывести залы" />
+                    }
+                    <div id="loading" style="display:none; color:red; font-weight:bold;">
+                        <p>Поиск...</p>
+                    </div>
+                    <div id="result"></div>
                 </div>
             </div>
-            <input type="button" value="Еще сектор" id="addSector" />
-            <input type="submit" value="Добавить" />
-        }
-    </div>
-    <div class="col-md-6">
-        <div>
-            @using (Ajax.BeginForm("HallSearch", new AjaxOptions
-            {
-                UpdateTargetId = "result",
-                LoadingElementId = "loading",
-                LoadingElementDuration = 500
-            }))
-            {
-                <label>Кинотеатр:</label>
-                <input type="text" name="cinemaName" />
-                <input type="submit" value="Вывести залы" />
-            }
-            <div id="loading" style="display:none; color:red; font-weight:bold;">
-                <p>Поиск...</p>
-            </div>
-            <div id="result"></div>
         </div>
-    </div>
-</div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.jquery.min.js"></script>
+        <script>
+            $(".search").chosen();
+        </script>
+    </body>
+    </html>
+
 @Scripts.Render("~/scripts/jquery-3.4.1.min.js")
 @Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
 @section Scripts{

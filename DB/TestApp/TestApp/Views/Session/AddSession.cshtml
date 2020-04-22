@@ -3,38 +3,74 @@
     ViewBag.Title = "AddSession";
 }
 
-<h2>Добавление сеанса для кинотеатра "@ViewBag.Cinema.NameCinema":</h2>
-<div class="row">
-    <div class="col-md-6">
-        @using (Html.BeginForm())
-        {
-            <label>Зал: </label>
-            <select required name="HallId">
-                <option hidden></option>
-                @foreach (var hall in Model)
+    <html>
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.min.css" />
+    </head>
+    <body>
+        <h2>Добавление сеанса для кинотеатра "@ViewBag.Cinema.NameCinema":</h2>
+        <div class="row">
+            <div class="col-md-6">
+                @using (Html.BeginForm())
                 {
-                    <option value="@hall.IdHall">@hall.NameHall</option>
+                    <label>Зал: </label>
+                    <select style="min-width:200px" class="search" required name="HallId">
+                        <option hidden></option>
+                        @foreach (var hall in Model)
+                        {
+                            <option value="@hall.IdHall">@hall.NameHall</option>
+                        }
+                    </select>
+                    <br />
+                    <label>Фильм: </label>
+                    <select class="search" required id="Film" name="FilmId">
+                        <option hidden></option>
+                        @foreach (var film in ViewBag.Films)
+                        {
+                            <option value="@film.IdFilm">@film.NameFilm</option>
+                        }
+                    </select>
+                    <br />
+                    <label>Начало проведения сеанса: </label>
+                    <input required type="datetime-local" name="StartSession" />
+                    <br />
+                    <input type="submit" value="Добавить" />
                 }
-            </select>
-            <br />
-            <label>Фильм: </label>
-            <select required name="FilmId">
-                <option hidden></option>
-                @foreach (var film in ViewBag.Films)
-                {
-                    <option value="@film.IdFilm">@film.NameFilm</option>
-                }
-            </select>
-            <br />
-            <label>Начало проведения сеанса: </label>
-            <input type="datetime-local" name="StartSession"/>
-            <br />
-            <input type="submit" value="Добавить"/>
-        }
-
-    </div>
-    <div class="col-md-6">
-
-    </div>
-</div>
+            </div>
+            <div class="col-md-6">
+                <div>
+                    @using (Ajax.BeginForm("SessionSearch", new AjaxOptions
+                    {
+                        UpdateTargetId = "result",
+                        LoadingElementId = "loading",
+                        LoadingElementDuration = 300
+                    }))
+                    {
+                        <label>Зал кинотеатра:</label>
+                        <select style="min-width:200px" class="search" required name="HallId">
+                            <option hidden></option>
+                            @foreach (var hall in Model)
+                            {
+                                <option value="@hall.IdHall">@hall.NameHall</option>
+                            }
+                        </select>
+                        <input type="submit" value="Вывести сеансы" class="btn btn-primary" />
+                    }
+                    <div id="loading" style="display:none; color:red; font-weight:bold;">
+                        <p>Поиск...</p>
+                    </div>
+                    <div id="result"></div>
+                </div>
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.jquery.min.js"></script>
+        <script>
+            $(".search").chosen();
+        </script>
+    </body>
+    </html>
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
 

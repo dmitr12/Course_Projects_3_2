@@ -135,7 +135,39 @@ insert into SectorsHall(Hall, NameSector , StartRow, EndRow, CountSeatsRow, Cost
 values(hall, namesector, startrow, endrow, countseatsrow, costseat);
 commit;
 end;
-//////////////////////////
+
+create or replace procedure AddSession(
+film number,
+hall number,
+startsession Sessions.StartSession%type
+)
+as
+begin
+insert into Sessions(Film, Hall, StartSession) values(film, hall, startsession);
+commit;
+end;
+//////////check selects////
+select * from Sessions join Films on Film=IdFilm where Hall=4
+///////////СОЗДАНИЕ РОЛЕЙ//////////
+create role c##Role_Admin;
+
+grant create session to c##Role_Admin;
+grant all on Films to c##Role_Admin;
+grant all on FilmsGenres to c##Role_Admin;
+grant select on Genres to c##Role_Admin;
+grant all on CinemaAddresses to c##Role_Admin;
+grant all on MovieTheatres to c##Role_Admin;
+grant all on Halls to c##Role_Admin;
+grant all on Sessions to c##Role_Admin;
+grant all on SectorsHall to c##Role_Admin;
+grant all on Seats to c##Role_Admin;
+grant select on Users to c##Role_Admin;
+grant select on Tickets to c##Role_Admin;
+
+create user c##Admin identified by admin;
+
+grant c##Role_Admin to c##Admin;
+//////////////////////////////////
 insert into Genres(NameGenre, DescriptionGenre) values ('Биографический','Биографический фильм – жанр кинематографа, повествующий о судьбе какой-либо известной, выдающейся личности, оставившей свой след в истории. Некоторые биографические фильмы уделяют внимание лишь ключевым моментам из жизни главного героя, другие же начинают вести повествование с момента его рождения, чтобы показать, как формировался его характер под влиянием его родителей, учителей, друзей, детских потрясений, потерь, первой любви и т.п.');
 insert into Genres(NameGenre, DescriptionGenre) values ('Боевик','Боевик – кинематографический жанр, в котором главный герои или герои сталкиваются с рядом проблем, решить которые, не прибегнув к насилию, не удается. Фильмы боевики изобилуют насилием во всех его проявлениях, безумными погонями, дорогостоящими спецэффектами и сложными каскадерскими трюками. Главные герои часто оказываются в, казалось бы, безвыходных, смертельно опасных ситуациях, выбраться живыми из которых им удается благодаря их профессиональной подготовке, находчивости и решительности. В абсолютном большинстве боевиков добро торжествует, а злодеи погибают или оказываются за решеткой. Жанр боевика легко «смешивается» с любым другим жанром, однако лучше всего сочетается с приключенческими фильмами и триллерами.');
 insert into Genres(NameGenre, DescriptionGenre) values ('Фантастика','Фантастические фильмы – произведения игрового кинематографа, сюжет которых основывается на фантастических спекуляциях в области гуманитарных, естественных и технических наук. С помощью подобных спекуляций могут обосновываться те или иные явления, события и технологии, которые теоретически могут существовать уже сегодня или быть изобретены в будущем. Например: внеземные формы жизни, параллельные миры, экстрасенсорные способности, путешествия во времени, межзвездные путешествия, киборги, искусственный интеллект и тому подобное. Время развития событий в большинстве фантастических фильмов – ближайшее или отдаленное будущее.');

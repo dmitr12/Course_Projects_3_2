@@ -184,6 +184,19 @@ namespace TestApp.Models
             }
         }
 
+        public void AddSession(Session session)
+        {
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("AddSession", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@film", session.FilmId);
+                cmd.Parameters.Add("@hall", session.HallId);
+                cmd.Parameters.Add("@startsession", session.StartSession);
+                cmd.ExecuteNonQuery();
+            }
+        }
 
         public void AddSector(object idHall, Sector sector)
         {
@@ -261,6 +274,35 @@ namespace TestApp.Models
 
             }
             return halls;
+        }
+
+        public List<Session> GetSessionsByHallId(int hallId)
+        {
+            List<Session> sessions = new List<Session>();
+            string strCom = $"select * from Sessions join Films on Film=IdFilm where Hall={hallId} order by StartSession";
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand(strCom, con);
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    sessions.Add(new Session
+                    {
+                        IdSession = reader.GetInt32(0),
+                        FilmId=reader.GetInt32(1),
+                        Film = new Film
+                        {
+                            IdFilm = reader.GetInt32(1),
+                            NameFilm = reader.GetString(5),
+                            DurationMinutesFilm = reader.GetInt32(9)
+                        },
+                        HallId =reader.GetInt32(2),
+                        StartSession=reader.GetDateTime(3)
+                    });
+                }
+            }
+            return sessions;
         }
     }
 }

@@ -29,5 +29,12 @@ namespace TestApp.Controllers
             db.AddSession(session);
             return Content("Good!");
         }
+
+        [HttpPost]
+        public ActionResult SessionSearch(int HallId)
+        {
+            List<Session> sessions = db.GetSessionsByHallId(HallId);
+            return PartialView(sessions);
+        }
     }
 }
