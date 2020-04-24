@@ -5,12 +5,14 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using TestApp.Models;
+using TestApp.Utils;
 
 namespace TestApp.Controllers
 {
     public class AccountController : Controller
     {
         DatabaseWork db = new DatabaseWork("DefaultConnection");
+        HashAlgorithm md5 = new HashAlgorithm();
 
         public ActionResult Register()
         {
@@ -26,6 +28,7 @@ namespace TestApp.Controllers
                 User user = db.GetUser(model.Login);
                 if (user == null)
                 {
+                    model.Password = md5.GetHash(model.Password);
                     db.AddUser(model);
                     user = db.GetUser(model.Login);
                     if (user != null)
@@ -54,7 +57,7 @@ namespace TestApp.Controllers
                 User user = db.GetUser(model.Login);
                 if (user != null)
                 {
-                    if (user.Password != model.Password)
+                    if (!md5.CheckHash(model.Password, user.Password))
                     {
                         ModelState.AddModelError("", "Неправильный пароль");
                         return View(model);
