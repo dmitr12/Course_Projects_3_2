@@ -13,6 +13,7 @@ namespace TestApp.Controllers
     {
         DatabaseWork db = new DatabaseWork("DefaultConnection");
 
+        [Authorize(Roles ="User")]
         public ActionResult Index()
         {
             return View(db.SelectAllFilms());

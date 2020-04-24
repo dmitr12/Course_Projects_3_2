@@ -17,21 +17,10 @@ namespace TestApp.Models
             conString = WebConfigurationManager.ConnectionStrings[connectionString].ConnectionString;
         }
 
-        public string CheckDb()
-        {
-            string result="";
-            using(OracleConnection con=new OracleConnection(conString))
-            {
-                con.Open();
-                result += con.ServiceName + "\n" + con.State + "\n" + con.ServerVersion;
-            }
-            return result;
-        }
-
         public Genre GetGenre(int idGenre)
         {
             Genre genre=null;
-            string strCommand = $"select * from Genres where IdGenre={idGenre}";
+            string strCommand = $"select * from system.Genres where IdGenre={idGenre}";
             OracleConnection con = new OracleConnection(conString);
             con.Open();
             OracleCommand com = new OracleCommand(strCommand, con);
@@ -52,7 +41,7 @@ namespace TestApp.Models
         public Cinema GetCinema(int idCinema)
         {
             Cinema cinema = null;
-            string strCommand = $"select * from MovieTheatres where IdCinema={idCinema}";
+            string strCommand = $"select * from system.MovieTheatres where IdCinema={idCinema}";
             OracleConnection con = new OracleConnection(conString);
             con.Open();
             OracleCommand com = new OracleCommand(strCommand, con);
@@ -69,10 +58,55 @@ namespace TestApp.Models
             return cinema;
         }
 
+        public User GetUser(string login)
+        {
+            User user = null;
+            string strCommand = $"select * from system.Users where Login='{login}'";
+            OracleConnection con = new OracleConnection(conString);
+            con.Open();
+            OracleCommand com = new OracleCommand(strCommand, con);
+            OracleDataReader reader = com.ExecuteReader();
+            while (reader.Read())
+            {
+                user = new User
+                {
+                    IdUser=reader.GetInt32(0),
+                    Login=reader.GetString(1),
+                    Mail=reader.GetString(2),
+                    Password=reader.GetString(3),
+                    RoleOfUserId=reader.GetInt32(4)
+                };
+            }
+            con.Close();
+            return user;
+        }
+
+        public RoleOfUser GetRoleForUser(int idUser)
+        {
+            RoleOfUser role = null;
+            string strCommand = $"select * from system.Users join system.RolesOfUsers on RoleOfUser=IdRole" +
+                $" where IdUser={idUser}";
+            OracleConnection con = new OracleConnection(conString);
+            con.Open();
+            OracleCommand com = new OracleCommand(strCommand, con);
+            OracleDataReader reader = com.ExecuteReader();
+            while (reader.Read())
+            {
+                role = new RoleOfUser
+                {
+                    IdRole=reader.GetInt32(5),
+                    NameRole=reader.GetString(6),
+                    NameConnection=reader.GetString(7)
+                };
+            }
+            con.Close();
+            return role;
+        }
+
         public List<Film> SelectAllFilms()
         {
             List<Film> films = new List<Film>();
-            string strCommand = "select * from Films";
+            string strCommand = "select * from system.Films";
             using (OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
@@ -99,7 +133,7 @@ namespace TestApp.Models
         public List<Cinema> SelectAllCinemas()
         {
             List<Cinema> cinemas = new List<Cinema>();
-            string strCommand = "select * from MovieTheatres";
+            string strCommand = "select * from system.MovieTheatres";
             using (OracleConnection con = new OracleConnection(conString))
             {
                 con.Open();
@@ -123,7 +157,7 @@ namespace TestApp.Models
         public List<Genre> SelectAllGenre()
         {
             List<Genre> genres = new List<Genre>();
-            string strCommand = "select * from Genres";
+            string strCommand = "select * from system.Genres";
             using (OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
@@ -148,7 +182,7 @@ namespace TestApp.Models
         public List<Hall> SelectAllHallsCinema(int idCinema)
         {
             List<Hall> halls = new List<Hall>();
-            string strCommand = $"select * from Halls where Cinema={idCinema}";
+            string strCommand = $"select * from system.Halls where Cinema={idCinema}";
             using(OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
@@ -170,7 +204,7 @@ namespace TestApp.Models
 
         public void AddFilm(Film film/*, int[] selectedGenres*/)
         {
-            string filmCommand = "insert into Films(NameFilm,DescriptionFilm,Country,YearIssue,DurationMinutesFilm,Poster) " +
+            string filmCommand = "insert into system.Films(NameFilm,DescriptionFilm,Country,YearIssue,DurationMinutesFilm,Poster) " +
                 $"values('{film.NameFilm}', '{film.DescriptionFilm}', '{film.Country}', {film.YearIssue}, {film.DurationMinutesFilm}, :Poster)";
 
             using(OracleConnection con=new OracleConnection(conString))
@@ -189,11 +223,25 @@ namespace TestApp.Models
             using(OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
-                OracleCommand cmd = new OracleCommand("AddSession", con);
+                OracleCommand cmd = new OracleCommand("system.AddSession", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@film", session.FilmId);
                 cmd.Parameters.Add("@hall", session.HallId);
                 cmd.Parameters.Add("@startsession", session.StartSession);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void AddUser(RegisterModel user)
+        {
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.AddUser", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@login", user.Login);
+                cmd.Parameters.Add("@mail", user.Mail);
+                cmd.Parameters.Add("@password", user.Password);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -203,7 +251,7 @@ namespace TestApp.Models
             using(OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
-                OracleCommand cmd = new OracleCommand("AddSector", con);
+                OracleCommand cmd = new OracleCommand("system.AddSector", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@hall", idHall);
                 cmd.Parameters.Add("@namesector", sector.NameSector);
@@ -221,7 +269,7 @@ namespace TestApp.Models
             using(OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
-                OracleCommand cmd = new OracleCommand("AddHall", con);
+                OracleCommand cmd = new OracleCommand("system.AddHall", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@namehall", hall.NameHall);
                 cmd.Parameters.Add("@cinema", idCinema);
@@ -238,14 +286,14 @@ namespace TestApp.Models
             using(OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
-                OracleCommand com = new OracleCommand("AddCinemaAddress", con);
+                OracleCommand com = new OracleCommand("SYSTEM.AddCinemaAddress", con);
                 com.CommandType = CommandType.StoredProcedure;
                 com.Parameters.Add("@street", address.Street);
                 com.Parameters.Add("@numberhouse", address.NumberHouse);
                 com.Parameters.Add("@idAddr", OracleDbType.Int32).Direction=ParameterDirection.Output;
                 com.ExecuteNonQuery();
                 var idAddr = com.Parameters["@idAddr"].Value;
-                com = new OracleCommand("AddCinema", con);
+                com = new OracleCommand("SYSTEM.AddCinema", con);
                 com.CommandType = CommandType.StoredProcedure;
                 com.Parameters.Add("@namecinema", cinema.NameCinema);
                 com.Parameters.Add("@idAddr", idAddr);
@@ -256,7 +304,7 @@ namespace TestApp.Models
         public List<Hall> GetHallsByCinameName(string nameCinema)
         {
             List<Hall> halls = new List<Hall>();
-            string strCom= $"select * from Halls where Cinema=(select IdCinema from MovieTheatres where NameCinema='{nameCinema}')";
+            string strCom= $"select * from system.Halls where Cinema=(select IdCinema from system.MovieTheatres where NameCinema='{nameCinema}')";
             using(OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
@@ -279,7 +327,7 @@ namespace TestApp.Models
         public List<Session> GetSessionsByHallId(int hallId)
         {
             List<Session> sessions = new List<Session>();
-            string strCom = $"select * from Sessions join Films on Film=IdFilm where Hall={hallId} order by StartSession";
+            string strCom = $"select * from system.Sessions join system.Films on Film=IdFilm where Hall={hallId} order by StartSession";
             using(OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();

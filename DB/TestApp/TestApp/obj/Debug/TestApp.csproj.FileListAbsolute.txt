@@ -84,3 +84,9 @@ D:\CourseProjects32\Repository\DB\TestApp\TestApp\obj\Debug\TestApp.csprojAssemb
 D:\CourseProjects32\Repository\DB\TestApp\TestApp\obj\Debug\TestApp.csproj.CopyComplete
 D:\CourseProjects32\Repository\DB\TestApp\TestApp\obj\Debug\TestApp.dll
 D:\CourseProjects32\Repository\DB\TestApp\TestApp\obj\Debug\TestApp.pdb
+D:\CourseProjects32\Repository\DB\TestApp\TestApp\bin\EntityFramework.dll
+D:\CourseProjects32\Repository\DB\TestApp\TestApp\bin\EntityFramework.SqlServer.dll
+D:\CourseProjects32\Repository\DB\TestApp\TestApp\bin\System.Web.Providers.dll
+D:\CourseProjects32\Repository\DB\TestApp\TestApp\bin\EntityFramework.xml
+D:\CourseProjects32\Repository\DB\TestApp\TestApp\bin\EntityFramework.SqlServer.xml
+D:\CourseProjects32\Repository\DB\TestApp\TestApp\bin\System.Web.Providers.xml

@@ -50,11 +50,21 @@ constraint Film_Id_Sessions foreign key(Film) references Films(IdFilm),
 constraint Hall_Id_Sessions foreign key(Hall) references Halls(IdHall)
 );
 
+create table RolesOfUsers(
+IdRole number primary key,
+NameRole varchar(50) unique not null,
+NameConnection varchar(50) unique not null,
+constraint CheckNameRole_Roles check(NameRole in ('Admin','User')),
+constraint CheckNameConnection_Roles check(NameConnection in ('C##Admin', 'C##User'))
+);
+
 create table Users(
 IdUser number generated always as identity primary key,
 Login varchar(100) unique not null,
+Mail varchar(300) unique not null,
 Password clob not null,
-Status varchar(100) not null  ////Определение роли
+RoleOfUser number not null,
+constraint RoleOfUser_Users foreign key(RoleOfUser) references RolesOfUsers(IdRole)
 );
 
 create table SectorsHall(
@@ -101,7 +111,7 @@ end;
 
 create or replace procedure AddCinema(
 namecinema MovieTheatres.NameCinema%type,
-idAddr number,
+idAddr number
 )
 as
 begin
@@ -146,7 +156,18 @@ begin
 insert into Sessions(Film, Hall, StartSession) values(film, hall, startsession);
 commit;
 end;
-//////////check selects////
+
+create or replace procedure AddUser(
+login Users.Login%type,
+mail Users.Mail%type,
+password Users.Password%type
+)
+as
+begin
+insert into Users(Login, Mail, Password, RoleOfUser) values (login, mail, password, 2);
+commit;
+end;
+//////////check selects//// 
 select * from Sessions join Films on Film=IdFilm where Hall=4
 ///////////СОЗДАНИЕ РОЛЕЙ//////////
 create role c##Role_Admin;
@@ -161,18 +182,45 @@ grant all on Halls to c##Role_Admin;
 grant all on Sessions to c##Role_Admin;
 grant all on SectorsHall to c##Role_Admin;
 grant all on Seats to c##Role_Admin;
-grant select on Users to c##Role_Admin;
+grant all on Users to c##Role_Admin;
+grant select on RolesOfUsers to c##Role_Admin;
 grant select on Tickets to c##Role_Admin;
+grant execute on AddCinema to c##Role_Admin;
+grant execute on AddCinemaAddress to c##Role_Admin;
+grant execute on AddHall to c##Role_Admin;
+grant execute on AddSector to c##Role_Admin;
+grant execute on AddSession to c##Role_Admin;
 
 create user c##Admin identified by admin;
-
 grant c##Role_Admin to c##Admin;
+
+create role C##Role_User;
+grant create session to c##Role_User;
+grant select on Films to c##Role_User;
+grant select on FilmsGenres to c##Role_User;
+grant select on Genres to c##Role_User;
+grant select on CinemaAddresses to c##Role_User;
+grant select on MovieTheatres to c##Role_User;
+grant select on Halls to c##Role_User;
+grant select on Sessions to c##Role_User;
+grant select on RolesOfUsers to c##Role_User;
+grant all on Users to c##Role_User;
+grant select on SectorsHall to c##Role_User;
+grant select on Seats to c##Role_User;
+grant all on Tickets to c##Role_User;
+grant execute on AddUser to c##Role_User;
+
+create user C##User identified by user;
+grant C##Role_User to C##User;
 //////////////////////////////////
 insert into Genres(NameGenre, DescriptionGenre) values ('Биографический','Биографический фильм – жанр кинематографа, повествующий о судьбе какой-либо известной, выдающейся личности, оставившей свой след в истории. Некоторые биографические фильмы уделяют внимание лишь ключевым моментам из жизни главного героя, другие же начинают вести повествование с момента его рождения, чтобы показать, как формировался его характер под влиянием его родителей, учителей, друзей, детских потрясений, потерь, первой любви и т.п.');
 insert into Genres(NameGenre, DescriptionGenre) values ('Боевик','Боевик – кинематографический жанр, в котором главный герои или герои сталкиваются с рядом проблем, решить которые, не прибегнув к насилию, не удается. Фильмы боевики изобилуют насилием во всех его проявлениях, безумными погонями, дорогостоящими спецэффектами и сложными каскадерскими трюками. Главные герои часто оказываются в, казалось бы, безвыходных, смертельно опасных ситуациях, выбраться живыми из которых им удается благодаря их профессиональной подготовке, находчивости и решительности. В абсолютном большинстве боевиков добро торжествует, а злодеи погибают или оказываются за решеткой. Жанр боевика легко «смешивается» с любым другим жанром, однако лучше всего сочетается с приключенческими фильмами и триллерами.');
 insert into Genres(NameGenre, DescriptionGenre) values ('Фантастика','Фантастические фильмы – произведения игрового кинематографа, сюжет которых основывается на фантастических спекуляциях в области гуманитарных, естественных и технических наук. С помощью подобных спекуляций могут обосновываться те или иные явления, события и технологии, которые теоретически могут существовать уже сегодня или быть изобретены в будущем. Например: внеземные формы жизни, параллельные миры, экстрасенсорные способности, путешествия во времени, межзвездные путешествия, киборги, искусственный интеллект и тому подобное. Время развития событий в большинстве фантастических фильмов – ближайшее или отдаленное будущее.');
 insert into Genres(NameGenre, DescriptionGenre) values ('Триллер','Триллер – телевизионный и кинематографический жанр, с множеством поджанров. Характерной и определяющей чертой триллеров являются вызываемые ими чувства тревоги, неопределенности (саспенс), возбуждения и удивления. Хорошим примером этого жанра являются фильмы легендарного британского режиссера Альфреда Хичкока, лучшие работы которого хотя и были созданы более полувека назад, пользуются большой популярность и в наши дни.Общими элементами большинства фильмов этого жанра являются сокрытие важной информации от зрителя, ложные наводки, неожиданные сюжетные повороты и т.н. клиффхэнгеры (обрыв повествования на самом интересном, волнующем моменте). Лучшие фильмы триллеры держат зрителя в напряжении на протяжении всего фильма.');
 insert into Genres(NameGenre, DescriptionGenre) values ('Драма','Драматические фильмы – один из наиболее распространенных кинематографических жанров. Как правило, эти фильмы повествуют о частной жизни и социальных конфликтах персонажей, акцентируя внимание на воплощенных в их поступках и поведении общечеловеческих противоречиях. Характерной чертой жанра является приближенная к реальности стилистика и бытовой сюжет.');
+
+insert into RolesOfUsers(IdRole, NameRole, NameConnection) values(1, 'Admin','C##Admin');
+insert into RolesOfUsers(IdRole, NameRole, NameConnection) values(2, 'User','C##User');
 
 create or replace directory IMAGES as 'D:\CourseProjects32\Repository\DB';
 DECLARE
@@ -189,5 +237,3 @@ values('Я-легенда','США','25.12.2007','фантастика',96,EMPTY_BLOB) returning Post
    DBMS_LOB.FILECLOSE( V_FILE );
    COMMIT;
 END;
-
-select * from Films

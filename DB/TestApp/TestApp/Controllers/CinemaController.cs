@@ -10,6 +10,8 @@ namespace TestApp.Controllers
     public class CinemaController : Controller
     {
         DatabaseWork db = new DatabaseWork("DefaultConnection");
+
+        [Authorize(Roles ="Admin")]
         public ActionResult AddCinema()
         {
             return View();
