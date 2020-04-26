@@ -9,10 +9,11 @@ namespace TestApp.Controllers
 {
     public class HallController : Controller
     {
-        DatabaseWork db = new DatabaseWork("DefaultConnection");
+        DatabaseWork db = new DatabaseWork();
 
         public ActionResult AddHall()
         {
+            db.ConnectionString = User.Identity.Name;
             ViewBag.Cinemas = db.SelectAllCinemas();
             return View();
         }
@@ -20,6 +21,7 @@ namespace TestApp.Controllers
         [HttpPost]
         public ActionResult AddHall(int idCinema, Hall hall)
         {
+            db.ConnectionString = User.Identity.Name;
             db.AddHall(idCinema, hall);
             return Content("good");
         }
@@ -27,6 +29,7 @@ namespace TestApp.Controllers
         [HttpPost]
         public ActionResult HallSearch(string cinemaName)
         {
+            db.ConnectionString = User.Identity.Name;
             List<Hall> halls = db.GetHallsByCinameName(cinemaName);
             return PartialView(halls);
         }

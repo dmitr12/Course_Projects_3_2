@@ -9,7 +9,7 @@ namespace TestApp.Controllers
 {
     public class CinemaController : Controller
     {
-        DatabaseWork db = new DatabaseWork("DefaultConnection");
+        DatabaseWork db = new DatabaseWork();
 
         [Authorize(Roles ="Admin")]
         public ActionResult AddCinema()
@@ -22,6 +22,7 @@ namespace TestApp.Controllers
         {
             if(ModelState.IsValid)
             {
+                db.ConnectionString = User.Identity.Name;
                 db.AddCinema(cinema, address);
                 return Content("Good!");
             }
@@ -31,6 +32,7 @@ namespace TestApp.Controllers
         [HttpPost]
         public ActionResult GetAllCinemas()
         {
+            db.ConnectionString = User.Identity.Name;
             return PartialView(db.SelectAllCinemas());
         }
     }

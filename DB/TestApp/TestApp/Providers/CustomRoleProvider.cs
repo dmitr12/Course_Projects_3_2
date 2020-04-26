@@ -9,7 +9,7 @@ namespace TestApp.Providers
 {
     public class CustomRoleProvider : RoleProvider
     {
-        DatabaseWork db = new DatabaseWork("DefaultConnection");
+        DatabaseWork db = new DatabaseWork();
 
         public override string ApplicationName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
@@ -41,6 +41,7 @@ namespace TestApp.Providers
         public override string[] GetRolesForUser(string username)
         {
             string[] roles = new string[] { };
+            db.ConnectionString = "";
             User user = db.GetUser(username);
             if (user != null)
             {
@@ -59,6 +60,7 @@ namespace TestApp.Providers
         public override bool IsUserInRole(string username, string roleName)
         {
             bool isUserInRole = false;
+            db.ConnectionString = "";
             User user = db.GetUser(username);
             if(user!=null)
             {

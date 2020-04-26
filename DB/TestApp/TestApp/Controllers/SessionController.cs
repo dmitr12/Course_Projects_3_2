@@ -9,15 +9,17 @@ namespace TestApp.Controllers
 {
     public class SessionController : Controller
     {
-        DatabaseWork db = new DatabaseWork("DefaultConnection");
+        DatabaseWork db = new DatabaseWork();
 
         public ActionResult ChooseCinemaToAddSession()
         {
+            db.ConnectionString = User.Identity.Name;
             return View(db.SelectAllCinemas());
         }
 
         public ActionResult AddSession(int idCinema)
         {
+            db.ConnectionString = User.Identity.Name;
             ViewBag.Cinema = db.GetCinema(idCinema);
             ViewBag.Films = db.SelectAllFilms();
             return View(db.SelectAllHallsCinema(idCinema));
@@ -26,6 +28,7 @@ namespace TestApp.Controllers
         [HttpPost]
         public ActionResult AddSession(Session session)
         {
+            db.ConnectionString = User.Identity.Name;
             db.AddSession(session);
             return Content("Good!");
         }
@@ -33,6 +36,7 @@ namespace TestApp.Controllers
         [HttpPost]
         public ActionResult SessionSearch(int HallId)
         {
+            db.ConnectionString = User.Identity.Name;
             List<Session> sessions = db.GetSessionsByHallId(HallId);
             return PartialView(sessions);
         }

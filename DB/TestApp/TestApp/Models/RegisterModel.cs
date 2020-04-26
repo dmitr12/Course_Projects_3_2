@@ -20,8 +20,5 @@ namespace TestApp.Models
         [Display(Name ="Подтверждение пароля")]
         [Compare("Password")]
         public string ConfirmPassword { get; set; }
-        [Required]
-        [Display(Name = "Почта")]
-        public string Mail { get; set; }
     }
 }

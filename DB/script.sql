@@ -61,7 +61,6 @@ constraint CheckNameConnection_Roles check(NameConnection in ('C##Admin', 'C##Us
 create table Users(
 IdUser number generated always as identity primary key,
 Login varchar(100) unique not null,
-Mail varchar(300) unique not null,
 Password clob not null,
 RoleOfUser number not null,
 constraint RoleOfUser_Users foreign key(RoleOfUser) references RolesOfUsers(IdRole)
@@ -159,12 +158,11 @@ end;
 
 create or replace procedure AddUser(
 login Users.Login%type,
-mail Users.Mail%type,
 password Users.Password%type
 )
 as
 begin
-insert into Users(Login, Mail, Password, RoleOfUser) values (login, mail, password, 2);
+insert into Users(Login, Password, RoleOfUser) values (login, password, 2);
 commit;
 end;
 
@@ -180,6 +178,16 @@ as
 begin
 insert into system.Films(NameFilm,DescriptionFilm,Country,YearIssue,DurationMinutesFilm,Poster)
 values(namefilm, descriptionfilm, country, yearissue, durationminutesfilm, poster);
+commit;
+end;
+
+create or replace procedure ChangeUserPassword(
+lg Users.Login%type,
+newPsw Users.Password%type
+)
+as
+begin
+update Users set Password=newPsw where Login=lg;
 commit;
 end;
 
@@ -310,6 +318,7 @@ grant execute on GetRoleForUser to c##Role_Admin;
 grant execute on GetSessionsByHallId to c##Role_Admin;
 grant execute on GetUser to c##Role_Admin;
 grant execute on AddFilm to c##Role_Admin;
+grant execute on ChangeUserPassword to c##Role_Admin;
 
 create user c##Admin identified by admin;
 grant c##Role_Admin to c##Admin;
@@ -339,6 +348,7 @@ grant execute on GetHallsByCinameName to c##Role_User;
 grant execute on GetRoleForUser to c##Role_User;
 grant execute on GetSessionsByHallId to c##Role_User;
 grant execute on GetUser to c##Role_User;
+grant execute on ChangeUserPassword to c##Role_User;
 
 create user C##User identified by user;
 grant C##Role_User to C##User;
@@ -352,7 +362,7 @@ insert into Genres(NameGenre, DescriptionGenre) values ('Драма','Драматические ф
 insert into RolesOfUsers(IdRole, NameRole, NameConnection) values(1, 'Admin','C##Admin');
 insert into RolesOfUsers(IdRole, NameRole, NameConnection) values(2, 'User','C##User');
 
-insert into Users(Login, Mail, Password, RoleOfUser) values('Admin','dyrda.dmitrij@mail.ru','GaKFQUS2Oo92F6byJQGbEg==',1); --Пароль: 'admin'
+insert into Users(Login, Password, RoleOfUser) values('Admin','GaKFQUS2Oo92F6byJQGbEg==',1); --Пароль: 'admin'
 --Тема курсового
 create or replace directory IMAGES as 'D:\CourseProjects32\Repository\DB';
 DECLARE

@@ -144,6 +144,7 @@
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Cinema.cs" />
     <Compile Include="Models\DatabaseWork.cs" />
+    <Compile Include="Models\EditUserPassword.cs" />
     <Compile Include="Models\Film.cs" />
     <Compile Include="Models\Genre.cs" />
     <Compile Include="Models\Hall.cs" />
@@ -204,8 +205,9 @@
     <Content Include="Views\Session\AddSession.cshtml" />
     <Content Include="Views\Session\ChooseCinemaToAddSession.cshtml" />
     <Content Include="Views\Session\SessionSearch.cshtml" />
-    <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Account\Register.cshtml" />
+    <Content Include="Views\Account\EditPassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

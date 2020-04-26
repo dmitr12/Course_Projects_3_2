@@ -12,9 +12,16 @@ namespace TestApp.Models
     public class DatabaseWork
     {
         string conString;
-        public DatabaseWork(string connectionString)
+
+        public string ConnectionString
         {
-            conString = WebConfigurationManager.ConnectionStrings[connectionString].ConnectionString;
+            get { return conString; }
+            set
+            {
+                conString = value == "Admin" ?
+                WebConfigurationManager.ConnectionStrings["AdminDbConnection"].ConnectionString
+                : WebConfigurationManager.ConnectionStrings["UserDbConnection"].ConnectionString;
+            }
         }
 
         public Genre GetGenre(int idGenre)
@@ -80,9 +87,8 @@ namespace TestApp.Models
                 {
                     IdUser=reader.GetInt32(0),
                     Login=reader.GetString(1),
-                    Mail=reader.GetString(2),
-                    Password=reader.GetString(3),
-                    RoleOfUserId=reader.GetInt32(4)
+                    Password=reader.GetString(2),
+                    RoleOfUserId=reader.GetInt32(3)
                 };
             }
             con.Close();
@@ -103,9 +109,9 @@ namespace TestApp.Models
             {
                 role = new RoleOfUser
                 {
-                    IdRole=reader.GetInt32(5),
-                    NameRole=reader.GetString(6),
-                    NameConnection=reader.GetString(7)
+                    IdRole=reader.GetInt32(4),
+                    NameRole=reader.GetString(5),
+                    NameConnection=reader.GetString(6)
                 };
             }
             con.Close();
@@ -311,7 +317,6 @@ namespace TestApp.Models
                 OracleCommand cmd = new OracleCommand("system.AddUser", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@login", user.Login);
-                cmd.Parameters.Add("@mail", user.Mail);
                 cmd.Parameters.Add("@password", user.Password);
                 cmd.ExecuteNonQuery();
             }
@@ -368,6 +373,19 @@ namespace TestApp.Models
                 com.CommandType = CommandType.StoredProcedure;
                 com.Parameters.Add("@namecinema", cinema.NameCinema);
                 com.Parameters.Add("@idAddr", idAddr);
+                com.ExecuteNonQuery();
+            }
+        }
+
+        public void EditUserPassword(EditUserPassword eup)
+        {
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system.ChangeUserPassword", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@lg", eup.Login);
+                com.Parameters.Add("@newPsw", eup.NewPassword);
                 com.ExecuteNonQuery();
             }
         }

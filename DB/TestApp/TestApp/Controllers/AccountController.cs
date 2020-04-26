@@ -11,7 +11,7 @@ namespace TestApp.Controllers
 {
     public class AccountController : Controller
     {
-        DatabaseWork db = new DatabaseWork("DefaultConnection");
+        DatabaseWork db = new DatabaseWork();
         HashAlgorithm md5 = new HashAlgorithm();
 
         public ActionResult Register()
@@ -20,11 +20,11 @@ namespace TestApp.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Register(RegisterModel model)
         {
             if (ModelState.IsValid)
             {
+                db.ConnectionString = "";
                 User user = db.GetUser(model.Login);
                 if (user == null)
                 {
@@ -49,11 +49,11 @@ namespace TestApp.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Login(LoginModel model)
         {
             if (ModelState.IsValid)
             {
+                db.ConnectionString = "";
                 User user = db.GetUser(model.Login);
                 if (user != null)
                 {
@@ -64,6 +64,42 @@ namespace TestApp.Controllers
                     }
                     FormsAuthentication.SetAuthCookie(model.Login, false);
                     return RedirectToAction("Index", "Home");
+                }
+                else
+                    ModelState.AddModelError("", "Пользователь не зарегистрирован");
+            }
+            return View(model);
+        }
+
+        [Authorize]
+        public ActionResult SignOut()
+        {
+            FormsAuthentication.SignOut();
+            return RedirectToAction("Login");      
+        }
+
+        public ActionResult EditPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult EditPassword(EditUserPassword model)
+        {
+            if (ModelState.IsValid)
+            {
+                db.ConnectionString = "";
+                User user = db.GetUser(model.Login);
+                if (user != null)
+                {
+                    if(!md5.CheckHash(model.OldPassword, user.Password))
+                    {
+                        ModelState.AddModelError("", "Неверный старый пароль");
+                        return View(model);
+                    }
+                    model.NewPassword = md5.GetHash(model.NewPassword);
+                    db.EditUserPassword(model);
+                    return RedirectToAction("Login");
                 }
                 else
                     ModelState.AddModelError("", "Пользователь не зарегистрирован");
