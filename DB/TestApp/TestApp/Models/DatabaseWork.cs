@@ -20,31 +20,37 @@ namespace TestApp.Models
         public Genre GetGenre(int idGenre)
         {
             Genre genre=null;
-            string strCommand = $"select * from system.Genres where IdGenre={idGenre}";
-            OracleConnection con = new OracleConnection(conString);
-            con.Open();
-            OracleCommand com = new OracleCommand(strCommand, con);
-            OracleDataReader reader = com.ExecuteReader();
-            while (reader.Read())
+            using (OracleConnection con = new OracleConnection(conString))
             {
-                genre = new Genre
+                con.Open();
+                OracleCommand com = new OracleCommand("system.GetGenre", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@resultGenre",OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@gnr", idGenre);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
                 {
-                    IdGenre = reader.GetInt32(0),
-                    NameGenre = reader.GetString(1),
-                    DescriptionGenre = reader.GetString(2)
-                };
+                    genre = new Genre
+                    {
+                        IdGenre = reader.GetInt32(0),
+                        NameGenre = reader.GetString(1),
+                        DescriptionGenre = reader.GetString(2)
+                    };
+                }
+                reader.Close();
             }
-            con.Close();
             return genre;
         }
 
         public Cinema GetCinema(int idCinema)
         {
             Cinema cinema = null;
-            string strCommand = $"select * from system.MovieTheatres where IdCinema={idCinema}";
             OracleConnection con = new OracleConnection(conString);
             con.Open();
-            OracleCommand com = new OracleCommand(strCommand, con);
+            OracleCommand com = new OracleCommand("system.GetCinema", con);
+            com.CommandType = CommandType.StoredProcedure;
+            com.Parameters.Add("@resultCinema", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+            com.Parameters.Add("@cnm", idCinema);
             OracleDataReader reader = com.ExecuteReader();
             while (reader.Read())
             {
@@ -61,10 +67,12 @@ namespace TestApp.Models
         public User GetUser(string login)
         {
             User user = null;
-            string strCommand = $"select * from system.Users where Login='{login}'";
             OracleConnection con = new OracleConnection(conString);
             con.Open();
-            OracleCommand com = new OracleCommand(strCommand, con);
+            OracleCommand com = new OracleCommand("system.GetUser", con);
+            com.CommandType = CommandType.StoredProcedure;
+            com.Parameters.Add("@resultUser", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+            com.Parameters.Add("@nmUser", login);
             OracleDataReader reader = com.ExecuteReader();
             while (reader.Read())
             {
@@ -84,11 +92,12 @@ namespace TestApp.Models
         public RoleOfUser GetRoleForUser(int idUser)
         {
             RoleOfUser role = null;
-            string strCommand = $"select * from system.Users join system.RolesOfUsers on RoleOfUser=IdRole" +
-                $" where IdUser={idUser}";
             OracleConnection con = new OracleConnection(conString);
             con.Open();
-            OracleCommand com = new OracleCommand(strCommand, con);
+            OracleCommand com = new OracleCommand("system.GetRoleForUser", con);
+            com.CommandType = CommandType.StoredProcedure;
+            com.Parameters.Add("@resultRole", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+            com.Parameters.Add("@userId", idUser);
             OracleDataReader reader = com.ExecuteReader();
             while (reader.Read())
             {
@@ -106,11 +115,12 @@ namespace TestApp.Models
         public List<Film> SelectAllFilms()
         {
             List<Film> films = new List<Film>();
-            string strCommand = "select * from system.Films";
             using (OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
-                OracleCommand com = new OracleCommand(strCommand, con);
+                OracleCommand com = new OracleCommand("system.GetAllFilms", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@allFilms", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
                 OracleDataReader reader = com.ExecuteReader();
                 while (reader.Read())
                 {
@@ -133,11 +143,12 @@ namespace TestApp.Models
         public List<Cinema> SelectAllCinemas()
         {
             List<Cinema> cinemas = new List<Cinema>();
-            string strCommand = "select * from system.MovieTheatres";
             using (OracleConnection con = new OracleConnection(conString))
             {
                 con.Open();
-                OracleCommand com = new OracleCommand(strCommand, con);
+                OracleCommand com = new OracleCommand("system.GetAllCinemas", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@allCinemas", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
                 using (var reader = com.ExecuteReader())
                 {
                     while (reader.Read())
@@ -157,11 +168,12 @@ namespace TestApp.Models
         public List<Genre> SelectAllGenre()
         {
             List<Genre> genres = new List<Genre>();
-            string strCommand = "select * from system.Genres";
             using (OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
-                OracleCommand com = new OracleCommand(strCommand, con);
+                OracleCommand com = new OracleCommand("system.GetAllGenres", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@allGenres", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
                 using (var reader=com.ExecuteReader())
                 {
                     while(reader.Read())
@@ -182,11 +194,13 @@ namespace TestApp.Models
         public List<Hall> SelectAllHallsCinema(int idCinema)
         {
             List<Hall> halls = new List<Hall>();
-            string strCommand = $"select * from system.Halls where Cinema={idCinema}";
             using(OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
-                OracleCommand com = new OracleCommand(strCommand, con);
+                OracleCommand com = new OracleCommand("system.GetAllHallsCinema", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@allHallsCinema", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@cnm", idCinema);
                 using (OracleDataReader reader = com.ExecuteReader())
                 {
                     while (reader.Read())
@@ -202,19 +216,76 @@ namespace TestApp.Models
             return halls;
         }
 
-        public void AddFilm(Film film/*, int[] selectedGenres*/)
+        public List<Hall> GetHallsByCinameName(string nameCinema)
         {
-            string filmCommand = "insert into system.Films(NameFilm,DescriptionFilm,Country,YearIssue,DurationMinutesFilm,Poster) " +
-                $"values('{film.NameFilm}', '{film.DescriptionFilm}', '{film.Country}', {film.YearIssue}, {film.DurationMinutesFilm}, :Poster)";
+            List<Hall> halls = new List<Hall>();
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.GetHallsByCinameName", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@hallsCinema", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                cmd.Parameters.Add("@cnmName", nameCinema);
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    halls.Add(new Hall()
+                    {
+                        IdHall = reader.GetInt32(0),
+                        NameHall = reader.GetString(1),
+                        CinemaId = reader.GetInt32(2)
+                    });
+                }
 
+            }
+            return halls;
+        }
+
+        public List<Session> GetSessionsByHallId(int hallId)
+        {
+            List<Session> sessions = new List<Session>();
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.GetSessionsByHallId", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@resultSessions", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                cmd.Parameters.Add("@hlId", hallId);
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    sessions.Add(new Session
+                    {
+                        IdSession = reader.GetInt32(0),
+                        FilmId = reader.GetInt32(1),
+                        Film = new Film
+                        {
+                            IdFilm = reader.GetInt32(1),
+                            NameFilm = reader.GetString(5),
+                            DurationMinutesFilm = reader.GetInt32(9)
+                        },
+                        HallId = reader.GetInt32(2),
+                        StartSession = reader.GetDateTime(3)
+                    });
+                }
+            }
+            return sessions;
+        }
+
+        public void AddFilm(Film film)
+        {  
             using(OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
-                using (OracleCommand cmd=new OracleCommand(filmCommand, con))
-                {
-                    cmd.Parameters.Add("Poster", OracleDbType.Blob, film.Poster, ParameterDirection.Input);
-                    cmd.ExecuteNonQuery();
-                }
+                OracleCommand cmd = new OracleCommand("system.AddFilm", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@namefilm", film.NameFilm);
+                cmd.Parameters.Add("@descriptionfilm", film.DescriptionFilm);
+                cmd.Parameters.Add("@country", film.Country);
+                cmd.Parameters.Add("@yearissue", film.YearIssue);
+                cmd.Parameters.Add("@durationminutesfilm", film.DurationMinutesFilm);
+                cmd.Parameters.Add("@poster",OracleDbType.Blob, film.Poster, ParameterDirection.Input);
+                cmd.ExecuteNonQuery();
             }
         }
 
@@ -299,58 +370,6 @@ namespace TestApp.Models
                 com.Parameters.Add("@idAddr", idAddr);
                 com.ExecuteNonQuery();
             }
-        }
-
-        public List<Hall> GetHallsByCinameName(string nameCinema)
-        {
-            List<Hall> halls = new List<Hall>();
-            string strCom= $"select * from system.Halls where Cinema=(select IdCinema from system.MovieTheatres where NameCinema='{nameCinema}')";
-            using(OracleConnection con=new OracleConnection(conString))
-            {
-                con.Open();
-                OracleCommand cmd = new OracleCommand(strCom, con);
-                OracleDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    halls.Add(new Hall()
-                    {
-                        IdHall = reader.GetInt32(0),
-                        NameHall = reader.GetString(1),
-                        CinemaId = reader.GetInt32(2)
-                    });
-                }
-
-            }
-            return halls;
-        }
-
-        public List<Session> GetSessionsByHallId(int hallId)
-        {
-            List<Session> sessions = new List<Session>();
-            string strCom = $"select * from system.Sessions join system.Films on Film=IdFilm where Hall={hallId} order by StartSession";
-            using(OracleConnection con=new OracleConnection(conString))
-            {
-                con.Open();
-                OracleCommand cmd = new OracleCommand(strCom, con);
-                OracleDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    sessions.Add(new Session
-                    {
-                        IdSession = reader.GetInt32(0),
-                        FilmId=reader.GetInt32(1),
-                        Film = new Film
-                        {
-                            IdFilm = reader.GetInt32(1),
-                            NameFilm = reader.GetString(5),
-                            DurationMinutesFilm = reader.GetInt32(9)
-                        },
-                        HallId =reader.GetInt32(2),
-                        StartSession=reader.GetDateTime(3)
-                    });
-                }
-            }
-            return sessions;
         }
     }
 }

@@ -96,7 +96,7 @@ constraint Session_Id_Tickets foreign key(SessionId) references Sessions(IdSessi
 constraint Seat_Id_Tickets foreign key(SeatId) references Seats(IdSeat)
 ); 
 
-///////////////////////////////Процедуры
+--Процедуры и функции
 create or replace procedure AddCinemaAddress(
 street CinemaAddresses.Street%type,
 numberhouse CinemaAddresses.NumberHouse%type, 
@@ -167,9 +167,118 @@ begin
 insert into Users(Login, Mail, Password, RoleOfUser) values (login, mail, password, 2);
 commit;
 end;
-//////////check selects//// 
+
+create or replace procedure AddFilm(
+namefilm Films.NameFilm%type,
+descriptionfilm Films.DescriptionFilm%type,
+country Films.Country%type,
+yearissue Films.YearIssue%type,
+durationminutesfilm Films.DurationMinutesFilm%type,
+poster Films.Poster%type
+)
+as
+begin
+insert into system.Films(NameFilm,DescriptionFilm,Country,YearIssue,DurationMinutesFilm,Poster)
+values(namefilm, descriptionfilm, country, yearissue, durationminutesfilm, poster);
+commit;
+end;
+
+--------------
+
+create or replace function GetGenre(gnr number)
+return SYS_REFCURSOR
+is
+resultGenre SYS_REFCURSOR;
+begin
+open resultGenre for select * from Genres where IdGenre=gnr;
+return resultGenre;
+end GetGenre;
+
+create or replace function GetCinema(cnm number)
+return SYS_REFCURSOR
+is
+resultCinema SYS_REFCURSOR;
+begin
+open resultCinema for select * from MovieTheatres where IdCinema=cnm;
+return resultCinema;
+end GetCinema;
+
+create or replace function GetUser(nmUser varchar)
+return SYS_REFCURSOR
+is
+resultUser SYS_REFCURSOR;
+begin
+open resultUser for select * from Users where Login=nmUser;
+return resultUser;
+end;
+
+create or replace function GetRoleForUser(userId number)
+return SYS_REFCURSOR
+is
+resultRole SYS_REFCURSOR;
+begin
+open resultRole for select * from Users join RolesOfUsers on RoleOfUser=IdRole where IdUser=userId;
+return resultRole;
+end;
+
+create or replace function GetAllFilms
+return SYS_REFCURSOR
+is
+allFilms SYS_REFCURSOR;
+begin
+open allFilms for select * from Films;
+return allFilms;
+end;
+
+create or replace function GetAllCinemas
+return SYS_REFCURSOR
+is
+allCinemas SYS_REFCURSOR;
+begin
+open allCinemas for select * from MovieTheatres;
+return allCinemas;
+end;
+
+create or replace function GetAllGenres
+return SYS_REFCURSOR
+is
+allGenres SYS_REFCURSOR;
+begin
+open allGenres for select * from Genres;
+return allGenres;
+end;
+
+create or replace function GetAllHallsCinema(cnm number)
+return SYS_REFCURSOR
+is
+allHallsCinema SYS_REFCURSOR;
+begin
+open allHallsCinema for select * from Halls where Cinema=cnm;
+return allHallsCinema;
+end;
+
+create or replace function GetHallsByCinameName(cnmName varchar)
+return SYS_REFCURSOR
+is
+hallsCinema SYS_REFCURSOR;
+begin
+open hallsCinema for select * from Halls where Cinema=(select IdCinema from MovieTheatres where NameCinema=cnmName);
+return hallsCinema;
+end;
+
+create or replace function GetSessionsByHallId(hlId number)
+return SYS_REFCURSOR
+is
+resultSessions SYS_REFCURSOR;
+begin
+open resultSessions for select * from Sessions join Films on Film=IdFilm where Hall=hlId order by StartSession;
+return resultSessions;
+end;
+
+select GetSessionsByHallId(4) from dual
+--Проверка SELECTS
 select * from Sessions join Films on Film=IdFilm where Hall=4
-///////////СОЗДАНИЕ РОЛЕЙ//////////
+--Создание ролей
 create role c##Role_Admin;
 
 grant create session to c##Role_Admin;
@@ -190,6 +299,17 @@ grant execute on AddCinemaAddress to c##Role_Admin;
 grant execute on AddHall to c##Role_Admin;
 grant execute on AddSector to c##Role_Admin;
 grant execute on AddSession to c##Role_Admin;
+grant execute on GetGenre to c##Role_Admin;
+grant execute on GetCinema to c##Role_Admin;
+grant execute on GetAllCinemas to c##Role_Admin;
+grant execute on GetAllFilms to c##Role_Admin;
+grant execute on GetAllGenres to c##Role_Admin;
+grant execute on GetAllHallsCinema to c##Role_Admin;
+grant execute on GetHallsByCinameName to c##Role_Admin;
+grant execute on GetRoleForUser to c##Role_Admin;
+grant execute on GetSessionsByHallId to c##Role_Admin;
+grant execute on GetUser to c##Role_Admin;
+grant execute on AddFilm to c##Role_Admin;
 
 create user c##Admin identified by admin;
 grant c##Role_Admin to c##Admin;
@@ -209,10 +329,20 @@ grant select on SectorsHall to c##Role_User;
 grant select on Seats to c##Role_User;
 grant all on Tickets to c##Role_User;
 grant execute on AddUser to c##Role_User;
+grant execute on GetGenre to c##Role_User;
+grant execute on GetCinema to c##Role_User;
+grant execute on GetAllCinemas to c##Role_User;
+grant execute on GetAllFilms to c##Role_User;
+grant execute on GetAllGenres to c##Role_User;
+grant execute on GetAllHallsCinema to c##Role_User;
+grant execute on GetHallsByCinameName to c##Role_User;
+grant execute on GetRoleForUser to c##Role_User;
+grant execute on GetSessionsByHallId to c##Role_User;
+grant execute on GetUser to c##Role_User;
 
 create user C##User identified by user;
 grant C##Role_User to C##User;
-////////////INSERTS///////////////////
+--Вставка данных
 insert into Genres(NameGenre, DescriptionGenre) values ('Биографический','Биографический фильм – жанр кинематографа, повествующий о судьбе какой-либо известной, выдающейся личности, оставившей свой след в истории. Некоторые биографические фильмы уделяют внимание лишь ключевым моментам из жизни главного героя, другие же начинают вести повествование с момента его рождения, чтобы показать, как формировался его характер под влиянием его родителей, учителей, друзей, детских потрясений, потерь, первой любви и т.п.');
 insert into Genres(NameGenre, DescriptionGenre) values ('Боевик','Боевик – кинематографический жанр, в котором главный герои или герои сталкиваются с рядом проблем, решить которые, не прибегнув к насилию, не удается. Фильмы боевики изобилуют насилием во всех его проявлениях, безумными погонями, дорогостоящими спецэффектами и сложными каскадерскими трюками. Главные герои часто оказываются в, казалось бы, безвыходных, смертельно опасных ситуациях, выбраться живыми из которых им удается благодаря их профессиональной подготовке, находчивости и решительности. В абсолютном большинстве боевиков добро торжествует, а злодеи погибают или оказываются за решеткой. Жанр боевика легко «смешивается» с любым другим жанром, однако лучше всего сочетается с приключенческими фильмами и триллерами.');
 insert into Genres(NameGenre, DescriptionGenre) values ('Фантастика','Фантастические фильмы – произведения игрового кинематографа, сюжет которых основывается на фантастических спекуляциях в области гуманитарных, естественных и технических наук. С помощью подобных спекуляций могут обосновываться те или иные явления, события и технологии, которые теоретически могут существовать уже сегодня или быть изобретены в будущем. Например: внеземные формы жизни, параллельные миры, экстрасенсорные способности, путешествия во времени, межзвездные путешествия, киборги, искусственный интеллект и тому подобное. Время развития событий в большинстве фантастических фильмов – ближайшее или отдаленное будущее.');
@@ -223,7 +353,7 @@ insert into RolesOfUsers(IdRole, NameRole, NameConnection) values(1, 'Admin','C#
 insert into RolesOfUsers(IdRole, NameRole, NameConnection) values(2, 'User','C##User');
 
 insert into Users(Login, Mail, Password, RoleOfUser) values('Admin','dyrda.dmitrij@mail.ru','GaKFQUS2Oo92F6byJQGbEg==',1); --Пароль: 'admin'
-//////////////////////////////////////
+--Тема курсового
 create or replace directory IMAGES as 'D:\CourseProjects32\Repository\DB';
 DECLARE
   V_BLOB      BLOB; 
