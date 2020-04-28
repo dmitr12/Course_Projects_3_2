@@ -18,24 +18,8 @@
                         <li>@Html.ActionLink("Домашняя страница", "Index", "Home")</li>
                         @if (User.Identity.Name == "Admin")
                         {
-                            <li class="dropdown">
-                                <a href="#" data-toggle="dropdown" class="dropdown-toggle">
-                                    Кинотеатры
-                                    <b class="caret"></b>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>@Html.ActionLink("Добавить", "AddCinema", "Cinema")</li>
-                                </ul>
-                            </li>
-                            <li class="dropdown">
-                                <a href="#" data-toggle="dropdown" class="dropdown-toggle">
-                                    Залы
-                                    <b class="caret"></b>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>@Html.ActionLink("Добавить", "AddHall", "Hall")</li>
-                                </ul>
-                            </li>
+                            <li>@Html.ActionLink("Кинотеатры","Index","Cinema")</li>
+                            <li>@Html.ActionLink("Залы","Index","Hall")</li>
                             <li class="dropdown">
                                 <a href="#" data-toggle="dropdown" class="dropdown-toggle">
                                     Сеансы

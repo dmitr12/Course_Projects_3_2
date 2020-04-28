@@ -21,24 +21,34 @@ constraint Film_Id_FilmsGenres foreign key(IdF) references Films(IdFilm),
 constraint Genre_Id_FilmsGenres foreign key(IdG) references Genres(IdGenre)
 ); 
 
+drop table Halls;
+drop table SectorsHall;
+drop table Sessions;
+drop table Seats;
+drop table Tickets;
+
 create table CinemaAddresses(
 IdAddress number generated always as identity primary key,
 Street varchar(150) not null,
-NumberHouse number not null
+NumberHouse number not null,
+constraint Уникальность_Адреса unique(Street, NumberHouse)
 );
 
 create table MovieTheatres(
 IdCinema number generated always as identity primary key,
 NameCinema varchar(100) not null,
 Address number not null,
-constraint Address_Id_MovieTheatres foreign key(Address) references CinemaAddresses(IdAddress)
+constraint Адрес_Кинотеатра foreign key(Address) references CinemaAddresses(IdAddress),
+constraint Уникальное_Название_Кинотеатра unique(NameCinema),
+constraint Уникальный_Адрес_Кинотеатра unique(Address)
 ); 
 
 create table Halls(
 IdHall number generated always as identity primary key,
 NameHall varchar(150) not null,
 Cinema number not null,
-constraint Cinema_Id_Halls foreign key(Cinema) references MovieTheatres(IdCinema)
+constraint Кинотеатр_Зала foreign key(Cinema) references MovieTheatres(IdCinema),
+constraint Уникальный_Зал_В_Кинотеатре unique(NameHall, Cinema)
 ); 	
 
 create table Sessions(
@@ -74,7 +84,8 @@ StartRow number not null,
 EndRow number not null,
 CountSeatsRow number not null,
 CostSeat number not null,
-constraint Hall_Id_SectorsHall foreign key(Hall) references Halls(IdHall)
+constraint Зал_сектора foreign key(Hall) references Halls(IdHall),
+constraint Уникальный_сектор_зала unique(NameSector, Hall)
 );
 
 create table Seats(
@@ -115,6 +126,27 @@ idAddr number
 as
 begin
 insert into MovieTheatres(NameCinema, Address) values(namecinema, idAddr);
+commit;
+end;
+
+create or replace procedure EditCinema(
+idEditCinema number,
+newName MovieTheatres.NameCinema%type
+)
+as
+begin
+update MovieTheatres set NameCinema=newName where IdCinema=idEditCinema;
+commit;
+end;
+
+create or replace procedure EditAddress(
+idEditAddress number,
+newStreet CinemaAddresses.Street%type,
+newNumberHouse CinemaAddresses.NumberHouse%type
+)
+as
+begin
+update CinemaAddresses set street=newStreet, NumberHouse=newNumberHouse where IdAddress=idEditAddress;
 commit;
 end;
 
@@ -207,7 +239,7 @@ return SYS_REFCURSOR
 is
 resultCinema SYS_REFCURSOR;
 begin
-open resultCinema for select * from MovieTheatres where IdCinema=cnm;
+open resultCinema for select * from MovieTheatres join CinemaAddresses on Address=IdAddress where IdCinema=cnm;
 return resultCinema;
 end GetCinema;
 
@@ -243,7 +275,7 @@ return SYS_REFCURSOR
 is
 allCinemas SYS_REFCURSOR;
 begin
-open allCinemas for select * from MovieTheatres;
+open allCinemas for select * from MovieTheatres join CinemaAddresses on Address=IdAddress;
 return allCinemas;
 end;
 
@@ -261,10 +293,10 @@ return SYS_REFCURSOR
 is
 allHallsCinema SYS_REFCURSOR;
 begin
-open allHallsCinema for select * from Halls where Cinema=cnm;
+open allHallsCinema for select * from Halls join SectorsHall on IdHall=Hall where Cinema=cnm order by IdHall;
 return allHallsCinema;
 end;
-
+select getallhallscinema(2) from dual
 create or replace function GetHallsByCinameName(cnmName varchar)
 return SYS_REFCURSOR
 is
@@ -283,7 +315,16 @@ open resultSessions for select * from Sessions join Films on Film=IdFilm where H
 return resultSessions;
 end;
 
-select GetSessionsByHallId(4) from dual
+create or replace function GetCinemasByName(
+nmCnm MovieTheatres.NameCinema%type)
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select * from MovieTheatres join CinemaAddresses on Address=IdAddress where NameCinema=nmCnm;
+return res;
+end;
+
 --Проверка SELECTS
 select * from Sessions join Films on Film=IdFilm where Hall=4
 --Создание ролей
@@ -319,6 +360,9 @@ grant execute on GetSessionsByHallId to c##Role_Admin;
 grant execute on GetUser to c##Role_Admin;
 grant execute on AddFilm to c##Role_Admin;
 grant execute on ChangeUserPassword to c##Role_Admin;
+grant execute on GetCinemasByName to c##Role_Admin;
+grant execute on EditAddress to c##Role_Admin;
+grant execute on EditCinema to c##Role_Admin;
 
 create user c##Admin identified by admin;
 grant c##Role_Admin to c##Admin;
@@ -349,6 +393,7 @@ grant execute on GetRoleForUser to c##Role_User;
 grant execute on GetSessionsByHallId to c##Role_User;
 grant execute on GetUser to c##Role_User;
 grant execute on ChangeUserPassword to c##Role_User;
+grant execute on GetCinemasByName to c##Role_User;
 
 create user C##User identified by user;
 grant C##Role_User to C##User;

@@ -1,0 +1,29 @@
+﻿@model IEnumerable<TestApp.Models.Cinema>
+
+@{
+    ViewBag.Title = "Список кинотеатров";
+}
+
+<h2></h2>
+<p>
+    @Html.ActionLink("Добавить кинотеатр", "AddCinema")
+</p>
+<div>
+    @using (Ajax.BeginForm("GetAllCinemas", new AjaxOptions
+    {
+        UpdateTargetId = "result",
+        LoadingElementId = "loading",
+        LoadingElementDuration = 300
+    }))
+    {
+        <input type="text" name="nameCinema" placeholder="Название кинотеатра" />
+        <input class="btn btn-primary" type="submit" value="Вывести список кинотеатров" />
+    }
+    <div id="loading" style="display:none; color:red; font-weight:bold;">
+        <p>Выборка...</p>
+    </div>
+    <div id="result"></div>
+</div>
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+

@@ -61,10 +61,18 @@ namespace TestApp.Models
             OracleDataReader reader = com.ExecuteReader();
             while (reader.Read())
             {
+
                 cinema = new Cinema
                 {
                     IdCinema = reader.GetInt32(0),
-                    NameCinema = reader.GetString(1)
+                    NameCinema = reader.GetString(1),
+                    AddressId=reader.GetInt32(2)
+                };
+                cinema.Address = new Address
+                {
+                    IdAddress = reader.GetInt32(3),
+                    Street = reader.GetString(4),
+                    NumberHouse = reader.GetInt32(5)
                 };
             }
             con.Close();
@@ -159,10 +167,17 @@ namespace TestApp.Models
                 {
                     while (reader.Read())
                     {
-                        Cinema cinema = new Cinema()
+                        Cinema cinema = new Cinema
                         {
-                            IdCinema=reader.GetInt32(0),
-                            NameCinema=reader.GetString(1)
+                            IdCinema = reader.GetInt32(0),
+                            NameCinema = reader.GetString(1),
+                            AddressId = reader.GetInt32(2)
+                        };
+                        cinema.Address = new Address
+                        {
+                            IdAddress = reader.GetInt32(3),
+                            Street = reader.GetString(4),
+                            NumberHouse = reader.GetInt32(5)
                         };
                         cinemas.Add(cinema);
                     }
@@ -200,6 +215,9 @@ namespace TestApp.Models
         public List<Hall> SelectAllHallsCinema(int idCinema)
         {
             List<Hall> halls = new List<Hall>();
+            List<Sector> sectors = new List<Sector>();
+            Hall hall = null;
+            int idHall = 0;
             using(OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
@@ -211,15 +229,39 @@ namespace TestApp.Models
                 {
                     while (reader.Read())
                     {
-                        halls.Add(new Hall
+                        int prev = idHall;
+                        int hl = reader.GetInt32(0);
+                        if (hall != null)
+                            halls.Add(hall);
+                        List<Hall> hls = halls.Where(h => h.IdHall == hl).ToList();
+                        if (hls.Count == 0)
                         {
-                            IdHall = reader.GetInt32(0),
-                            NameHall = reader.GetString(1)
-                        });
+                            hall = new Hall
+                            {
+                                IdHall = reader.GetInt32(0),
+                                NameHall = reader.GetString(1)
+                            };                       
+                        }
+                        if (idHall == prev || idHall == hl)
+                        {
+                            hall.Sectors.Add(new Sector
+                            {
+                                IdSector=reader.GetInt32(3),
+                                HallId=reader.GetInt32(4),
+                                NameSector=reader.GetString(5),
+                                StartRow=reader.GetInt32(6),
+                                EndRow=reader.GetInt32(7),
+                                CountSeatsRow=reader.GetInt32(8),
+                                CostSeat=reader.GetInt32(9)
+                            });
+                        }
+                        idHall = hl;
                     }
+                    if(!halls.Contains(hall))
+                        halls.Add(hall);
                 }
             }
-            return halls;
+            return halls.Distinct().ToList();
         }
 
         public List<Hall> GetHallsByCinameName(string nameCinema)
@@ -276,6 +318,36 @@ namespace TestApp.Models
                 }
             }
             return sessions;
+        }
+
+        public Cinema GetCinemaByName(string nameCinema)
+        {
+            Cinema cinema = null;
+            OracleConnection con = new OracleConnection(conString);
+            con.Open();
+            OracleCommand com = new OracleCommand("system.GetCinemasByName", con);
+            com.CommandType = CommandType.StoredProcedure;
+            com.Parameters.Add("@result", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+            com.Parameters.Add("@nmCnm", nameCinema);
+            OracleDataReader reader = com.ExecuteReader();
+            while (reader.Read())
+            {
+
+                cinema = new Cinema
+                {
+                    IdCinema = reader.GetInt32(0),
+                    NameCinema = reader.GetString(1),
+                    AddressId = reader.GetInt32(2)
+                };
+                cinema.Address = new Address
+                {
+                    IdAddress = reader.GetInt32(3),
+                    Street = reader.GetString(4),
+                    NumberHouse = reader.GetInt32(5)
+                };
+            }
+            con.Close();
+            return cinema;
         }
 
         public void AddFilm(Film film)
@@ -373,6 +445,25 @@ namespace TestApp.Models
                 com.CommandType = CommandType.StoredProcedure;
                 com.Parameters.Add("@namecinema", cinema.NameCinema);
                 com.Parameters.Add("@idAddr", idAddr);
+                com.ExecuteNonQuery();
+            }
+        }
+
+        public void EditCinema(Cinema cinema, Address address)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("SYSTEM.EditAddress", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@idEditAddress", cinema.AddressId);
+                com.Parameters.Add("@newStreet", address.Street);
+                com.Parameters.Add("@newNumberHouse", address.NumberHouse);
+                com.ExecuteNonQuery();
+                com = new OracleCommand("SYSTEM.EditCinema", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@idEditCinema", cinema.IdCinema);
+                com.Parameters.Add("@newName", cinema.NameCinema);
                 com.ExecuteNonQuery();
             }
         }

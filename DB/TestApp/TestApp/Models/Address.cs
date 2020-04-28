@@ -11,9 +11,12 @@ namespace TestApp.Models
         public int IdAddress { get; set; }
 
         [Required]
+        [Display(Name ="Улица")]
         public string Street { get; set; }
 
         [Required]
+        [Display(Name ="Номер дома")]
+        [Range(1,int.MaxValue)]
         public int NumberHouse { get; set; }
     }
 }

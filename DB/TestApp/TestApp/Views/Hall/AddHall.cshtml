@@ -14,6 +14,7 @@
             <div class="col-md-6">
                 @using (Html.BeginForm())
                 {
+                    @Html.ValidationSummary(true);
                     <label>Название кинотеатра:</label>
                     <br />
                     <select style="min-width:150px" class="search" required name="idCinema">
@@ -26,8 +27,7 @@
                     <br />
                     <label>Название зала:</label>
                     <br />
-                    <input type="text" name="NameHall" />
-                    <br />
+                    <input type="text" required name="NameHall" />
                     <div id="sectors">
                         <div>
                             <p style="color:red">Сектор:</p>
@@ -37,7 +37,7 @@
                             <br />
                             <label>Первый ряд:</label>
                             <br />
-                            <input required type="number" name="Sectors[0].StartRow" />
+                            <input required type="number" min="1" max="1" name="Sectors[0].StartRow" />
                             <br />
                             <label>Последний ряд:</label>
                             <br />
@@ -45,16 +45,17 @@
                             <br />
                             <label>Мест в одном ряде:</label>
                             <br />
-                            <input required type="number" name="Sectors[0].CountSeatsRow" />
+                            <input required type="number" min="5" name="Sectors[0].CountSeatsRow" />
                             <br />
                             <label>Стоимость одного места:</label>
                             <br />
-                            <input required type="number" name="Sectors[0].CostSeat" />
+                            <input required type="number" min="1" name="Sectors[0].CostSeat" />
                             <br />
                         </div>
                     </div>
-                    <input type="button" value="Еще сектор" id="addSector" />
-                    <input type="submit" value="Добавить" />
+                    <input type="button" value="Еще сектор" id="addSector" class="btn"/>
+                    <input type="submit" value="Добавить" class="btn"/>
+                    <a class="btn" href="~/Hall/Index">Отмена</a>
                 }
             </div>
             <div class="col-md-6">
@@ -63,11 +64,17 @@
                     {
                         UpdateTargetId = "result",
                         LoadingElementId = "loading",
-                        LoadingElementDuration = 500
+                        LoadingElementDuration = 300
                     }))
                     {
                         <label>Кинотеатр:</label>
-                        <input type="text" name="cinemaName" />
+                        <select style="min-width:150px" class="search" required name="idCinema">
+                            <option hidden></option>
+                            @foreach (var cinema in ViewBag.Cinemas)
+                            {
+                                <option value="@cinema.IdCinema">@cinema.NameCinema</option>
+                            }
+                        </select>
                         <input type="submit" value="Вывести залы" />
                     }
                     <div id="loading" style="display:none; color:red; font-weight:bold;">

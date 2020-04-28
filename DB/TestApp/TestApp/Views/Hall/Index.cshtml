@@ -1,0 +1,47 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.min.css" />
+    </head>
+    <body>
+        <h2></h2>
+        @Html.ActionLink("Добавить зал","AddHall")
+        <div>
+            @using (Ajax.BeginForm("HallSearch", new AjaxOptions
+            {
+                UpdateTargetId = "result",
+                LoadingElementId = "loading",
+                LoadingElementDuration = 300
+            }))
+            {
+                <select style="min-width:150px" class="search" required name="idCinema">
+                    <option hidden></option>
+                    @foreach (var cinema in ViewBag.Cinemas)
+                    {
+                        <option value="@cinema.IdCinema">@cinema.NameCinema</option>
+                    }
+                </select>
+                <input class="btn btn-primary" type="submit" value="Вывести залы кинотеатра" />
+            }
+            <div id="loading" style="display:none; color:red; font-weight:bold;">
+                <p>Выборка...</p>
+            </div>
+            <div id="result"></div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.jquery.min.js"></script>
+        <script>
+            $(".search").chosen();
+        </script>
+    </body>
+    </html>
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+
+

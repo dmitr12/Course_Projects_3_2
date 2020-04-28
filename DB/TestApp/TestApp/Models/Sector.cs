@@ -10,7 +10,7 @@ namespace TestApp.Models
     {
         public int IdSector { get; set; }
         public int? HallId { get; set; }
-        public Hall Hall { get; set; }
+        public Hall HallOfSector { get; set; }
         [Required]
         public string NameSector { get; set; }
         [Required]

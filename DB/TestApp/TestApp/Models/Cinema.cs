@@ -11,6 +11,7 @@ namespace TestApp.Models
         public int IdCinema { get; set; }
 
         [Required]
+        [Display(Name ="Название кинотеатра")]
         public string NameCinema { get; set; }
 
         public int? AddressId { get; set; }

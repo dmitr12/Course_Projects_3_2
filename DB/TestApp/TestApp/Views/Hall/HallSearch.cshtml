@@ -1,9 +1,25 @@
 ﻿@model IEnumerable<TestApp.Models.Hall>
+    @using TestApp.Models
+@using TestApp.Utils
     <div id="searchResult">
         <ul>
-            @foreach(var hall in Model)
+            @if (Model.ToList()[0] != null)
             {
-                <li>@hall.NameHall</li>
+                foreach (Hall hall in Model)
+                {
+                    <li style="color:red">@hall.NameHall</li>
+                    foreach (Sector sector in hall.Sectors)
+                    {
+                        <li style="color:green">Название сектора: @sector.NameSector</li>
+                        <li>Вместимость сектора: @Counter.GetCountSeats(sector.StartRow,sector.EndRow,sector.CountSeatsRow)</li>
+                        <li>Стоимость места: @sector.CostSeat</li>
+                    }
+                }
             }
+            else
+            {
+
+            }
+
         </ul>
     </div>

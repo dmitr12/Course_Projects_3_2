@@ -1,7 +1,33 @@
 ﻿@model IEnumerable<TestApp.Models.Cinema>
-    <ul>
-        @foreach(var cinema in Model.ToList().OrderBy(c=>c.NameCinema))
+    <table class="table">
+        <tr>
+            <th>
+                Название кинотеатра
+            </th>
+            <th>
+                Улица
+            </th>
+            <th>
+                Дом
+            </th>
+        </tr>
+
+        @foreach (var item in Model)
         {
-            <li>@cinema.NameCinema</li>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NameCinema)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address.Street)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address.NumberHouse)
+                </td>
+                <td>
+                    @Html.ActionLink("Изменить", "EditCinema", new { idCinema = item.IdCinema })
+                </td>
+            </tr>
         }
-    </ul>
+
+    </table>
