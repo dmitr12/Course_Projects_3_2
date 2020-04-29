@@ -24,29 +24,33 @@ namespace TestApp.Models
             }
         }
 
-        public Genre GetGenre(int idGenre)
+        public Film GetFilm(int idFilm)
         {
-            Genre genre=null;
+            Film film = null;
             using (OracleConnection con = new OracleConnection(conString))
             {
                 con.Open();
-                OracleCommand com = new OracleCommand("system.GetGenre", con);
+                OracleCommand com = new OracleCommand("system.GetFilmById", con);
                 com.CommandType = CommandType.StoredProcedure;
-                com.Parameters.Add("@resultGenre",OracleDbType.RefCursor, ParameterDirection.ReturnValue);
-                com.Parameters.Add("@gnr", idGenre);
+                com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@idFlm", idFilm);
                 OracleDataReader reader = com.ExecuteReader();
                 while (reader.Read())
                 {
-                    genre = new Genre
+                    film = new Film
                     {
-                        IdGenre = reader.GetInt32(0),
-                        NameGenre = reader.GetString(1),
-                        DescriptionGenre = reader.GetString(2)
+                        IdFilm = reader.GetInt32(0),
+                        NameFilm = reader.GetString(1),
+                        DescriptionFilm = reader.GetString(2),
+                        Country = reader.GetString(3),
+                        YearIssue = reader.GetInt32(4),
+                        DurationMinutesFilm = reader.GetInt32(5),
+                        Poster = reader.GetOracleBlob(6).Value
                     };
                 }
                 reader.Close();
             }
-            return genre;
+            return film;
         }
 
         public Cinema GetCinema(int idCinema)
@@ -184,32 +188,6 @@ namespace TestApp.Models
                 }
             }
             return cinemas;
-        }
-
-        public List<Genre> SelectAllGenre()
-        {
-            List<Genre> genres = new List<Genre>();
-            using (OracleConnection con=new OracleConnection(conString))
-            {
-                con.Open();
-                OracleCommand com = new OracleCommand("system.GetAllGenres", con);
-                com.CommandType = CommandType.StoredProcedure;
-                com.Parameters.Add("@allGenres", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
-                using (var reader=com.ExecuteReader())
-                {
-                    while(reader.Read())
-                    {
-                        Genre genre = new Genre()
-                        {
-                            IdGenre=reader.GetInt32(0),
-                            NameGenre = reader["NameGenre"].ToString(),
-                            DescriptionGenre = reader["DescriptionGenre"].ToString()
-                        };
-                        genres.Add(genre);
-                    }
-                }
-            }
-            return genres;
         }
 
         public List<Hall> SelectAllHallsCinema(int idCinema)
@@ -407,6 +385,9 @@ namespace TestApp.Models
                 cmd.Parameters.Add("@endrow", sector.EndRow);
                 cmd.Parameters.Add("@countseatsrow", sector.CountSeatsRow);
                 cmd.Parameters.Add("@costseat", sector.CostSeat);
+                cmd.ExecuteNonQuery();
+                cmd = new OracleCommand("system.SaveTriggerChanges", con);
+                cmd.CommandType = CommandType.StoredProcedure;
                 cmd.ExecuteNonQuery();
             }
         }

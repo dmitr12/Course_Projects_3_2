@@ -1,8 +1,3 @@
-create table Genres(
-IdGenre number generated always as identity primary key,
-NameGenre varchar(100) unique not null,
-DescriptionGenre clob not null
-); 
 
 create table Films(
 IdFilm number generated always as identity primary key,
@@ -13,19 +8,6 @@ YearIssue number not null,
 DurationMinutesFilm int not null,
 Poster blob not null
 ); 
-
-create table FilmsGenres(
-IdF number not null,
-IdG number not null,
-constraint Film_Id_FilmsGenres foreign key(IdF) references Films(IdFilm),
-constraint Genre_Id_FilmsGenres foreign key(IdG) references Genres(IdGenre)
-); 
-
-drop table Halls;
-drop table SectorsHall;
-drop table Sessions;
-drop table Seats;
-drop table Tickets;
 
 create table CinemaAddresses(
 IdAddress number generated always as identity primary key,
@@ -56,8 +38,8 @@ IdSession number generated always as identity primary key,
 Film number not null,
 Hall number not null,
 StartSession date not null,
-constraint Film_Id_Sessions foreign key(Film) references Films(IdFilm),
-constraint Hall_Id_Sessions foreign key(Hall) references Halls(IdHall)
+constraint Фильм_Сеанса foreign key(Film) references Films(IdFilm),
+constraint Зал_Проведения_Сеанса foreign key(Hall) references Halls(IdHall)
 );
 
 create table RolesOfUsers(
@@ -91,9 +73,8 @@ constraint Уникальный_сектор_зала unique(NameSector, Hall)
 create table Seats(
 IdSeat number generated always as identity primary key,
 NumberSeat number not null,
-NumberRow number not null,
 SectorHall number not null,
-constraint SectorHall_Id_Seats foreign key(SectorHall) references SectorsHall(IdSector)
+constraint Сектор_Места foreign key(SectorHall) references SectorsHall(IdSector)
 );
 
 create table Tickets(
@@ -101,11 +82,10 @@ IdTicket number generated always as identity primary key,
 Buyer number not null,
 SessionId number not null,
 SeatId number not null,
-constraint Buyer_Id_Tickets foreign key(Buyer) references Users(IdUser),
-constraint Session_Id_Tickets foreign key(SessionId) references Sessions(IdSession),
-constraint Seat_Id_Tickets foreign key(SeatId) references Seats(IdSeat)
+constraint Покупатель_Билета foreign key(Buyer) references Users(IdUser),
+constraint Сеанс_Билета foreign key(SessionId) references Sessions(IdSession),
+constraint Место_Билета foreign key(SeatId) references Seats(IdSeat)
 ); 
-
 --Процедуры и функции
 create or replace procedure AddCinemaAddress(
 street CinemaAddresses.Street%type,
@@ -224,16 +204,6 @@ commit;
 end;
 
 --------------
-
-create or replace function GetGenre(gnr number)
-return SYS_REFCURSOR
-is
-resultGenre SYS_REFCURSOR;
-begin
-open resultGenre for select * from Genres where IdGenre=gnr;
-return resultGenre;
-end GetGenre;
-
 create or replace function GetCinema(cnm number)
 return SYS_REFCURSOR
 is
@@ -279,15 +249,6 @@ open allCinemas for select * from MovieTheatres join CinemaAddresses on Address=
 return allCinemas;
 end;
 
-create or replace function GetAllGenres
-return SYS_REFCURSOR
-is
-allGenres SYS_REFCURSOR;
-begin
-open allGenres for select * from Genres;
-return allGenres;
-end;
-
 create or replace function GetAllHallsCinema(cnm number)
 return SYS_REFCURSOR
 is
@@ -296,7 +257,7 @@ begin
 open allHallsCinema for select * from Halls join SectorsHall on IdHall=Hall where Cinema=cnm order by IdHall;
 return allHallsCinema;
 end;
-select getallhallscinema(2) from dual
+
 create or replace function GetHallsByCinameName(cnmName varchar)
 return SYS_REFCURSOR
 is
@@ -315,6 +276,8 @@ open resultSessions for select * from Sessions join Films on Film=IdFilm where H
 return resultSessions;
 end;
 
+select * from MovieTheatres
+
 create or replace function GetCinemasByName(
 nmCnm MovieTheatres.NameCinema%type)
 return SYS_REFCURSOR
@@ -325,6 +288,16 @@ open res for select * from MovieTheatres join CinemaAddresses on Address=IdAddre
 return res;
 end;
 
+create or replace function GetFilmById(
+idFlm number)
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select * from Films where IdFilm=idFlm;
+return res;
+end;
+
 --Проверка SELECTS
 select * from Sessions join Films on Film=IdFilm where Hall=4
 --Создание ролей
@@ -332,8 +305,6 @@ create role c##Role_Admin;
 
 grant create session to c##Role_Admin;
 grant all on Films to c##Role_Admin;
-grant all on FilmsGenres to c##Role_Admin;
-grant select on Genres to c##Role_Admin;
 grant all on CinemaAddresses to c##Role_Admin;
 grant all on MovieTheatres to c##Role_Admin;
 grant all on Halls to c##Role_Admin;
@@ -348,11 +319,9 @@ grant execute on AddCinemaAddress to c##Role_Admin;
 grant execute on AddHall to c##Role_Admin;
 grant execute on AddSector to c##Role_Admin;
 grant execute on AddSession to c##Role_Admin;
-grant execute on GetGenre to c##Role_Admin;
 grant execute on GetCinema to c##Role_Admin;
 grant execute on GetAllCinemas to c##Role_Admin;
 grant execute on GetAllFilms to c##Role_Admin;
-grant execute on GetAllGenres to c##Role_Admin;
 grant execute on GetAllHallsCinema to c##Role_Admin;
 grant execute on GetHallsByCinameName to c##Role_Admin;
 grant execute on GetRoleForUser to c##Role_Admin;
@@ -363,15 +332,16 @@ grant execute on ChangeUserPassword to c##Role_Admin;
 grant execute on GetCinemasByName to c##Role_Admin;
 grant execute on EditAddress to c##Role_Admin;
 grant execute on EditCinema to c##Role_Admin;
+grant execute on GetFilmById to c##Role_Admin;
+grant execute on SaveTriggerChanges to c##Role_Admin;
 
 create user c##Admin identified by admin;
 grant c##Role_Admin to c##Admin;
 
 create role C##Role_User;
+
 grant create session to c##Role_User;
 grant select on Films to c##Role_User;
-grant select on FilmsGenres to c##Role_User;
-grant select on Genres to c##Role_User;
 grant select on CinemaAddresses to c##Role_User;
 grant select on MovieTheatres to c##Role_User;
 grant select on Halls to c##Role_User;
@@ -382,11 +352,9 @@ grant select on SectorsHall to c##Role_User;
 grant select on Seats to c##Role_User;
 grant all on Tickets to c##Role_User;
 grant execute on AddUser to c##Role_User;
-grant execute on GetGenre to c##Role_User;
 grant execute on GetCinema to c##Role_User;
 grant execute on GetAllCinemas to c##Role_User;
 grant execute on GetAllFilms to c##Role_User;
-grant execute on GetAllGenres to c##Role_User;
 grant execute on GetAllHallsCinema to c##Role_User;
 grant execute on GetHallsByCinameName to c##Role_User;
 grant execute on GetRoleForUser to c##Role_User;
@@ -394,16 +362,12 @@ grant execute on GetSessionsByHallId to c##Role_User;
 grant execute on GetUser to c##Role_User;
 grant execute on ChangeUserPassword to c##Role_User;
 grant execute on GetCinemasByName to c##Role_User;
+grant execute on GetFilmById to c##Role_User;
+grant execute on SaveTriggerChanges to c##Role_User;
 
 create user C##User identified by user;
 grant C##Role_User to C##User;
 --Вставка данных
-insert into Genres(NameGenre, DescriptionGenre) values ('Биографический','Биографический фильм – жанр кинематографа, повествующий о судьбе какой-либо известной, выдающейся личности, оставившей свой след в истории. Некоторые биографические фильмы уделяют внимание лишь ключевым моментам из жизни главного героя, другие же начинают вести повествование с момента его рождения, чтобы показать, как формировался его характер под влиянием его родителей, учителей, друзей, детских потрясений, потерь, первой любви и т.п.');
-insert into Genres(NameGenre, DescriptionGenre) values ('Боевик','Боевик – кинематографический жанр, в котором главный герои или герои сталкиваются с рядом проблем, решить которые, не прибегнув к насилию, не удается. Фильмы боевики изобилуют насилием во всех его проявлениях, безумными погонями, дорогостоящими спецэффектами и сложными каскадерскими трюками. Главные герои часто оказываются в, казалось бы, безвыходных, смертельно опасных ситуациях, выбраться живыми из которых им удается благодаря их профессиональной подготовке, находчивости и решительности. В абсолютном большинстве боевиков добро торжествует, а злодеи погибают или оказываются за решеткой. Жанр боевика легко «смешивается» с любым другим жанром, однако лучше всего сочетается с приключенческими фильмами и триллерами.');
-insert into Genres(NameGenre, DescriptionGenre) values ('Фантастика','Фантастические фильмы – произведения игрового кинематографа, сюжет которых основывается на фантастических спекуляциях в области гуманитарных, естественных и технических наук. С помощью подобных спекуляций могут обосновываться те или иные явления, события и технологии, которые теоретически могут существовать уже сегодня или быть изобретены в будущем. Например: внеземные формы жизни, параллельные миры, экстрасенсорные способности, путешествия во времени, межзвездные путешествия, киборги, искусственный интеллект и тому подобное. Время развития событий в большинстве фантастических фильмов – ближайшее или отдаленное будущее.');
-insert into Genres(NameGenre, DescriptionGenre) values ('Триллер','Триллер – телевизионный и кинематографический жанр, с множеством поджанров. Характерной и определяющей чертой триллеров являются вызываемые ими чувства тревоги, неопределенности (саспенс), возбуждения и удивления. Хорошим примером этого жанра являются фильмы легендарного британского режиссера Альфреда Хичкока, лучшие работы которого хотя и были созданы более полувека назад, пользуются большой популярность и в наши дни.Общими элементами большинства фильмов этого жанра являются сокрытие важной информации от зрителя, ложные наводки, неожиданные сюжетные повороты и т.н. клиффхэнгеры (обрыв повествования на самом интересном, волнующем моменте). Лучшие фильмы триллеры держат зрителя в напряжении на протяжении всего фильма.');
-insert into Genres(NameGenre, DescriptionGenre) values ('Драма','Драматические фильмы – один из наиболее распространенных кинематографических жанров. Как правило, эти фильмы повествуют о частной жизни и социальных конфликтах персонажей, акцентируя внимание на воплощенных в их поступках и поведении общечеловеческих противоречиях. Характерной чертой жанра является приближенная к реальности стилистика и бытовой сюжет.');
-
 insert into RolesOfUsers(IdRole, NameRole, NameConnection) values(1, 'Admin','C##Admin');
 insert into RolesOfUsers(IdRole, NameRole, NameConnection) values(2, 'User','C##User');
 
@@ -424,3 +388,55 @@ values('Я-легенда','США','25.12.2007','фантастика',96,EMPTY_BLOB) returning Post
    DBMS_LOB.FILECLOSE( V_FILE );
    COMMIT;
 END;
+
+-----DBMS_JOB!!!!!
+create or replace procedure RemoveSessionsAndTickets
+as
+begin
+delete from Tickets where SessionId in (select IdSession from Sessions where StartSession<SYSDATE);
+delete from Sessions where StartSession<SYSDATE;
+commit;
+end;
+
+--Таблицы будут очищаться каждый день в один час пять минут
+declare
+begin
+dbms_job.isubmit(100, 'begin RemoveSessionsAndTickets; end;', TO_DATE('29.04.2020 01:05','DD.MM.YYYY HH24:MI'), 'TRUNC(SYSDATE+1)+(1+(5/60))/24');
+commit;
+end;
+--Триггер на заполенение таблицы Seats и процедура, сохраняющая изменения триггера;
+create or replace trigger AfterInsertUpdateRowSector
+after insert or update on SectorsHall
+for each row
+declare
+i seats.numberseat%type:=1;
+begin
+if inserting then
+while(i<=((:new.EndRow-:new.StartRow+1)*:new.CountSeatsRow))
+loop
+insert into Seats(NumberSeat, SectorHall) values(i, :new.IdSector);
+i:=i+1;
+end loop;
+end if;
+if updating then
+delete from Seats where SectorHall=:old.IdSector;
+while(i<=((:new.EndRow-:new.StartRow+1)*:new.CountSeatsRow))
+loop
+insert into Seats(NumberSeat, SectorHall) values(i, :new.IdSector);
+i:=i+1;
+end loop;
+end if;
+end;
+
+create or replace trigger BeforeDeleteSector
+before delete on SectorsHall
+for each row
+begin
+delete from Seats where SectorHall=:old.IdSector;
+end;
+
+create or replace procedure SaveTriggerChanges
+as
+begin
+commit;
+end;

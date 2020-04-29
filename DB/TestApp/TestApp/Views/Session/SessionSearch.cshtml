@@ -6,7 +6,9 @@
         {
             DateTime begin = session.StartSession;
             DateTime end = session.StartSession.AddMinutes(session.Film.DurationMinutesFilm);
-            <li style="color:red">@begin.Day.@begin.Month.@begin.Year @begin.Hour:@begin.Minute-@end.Hour:@end.Minute
+            string endHour = end.Hour.ToString().Length > 1 ? end.Hour.ToString() : "0" + end.Hour.ToString();
+            string endMin = end.Minute.ToString().Length > 1 ? end.Minute.ToString() : "0" + end.Minute.ToString();
+            <li style="color:red">@TimerUtil.GetDateTimeString(begin)-@endHour:@endMin
             <p style="color:black">@session.Film.NameFilm</p>
             </li>
         }

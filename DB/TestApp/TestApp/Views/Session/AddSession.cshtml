@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<TestApp.Models.Hall>
+    @using TestApp.Utils
 @{
     ViewBag.Title = "AddSession";
 }
@@ -14,28 +15,51 @@
             <div class="col-md-6">
                 @using (Html.BeginForm())
                 {
-                    <label>Зал: </label>
-                    <select style="min-width:200px" class="search" required name="HallId">
-                        <option hidden></option>
-                        @foreach (var hall in Model)
-                        {
-                            <option value="@hall.IdHall">@hall.NameHall</option>
-                        }
-                    </select>
-                    <br />
-                    <label>Фильм: </label>
-                    <select class="search" required id="Film" name="FilmId">
-                        <option hidden></option>
-                        @foreach (var film in ViewBag.Films)
-                        {
-                            <option value="@film.IdFilm">@film.NameFilm</option>
-                        }
-                    </select>
-                    <br />
-                    <label>Начало проведения сеанса: </label>
-                    <input required type="datetime-local" name="StartSession" />
-                    <br />
-                    <input type="submit" value="Добавить" />
+                    @Html.ValidationSummary(true);
+                    <div class="form-group">
+                        <input type="number" name="idCinema" hidden value="@ViewBag.Cinema.IdCinema" />
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Зал", htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            <select class="search form-control" name="HallId">
+                                <option hidden></option>
+                                @foreach (var hall in Model)
+                                {
+                                    <option value="@hall.IdHall">@hall.NameHall</option>
+                                }
+                            </select>
+                            @Html.ValidationMessage("HallId", "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Фильм", htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            <select class="search form-control" id="Film" name="FilmId">
+                                <option hidden></option>
+                                @foreach (var film in ViewBag.Films)
+                                {
+                                    <option value="@film.IdFilm">@film.NameFilm</option>
+                                }
+                            </select>
+                            @Html.ValidationMessage("FilmId", "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Начало проведения сеанса", htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            <input type="datetime-local" min="@TimerUtil.GetTimeFormat(DateTime.Now.AddDays(1))" class="form-control" name="StartSession" />
+                            @Html.ValidationMessage("StartSession", "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-1">
+                            <input type="submit" value="Добавить" class="btn btn-primary" />
+                        </div>
+                        <div class="col-md-offset-2 col-md-1">
+                            <a class="btn btn-default" href="~/Session/ChooseCinemaToAddSession">Отмена</a>
+                        </div>
+                    </div>
                 }
             </div>
             <div class="col-md-6">

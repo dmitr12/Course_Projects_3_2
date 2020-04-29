@@ -3,11 +3,18 @@
     ViewBag.Title = "ChooseCinemaToAddSession";
 }
 
-<h2>Выберите кинотеатр:</h2>
+<h2>Выберите кинотеатр, с сеансами которого хотите работать:</h2>
 <ul>
-    @foreach(var cinema in Model)
+    @if (Model != null)
     {
-        <li><a href="~/Session/AddSession?idCinema=@cinema.IdCinema">@cinema.NameCinema</a></li>
+        foreach (var cinema in Model)
+        {
+            <li><a href="~/Session/AddSession?idCinema=@cinema.IdCinema">@cinema.NameCinema</a></li>
+        }
+    }
+    else
+    {
+        <li>Добавьте залы для кинотеатров</li>
     }
 </ul>
 

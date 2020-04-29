@@ -29,15 +29,23 @@ namespace TestApp.Controllers
         [HttpPost]
         public ActionResult AddFilm(Film film, HttpPostedFileBase uploadImage)
         {
-            if(ModelState.IsValid && uploadImage!=null)
+            try
             {
-                db.ConnectionString = User.Identity.Name;
-                using (var binaryReader = new BinaryReader(uploadImage.InputStream))
+                if (ModelState.IsValid && uploadImage != null)
                 {
-                    film.Poster = binaryReader.ReadBytes(uploadImage.ContentLength);
+                    db.ConnectionString = User.Identity.Name;
+                    using (var binaryReader = new BinaryReader(uploadImage.InputStream))
+                    {
+                        film.Poster = binaryReader.ReadBytes(uploadImage.ContentLength);
+                    }
+                    db.AddFilm(film);
+                    return RedirectToAction("Index");
                 }
-                db.AddFilm(film);
-                return RedirectToAction("Index");
+            }
+            catch(Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(film);
             }
             return View(film);
         }
