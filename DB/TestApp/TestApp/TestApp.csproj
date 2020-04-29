@@ -147,6 +147,7 @@
     <Compile Include="Models\Film.cs" />
     <Compile Include="Models\Hall.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\ModelAddFilm.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\RoleOfUser.cs" />
     <Compile Include="Models\Sector.cs" />
@@ -208,6 +209,8 @@
     <Content Include="Views\Cinema\Index.cshtml" />
     <Content Include="Views\Cinema\EditCinema.cshtml" />
     <Content Include="Views\Hall\Index.cshtml" />
+    <Content Include="Views\Home\GetListFilms.cshtml" />
+    <Content Include="Views\Home\GetFilmInfo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

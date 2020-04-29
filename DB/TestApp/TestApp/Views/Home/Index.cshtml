@@ -1,28 +1,50 @@
 ﻿@model IEnumerable<TestApp.Models.Film>
-@using TestApp.Models
-@using TestApp.Utils
-    <h2>Фильмы:</h2>
-    <table class="table table-bordered">
-        <tr>
-            <td>Id</td>
-            <td>Название</td>
-            <td>Описание</td>
-            <td>Страна</td>
-            <td>Год выпуска</td>
-            <td>Длительность фильма</td>
-            <td>Постер</td>
-        </tr>
-        @foreach(Film film in Model)
-        {
-            string src = $"data:image/jpg;base64,{Convert.ToBase64String(@film.Poster)}";
-            <tr>
-                <td>@film.IdFilm</td>
-                <td>@film.NameFilm</td>
-                <td>@film.DescriptionFilm</td>
-                <td>@film.Country</td>
-                <td>@film.YearIssue</td>
-                <td>@TimerUtil.GetTimeString(film.DurationMinutesFilm)</td>
-                <td><img src=@src width="200" height="300"></td>
-            </tr>
-        }
-    </table>
+
+@{
+    ViewBag.Title = "Фильмы";
+}
+
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.min.css" />
+    </head>
+    <body>
+        <h2></h2>
+        <p>
+            @Html.ActionLink("Добавить фильм", "AddFilm")
+        </p>
+        <div>
+            @using (Ajax.BeginForm("GetFilmInfo", new AjaxOptions
+            {
+                UpdateTargetId = "result",
+                LoadingElementId = "loading",
+                LoadingElementDuration = 300
+            }))
+            {
+                <label>Фильм:</label>
+                <select style="min-width:200px" class="search" required name="idFilm">
+                    <option hidden></option>
+                    @foreach (var film in Model)
+                    {
+                        <option value="@film.IdFilm">@film.NameFilm</option>
+                    }
+                </select>
+                <input class="btn btn-primary" type="submit" value="Вывести информацию о фильме" />
+            }
+            <div id="loading" style="display:none; color:red; font-weight:bold;">
+                <p>Выборка...</p>
+            </div>
+            <div id="result"></div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.jquery.min.js"></script>
+        <script>
+            $(".search").chosen();
+        </script>
+    </body>
+    </html>
+
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+

@@ -6,7 +6,9 @@ DescriptionFilm clob not null,
 Country varchar(70) not null,
 YearIssue number not null,
 DurationMinutesFilm int not null,
-Poster blob not null
+Poster blob not null,
+Trailer bfile,
+constraint Уникальное_Название_Фильма unique(NameFilm)
 ); 
 
 create table CinemaAddresses(
@@ -184,12 +186,13 @@ descriptionfilm Films.DescriptionFilm%type,
 country Films.Country%type,
 yearissue Films.YearIssue%type,
 durationminutesfilm Films.DurationMinutesFilm%type,
-poster Films.Poster%type
+poster Films.Poster%type,
+trailerVideo varchar2
 )
 as
 begin
-insert into system.Films(NameFilm,DescriptionFilm,Country,YearIssue,DurationMinutesFilm,Poster)
-values(namefilm, descriptionfilm, country, yearissue, durationminutesfilm, poster);
+insert into system.Films(NameFilm,DescriptionFilm,Country,YearIssue,DurationMinutesFilm,Poster,Trailer)
+values(namefilm, descriptionfilm, country, yearissue, durationminutesfilm, poster, BFILENAME('TRAILERDIR',trailerVideo));
 commit;
 end;
 
@@ -236,7 +239,8 @@ return SYS_REFCURSOR
 is
 allFilms SYS_REFCURSOR;
 begin
-open allFilms for select * from Films;
+open allFilms for select IdFilm, NameFilm, DescriptionFilm, Country,
+YearIssue, DurationMinutesFilm, Poster, Trailer, get_dir_name(Trailer), get_file_name(Trailer) from Films;
 return allFilms;
 end;
 
@@ -276,8 +280,6 @@ open resultSessions for select * from Sessions join Films on Film=IdFilm where H
 return resultSessions;
 end;
 
-select * from MovieTheatres
-
 create or replace function GetCinemasByName(
 nmCnm MovieTheatres.NameCinema%type)
 return SYS_REFCURSOR
@@ -294,7 +296,8 @@ return SYS_REFCURSOR
 is
 res SYS_REFCURSOR;
 begin
-open res for select * from Films where IdFilm=idFlm;
+open res for select IdFilm, NameFilm, DescriptionFilm, Country, YearIssue, DurationMinutesFilm, Poster, 
+Trailer, get_dir_name(Trailer), get_file_name(Trailer) from Films where IdFilm=idFlm;
 return res;
 end;
 
@@ -334,6 +337,9 @@ grant execute on EditAddress to c##Role_Admin;
 grant execute on EditCinema to c##Role_Admin;
 grant execute on GetFilmById to c##Role_Admin;
 grant execute on SaveTriggerChanges to c##Role_Admin;
+grant execute on get_dir_name to c##Role_Admin;
+grant execute on get_file_name to c##Role_Admin;
+grant create any directory to c##Role_Admin;
 
 create user c##Admin identified by admin;
 grant c##Role_Admin to c##Admin;
@@ -364,6 +370,8 @@ grant execute on ChangeUserPassword to c##Role_User;
 grant execute on GetCinemasByName to c##Role_User;
 grant execute on GetFilmById to c##Role_User;
 grant execute on SaveTriggerChanges to c##Role_User;
+grant execute on get_dir_name to c##Role_User;
+grant execute on get_file_name to c##Role_User;
 
 create user C##User identified by user;
 grant C##Role_User to C##User;
@@ -440,3 +448,30 @@ as
 begin
 commit;
 end;
+---CHECK VIDEO BFILE
+CREATE FUNCTION get_dir_name (bf BFILE) RETURN VARCHAR2 IS
+    DIR_ALIAS VARCHAR2(255);
+   FILE_NAME VARCHAR2(255);
+    BEGIN
+      IF bf is NULL
+      THEN
+        RETURN NULL;
+      ELSE
+        DBMS_LOB.FILEGETNAME (bf, dir_alias, file_name);
+       RETURN dir_alias;
+     END IF;
+   END;
+   
+   CREATE FUNCTION get_file_name (bf BFILE) RETURN VARCHAR2 is
+    dir_alias VARCHAR2(255);
+    file_name VARCHAR2(255);
+    BEGIN
+      IF bf is NULL
+      THEN
+        RETURN NULL;
+      ELSE
+        DBMS_LOB.FILEGETNAME (bf, dir_alias, file_name);
+       RETURN file_name;
+     END IF;
+   END;
+   

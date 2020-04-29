@@ -1,4 +1,5 @@
 ﻿using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -37,6 +38,10 @@ namespace TestApp.Models
                 OracleDataReader reader = com.ExecuteReader();
                 while (reader.Read())
                 {
+                    OracleBFile bFile = reader.GetOracleBFile(7);
+                    bFile.DirectoryName = reader.GetString(8);
+                    bFile.FileName = reader.GetString(9);
+                    bFile.OpenFile();
                     film = new Film
                     {
                         IdFilm = reader.GetInt32(0),
@@ -45,7 +50,38 @@ namespace TestApp.Models
                         Country = reader.GetString(3),
                         YearIssue = reader.GetInt32(4),
                         DurationMinutesFilm = reader.GetInt32(5),
-                        Poster = reader.GetOracleBlob(6).Value
+                        Poster = reader.GetOracleBlob(6).Value,
+                        Trailer=bFile.Value
+                    };
+                    bFile.CloseFile();
+                }
+                reader.Close();
+            }
+            return film;
+        }
+
+        public Film GetFilmWithoutTrailer(int idFilm)
+        {
+            Film film = null;
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system.GetFilmById", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@idFlm", idFilm);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    film = new Film
+                    {
+                        IdFilm = reader.GetInt32(0),
+                        NameFilm = reader.GetString(1),
+                        DescriptionFilm = reader.GetString(2),
+                        Country = reader.GetString(3),
+                        YearIssue = reader.GetInt32(4),
+                        DurationMinutesFilm = reader.GetInt32(5),
+                        Poster = reader.GetOracleBlob(6).Value,
                     };
                 }
                 reader.Close();
@@ -142,6 +178,10 @@ namespace TestApp.Models
                 OracleDataReader reader = com.ExecuteReader();
                 while (reader.Read())
                 {
+                    OracleBFile bFile = reader.GetOracleBFile(7);
+                    bFile.DirectoryName = reader.GetString(8);
+                    bFile.FileName = reader.GetString(9);
+                    bFile.OpenFile();
                     Film film = new Film
                     {
                         IdFilm = reader.GetInt32(0),
@@ -150,7 +190,37 @@ namespace TestApp.Models
                         Country = reader.GetString(3),
                         YearIssue = reader.GetInt32(4),
                         DurationMinutesFilm = reader.GetInt32(5),
-                        Poster = reader.GetOracleBlob(6).Value
+                        Poster = reader.GetOracleBlob(6).Value,
+                        Trailer=bFile.Value
+                    };
+                    bFile.CloseFile();
+                    films.Add(film);
+                }
+                return films;
+            }
+        }
+
+        public List<Film> GetAllFilmsWithoutTrailers()
+        {
+            List<Film> films = new List<Film>();
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system.GetAllFilms", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@allFilms", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    Film film = new Film
+                    {
+                        IdFilm = reader.GetInt32(0),
+                        NameFilm = reader.GetString(1),
+                        DescriptionFilm = reader.GetString(2),
+                        Country = reader.GetString(3),
+                        YearIssue = reader.GetInt32(4),
+                        DurationMinutesFilm = reader.GetInt32(5),
+                        Poster = reader.GetOracleBlob(6).Value,
                     };
                     films.Add(film);
                 }
@@ -328,12 +398,15 @@ namespace TestApp.Models
             return cinema;
         }
 
-        public void AddFilm(Film film)
+        public void AddFilm(ModelAddFilm film)
         {  
             using(OracleConnection con=new OracleConnection(conString))
             {
+
                 con.Open();
-                OracleCommand cmd = new OracleCommand("system.AddFilm", con);
+                OracleCommand cmd = new OracleCommand($"CREATE or REPLACE DIRECTORY TRAILERDIR as '{film.DirectoryTrailer}'", con);
+                cmd.ExecuteNonQuery();
+                cmd = new OracleCommand("system.AddFilm", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@namefilm", film.NameFilm);
                 cmd.Parameters.Add("@descriptionfilm", film.DescriptionFilm);
@@ -341,6 +414,7 @@ namespace TestApp.Models
                 cmd.Parameters.Add("@yearissue", film.YearIssue);
                 cmd.Parameters.Add("@durationminutesfilm", film.DurationMinutesFilm);
                 cmd.Parameters.Add("@poster",OracleDbType.Blob, film.Poster, ParameterDirection.Input);
+                cmd.Parameters.Add("@trailerVideo", film.FileTrailer);
                 cmd.ExecuteNonQuery();
             }
         }

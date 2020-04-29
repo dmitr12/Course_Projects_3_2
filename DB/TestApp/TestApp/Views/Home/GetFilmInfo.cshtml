@@ -1,0 +1,68 @@
+﻿@model TestApp.Models.Film
+
+<div>
+    <dl class="dl-horizontal">
+        <dd>
+            @Html.HiddenFor(model=>model.IdFilm)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.NameFilm)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NameFilm)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DescriptionFilm)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DescriptionFilm)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Country)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Country)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.YearIssue)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.YearIssue)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DurationMinutesFilm)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DurationMinutesFilm)
+        </dd>
+
+        <dt>
+            @Html.DisplayName("Постер")
+        </dt>
+
+        <dd>
+            <img src="data:image/jpg;base64,@Convert.ToBase64String(@Model.Poster)" width="200" height="300">
+        </dd>
+        <dt>
+            @Html.DisplayName("Трейлер")
+        </dt>
+
+        <dd>
+            <video width="300" height="150" controls>
+                <source type="video/mp4" src="data:video/mp4;base64,@Convert.ToBase64String(@Model.Trailer)" />
+            </video>        
+        </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+</p>

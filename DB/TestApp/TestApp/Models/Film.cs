@@ -28,6 +28,8 @@ namespace TestApp.Models
         public int DurationMinutesFilm { get; set; }
         [Display(Name ="Постер")]
         public byte[] Poster { get; set; }
+        [Display(Name="Трейлер")]
+        public byte[] Trailer { get; set; }
         
         public ICollection<Session> Sessions { get; set; }
         public Film()

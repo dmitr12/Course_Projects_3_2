@@ -34,7 +34,7 @@ namespace TestApp.Controllers
                     if (user != null)
                     {
                         FormsAuthentication.SetAuthCookie(model.Login, false);
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("GetListFilms", "Home");
                     }
                 }
                 else
@@ -63,7 +63,7 @@ namespace TestApp.Controllers
                         return View(model);
                     }
                     FormsAuthentication.SetAuthCookie(model.Login, false);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("GetListFilms", "Home");
                 }
                 else
                     ModelState.AddModelError("", "Пользователь не зарегистрирован");

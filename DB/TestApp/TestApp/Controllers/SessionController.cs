@@ -40,7 +40,7 @@ namespace TestApp.Controllers
         {
             db.ConnectionString = User.Identity.Name;
             ViewBag.Cinema = db.GetCinema(idCinema);
-            ViewBag.Films = db.SelectAllFilms();
+            ViewBag.Films = db.GetAllFilmsWithoutTrailers();
             return View(db.SelectAllHallsCinema(idCinema));
         }
 
@@ -49,13 +49,13 @@ namespace TestApp.Controllers
         {
             db.ConnectionString = User.Identity.Name;
             ViewBag.Cinema = db.GetCinema(idCinema);
-            ViewBag.Films = db.SelectAllFilms();
+            ViewBag.Films = db.GetAllFilmsWithoutTrailers();
             try
             {
                 if (ModelState.IsValid)
                 {
                     List<TestApp.Models.Session> listSessions = db.GetSessionsByHallId((int)session.HallId);
-                    Film filmSession = db.GetFilm((int)session.FilmId);
+                    Film filmSession = db.GetFilmWithoutTrailer((int)session.FilmId);
                     Session checkEndSession = session;
                     if((session.StartSession.Hour>22 || session.StartSession.Hour<9)
                         || (checkEndSession.StartSession.AddMinutes(filmSession.DurationMinutesFilm).Hour>22 ||

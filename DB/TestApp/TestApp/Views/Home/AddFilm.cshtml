@@ -1,4 +1,4 @@
-﻿@model TestApp.Models.Film
+﻿@model TestApp.Models.ModelAddFilm
 @{
     ViewBag.Title = "AddFilm";
 }
@@ -47,14 +47,29 @@
                 </div>
             </div>
             <div class="form-group">
+                @Html.LabelFor(m => m.DirectoryTrailer, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <input class="form-control" type="text" value="D:\MaterialForCurs\Videos" name="DirectoryTrailer">
+                    @Html.ValidationMessageFor(m => m.DirectoryTrailer, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.FileTrailer, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <input class="form-control" type="text" name="FileTrailer">
+                    @Html.ValidationMessageFor(m => m.FileTrailer, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
                 @Html.LabelFor(m => m.DurationMinutesFilm, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     @Html.EditorFor(m => m.DurationMinutesFilm, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(m => m.DurationMinutesFilm, "", new { @class = "text-danger" })
                 </div>
             </div>
+
             <div class="form-group">
-                    <input type="file" required name="uploadImage" />
+                <input type="file" required name="uploadImage" />
             </div>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-1">
