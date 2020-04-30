@@ -1,0 +1,20 @@
+﻿@model TestApp.Models.Film
+
+@{
+    ViewBag.Title = "DeleteFilm";
+}
+
+<h3>Вы действительно хотите удалить фильм "@Model.NameFilm"?</h3>
+<div>
+    @Html.ValidationSummary(true)
+    <dl class="dl-horizontal">
+        @Html.HiddenFor(model => model.IdFilm)
+    </dl>
+
+    @using (Html.BeginForm()) {
+        <div class="form-actions no-color">
+            <input type="submit" value="Удалить" class="btn btn-default" /> |
+            @Html.ActionLink("Назад", "Index")
+        </div>
+    }
+</div>

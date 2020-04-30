@@ -196,6 +196,32 @@ values(namefilm, descriptionfilm, country, yearissue, durationminutesfilm, poste
 commit;
 end;
 
+create or replace procedure EditFilm(
+idFlm number,
+nameflm Films.NameFilm%type,
+descript Films.DescriptionFilm%type,
+cntr Films.Country%type,
+yr Films.YearIssue%type,
+durationflm Films.DurationMinutesFilm%type,
+pstr Films.Poster%type,
+trailerVideo varchar2
+)
+as
+begin
+update Films set NameFilm=nameflm, DescriptionFilm=descript, Country=cntr, YearIssue=yr, DurationMinutesFilm=durationflm,
+Poster=pstr, Trailer=BFILENAME('TRAILERDIR', trailerVideo) where IdFilm=idFlm;
+commit;
+end;
+
+create or replace procedure DeleteFilm(
+idFlm number
+)
+as
+begin
+delete from Films where IdFilm=idFlm;
+commit;
+end;
+
 create or replace procedure ChangeUserPassword(
 lg Users.Login%type,
 newPsw Users.Password%type
@@ -205,7 +231,6 @@ begin
 update Users set Password=newPsw where Login=lg;
 commit;
 end;
-
 --------------
 create or replace function GetCinema(cnm number)
 return SYS_REFCURSOR
@@ -280,6 +305,15 @@ open resultSessions for select * from Sessions join Films on Film=IdFilm where H
 return resultSessions;
 end;
 
+create or replace function GetSessionsByFilmId(filmId number)
+return SYS_REFCURSOR
+is
+resultSessions SYS_REFCURSOR;
+begin
+open resultSessions for select * from Sessions join Halls on Hall=IdHall where Film=filmId order by StartSession;
+return resultSessions;
+end;
+
 create or replace function GetCinemasByName(
 nmCnm MovieTheatres.NameCinema%type)
 return SYS_REFCURSOR
@@ -301,6 +335,16 @@ Trailer, get_dir_name(Trailer), get_file_name(Trailer) from Films where IdFilm=i
 return res;
 end;
 
+create or replace function GetFilmByName(
+nameFlm Films.NameFilm%type)
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select IdFilm, NameFilm, DescriptionFilm, Country, YearIssue, DurationMinutesFilm, Poster, 
+Trailer, get_dir_name(Trailer), get_file_name(Trailer) from Films where NameFilm=nameFlm;
+return res;
+end;
 --Проверка SELECTS
 select * from Sessions join Films on Film=IdFilm where Hall=4
 --Создание ролей
@@ -331,6 +375,8 @@ grant execute on GetRoleForUser to c##Role_Admin;
 grant execute on GetSessionsByHallId to c##Role_Admin;
 grant execute on GetUser to c##Role_Admin;
 grant execute on AddFilm to c##Role_Admin;
+grant execute on EditFilm to c##Role_Admin;
+grant execute on DeleteFilm to c##Role_Admin;
 grant execute on ChangeUserPassword to c##Role_Admin;
 grant execute on GetCinemasByName to c##Role_Admin;
 grant execute on EditAddress to c##Role_Admin;
@@ -340,6 +386,8 @@ grant execute on SaveTriggerChanges to c##Role_Admin;
 grant execute on get_dir_name to c##Role_Admin;
 grant execute on get_file_name to c##Role_Admin;
 grant create any directory to c##Role_Admin;
+grant execute on GetSessionsByFilmId to c##Role_Admin;
+grant execute on GetFilmByName to c##Role_Admin;
 
 create user c##Admin identified by admin;
 grant c##Role_Admin to c##Admin;
@@ -365,6 +413,7 @@ grant execute on GetAllHallsCinema to c##Role_User;
 grant execute on GetHallsByCinameName to c##Role_User;
 grant execute on GetRoleForUser to c##Role_User;
 grant execute on GetSessionsByHallId to c##Role_User;
+grant execute on GetSessionsByFilmId to c##Role_User;
 grant execute on GetUser to c##Role_User;
 grant execute on ChangeUserPassword to c##Role_User;
 grant execute on GetCinemasByName to c##Role_User;
@@ -372,6 +421,8 @@ grant execute on GetFilmById to c##Role_User;
 grant execute on SaveTriggerChanges to c##Role_User;
 grant execute on get_dir_name to c##Role_User;
 grant execute on get_file_name to c##Role_User;
+grant execute on GetFilmByName to c##Role_User;
+grant create any directory to c##Role_User;
 
 create user C##User identified by user;
 grant C##Role_User to C##User;

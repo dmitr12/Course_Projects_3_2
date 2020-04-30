@@ -11,12 +11,12 @@
         <td>Год выпуска</td>
         <td>Длительность фильма</td>
         <td>Постер</td>
-        <td>Трейлер</td>
+        @*<td>Трейлер</td>*@
     </tr>
     @foreach (Film film in Model)
     {
         string src1 = $"data:image/jpg;base64,{Convert.ToBase64String(@film.Poster)}";
-        string src2 = $"data:video/mp4;base64,{Convert.ToBase64String(@film.Trailer)}";
+        //string src2 = $"data:video/mp4;base64,{Convert.ToBase64String(@film.Trailer)}";
         <tr>
             <td>@film.IdFilm</td>
             <td>@film.NameFilm</td>
@@ -24,8 +24,8 @@
             <td>@film.Country</td>
             <td>@film.YearIssue</td>
             <td>@TimerUtil.GetTimeString(film.DurationMinutesFilm)</td>
-            @*<td><img src=@src1 width="200" height="300"></td>
-            <td>
+            <td><img src=@src1 width="200" height="300"></td>
+            @*<td>
                 <video width="300" height="150" controls>
                     <source type="video/mp4" src="@src2" />
                 </video>

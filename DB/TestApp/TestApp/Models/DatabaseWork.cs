@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
+using TestApp.Utils;
 
 namespace TestApp.Models
 {
@@ -31,6 +32,8 @@ namespace TestApp.Models
             using (OracleConnection con = new OracleConnection(conString))
             {
                 con.Open();
+                OracleCommand cmd = new OracleCommand($"CREATE or REPLACE DIRECTORY TRAILERDIR as '{ConfigDirectory.VideoDirectory}'", con);
+                cmd.ExecuteNonQuery();
                 OracleCommand com = new OracleCommand("system.GetFilmById", con);
                 com.CommandType = CommandType.StoredProcedure;
                 com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
@@ -38,10 +41,18 @@ namespace TestApp.Models
                 OracleDataReader reader = com.ExecuteReader();
                 while (reader.Read())
                 {
+                    byte[] bytes = null;
                     OracleBFile bFile = reader.GetOracleBFile(7);
                     bFile.DirectoryName = reader.GetString(8);
                     bFile.FileName = reader.GetString(9);
-                    bFile.OpenFile();
+                    try
+                    {
+                        bFile.OpenFile();
+                        bytes = bFile.Value;
+                    }
+                    catch (Exception) { }
+                    if (bFile.IsOpen)
+                        bFile.CloseFile();
                     film = new Film
                     {
                         IdFilm = reader.GetInt32(0),
@@ -51,9 +62,52 @@ namespace TestApp.Models
                         YearIssue = reader.GetInt32(4),
                         DurationMinutesFilm = reader.GetInt32(5),
                         Poster = reader.GetOracleBlob(6).Value,
-                        Trailer=bFile.Value
+                        Trailer=bytes
                     };
-                    bFile.CloseFile();
+                }
+                reader.Close();
+            }
+            return film;
+        }
+
+        public Film GetFilmByName(string nameFilm)
+        {
+            Film film = null;
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand($"CREATE or REPLACE DIRECTORY TRAILERDIR as '{ConfigDirectory.VideoDirectory}'", con);
+                cmd.ExecuteNonQuery();
+                OracleCommand com = new OracleCommand("system.GetFilmByName", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@nameFlm", nameFilm);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    byte[] bytes = null;
+                    OracleBFile bFile = reader.GetOracleBFile(7);
+                    bFile.DirectoryName = reader.GetString(8);
+                    bFile.FileName = reader.GetString(9);
+                    try
+                    {
+                        bFile.OpenFile();
+                        bytes = bFile.Value;
+                    }
+                    catch (Exception) { }
+                    if (bFile.IsOpen)
+                        bFile.CloseFile();
+                    film = new Film
+                    {
+                        IdFilm = reader.GetInt32(0),
+                        NameFilm = reader.GetString(1),
+                        DescriptionFilm = reader.GetString(2),
+                        Country = reader.GetString(3),
+                        YearIssue = reader.GetInt32(4),
+                        DurationMinutesFilm = reader.GetInt32(5),
+                        Poster = reader.GetOracleBlob(6).Value,
+                        Trailer = bytes
+                    };
                 }
                 reader.Close();
             }
@@ -172,16 +226,26 @@ namespace TestApp.Models
             using (OracleConnection con=new OracleConnection(conString))
             {
                 con.Open();
+                OracleCommand cmd = new OracleCommand($"CREATE or REPLACE DIRECTORY TRAILERDIR as '{ConfigDirectory.VideoDirectory}'", con);
+                cmd.ExecuteNonQuery();
                 OracleCommand com = new OracleCommand("system.GetAllFilms", con);
                 com.CommandType = CommandType.StoredProcedure;
                 com.Parameters.Add("@allFilms", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
                 OracleDataReader reader = com.ExecuteReader();
                 while (reader.Read())
                 {
+                    byte[] bytes = new byte[] { };
                     OracleBFile bFile = reader.GetOracleBFile(7);
                     bFile.DirectoryName = reader.GetString(8);
                     bFile.FileName = reader.GetString(9);
-                    bFile.OpenFile();
+                    try
+                    {
+                        bFile.OpenFile();
+                        bytes = bFile.Value;
+                    }
+                    catch (Exception) { }
+                    if(bFile.IsOpen)
+                        bFile.CloseFile();
                     Film film = new Film
                     {
                         IdFilm = reader.GetInt32(0),
@@ -191,9 +255,8 @@ namespace TestApp.Models
                         YearIssue = reader.GetInt32(4),
                         DurationMinutesFilm = reader.GetInt32(5),
                         Poster = reader.GetOracleBlob(6).Value,
-                        Trailer=bFile.Value
+                        Trailer=bytes
                     };
-                    bFile.CloseFile();
                     films.Add(film);
                 }
                 return films;
@@ -368,6 +431,31 @@ namespace TestApp.Models
             return sessions;
         }
 
+        public List<Session> GetSessionsByFilmId(int filmId)
+        {
+            List<Session> sessions = new List<Session>();
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.GetSessionsByFilmId", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@resultSessions", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                cmd.Parameters.Add("@filmId", filmId);
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    sessions.Add(new Session
+                    {
+                        IdSession = reader.GetInt32(0),
+                        FilmId = reader.GetInt32(1),
+                        HallId = reader.GetInt32(2),
+                        StartSession = reader.GetDateTime(3)
+                    });
+                }
+            }
+            return sessions;
+        }
+
         public Cinema GetCinemaByName(string nameCinema)
         {
             Cinema cinema = null;
@@ -402,7 +490,6 @@ namespace TestApp.Models
         {  
             using(OracleConnection con=new OracleConnection(conString))
             {
-
                 con.Open();
                 OracleCommand cmd = new OracleCommand($"CREATE or REPLACE DIRECTORY TRAILERDIR as '{film.DirectoryTrailer}'", con);
                 cmd.ExecuteNonQuery();
@@ -415,6 +502,39 @@ namespace TestApp.Models
                 cmd.Parameters.Add("@durationminutesfilm", film.DurationMinutesFilm);
                 cmd.Parameters.Add("@poster",OracleDbType.Blob, film.Poster, ParameterDirection.Input);
                 cmd.Parameters.Add("@trailerVideo", film.FileTrailer);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void EditFilm(ModelAddFilm film)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand($"CREATE or REPLACE DIRECTORY TRAILERDIR as '{film.DirectoryTrailer}'", con);
+                cmd.ExecuteNonQuery();
+                cmd = new OracleCommand("system.EditFilm", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@idFlm", film.IdFilm);
+                cmd.Parameters.Add("@namefilm", film.NameFilm);
+                cmd.Parameters.Add("@descriptionfilm", film.DescriptionFilm);
+                cmd.Parameters.Add("@country", film.Country);
+                cmd.Parameters.Add("@yearissue", film.YearIssue);
+                cmd.Parameters.Add("@durationminutesfilm", film.DurationMinutesFilm);
+                cmd.Parameters.Add("@poster", OracleDbType.Blob, film.Poster, ParameterDirection.Input);
+                cmd.Parameters.Add("@trailerVideo", film.FileTrailer);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void DeleteFilm(int idFilm)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.DeleteFilm", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@idFlm", idFilm);
                 cmd.ExecuteNonQuery();
             }
         }

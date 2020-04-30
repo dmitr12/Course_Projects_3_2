@@ -34,6 +34,8 @@ namespace TestApp.Controllers
                     if (user != null)
                     {
                         FormsAuthentication.SetAuthCookie(model.Login, false);
+                        if(model.Login=="Admin")
+                            return RedirectToAction("AdminView", "Home");
                         return RedirectToAction("GetListFilms", "Home");
                     }
                 }
@@ -63,6 +65,8 @@ namespace TestApp.Controllers
                         return View(model);
                     }
                     FormsAuthentication.SetAuthCookie(model.Login, false);
+                    if (model.Login == "Admin")
+                        return RedirectToAction("AdminView", "Home");
                     return RedirectToAction("GetListFilms", "Home");
                 }
                 else

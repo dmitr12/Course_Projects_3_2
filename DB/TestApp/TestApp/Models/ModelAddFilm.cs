@@ -8,6 +8,7 @@ namespace TestApp.Models
 {
     public class ModelAddFilm
     {
+        public int IdFilm { get; set; }
         [Required]
         [Display(Name = "Название фильма")]
         public string NameFilm { get; set; }
