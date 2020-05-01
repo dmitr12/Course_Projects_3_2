@@ -456,6 +456,41 @@ namespace TestApp.Models
             return sessions;
         }
 
+        public List<Session> GetSessionsByStartSession(string startSession)
+        {
+            List<Session> sessions = new List<Session>();
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.GetSessionsByStartSession", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@resultSessions", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                cmd.Parameters.Add("@startDate", startSession);
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    sessions.Add(new Session
+                    {
+                        IdSession = reader.GetInt32(0),
+                        FilmId = reader.GetInt32(1),
+                        Film=new Film
+                        {
+                            IdFilm = reader.GetInt32(4),
+                            NameFilm = reader.GetString(5),
+                            DescriptionFilm = reader.GetString(6),
+                            Country = reader.GetString(7),
+                            YearIssue = reader.GetInt32(8),
+                            DurationMinutesFilm = reader.GetInt32(9),
+                            Poster = reader.GetOracleBlob(10).Value,
+                        },
+                        HallId = reader.GetInt32(2),
+                        StartSession = reader.GetDateTime(3)
+                    });
+                }
+            }
+            return sessions;
+        }
+
         public Cinema GetCinemaByName(string nameCinema)
         {
             Cinema cinema = null;

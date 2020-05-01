@@ -1,0 +1,18 @@
+﻿@model IEnumerable<TestApp.Models.Session>
+
+@foreach (var session in Model)
+{
+    <div class="col-md-3">
+        <a href="#"><img class="pict" onmouseover="funcOver(this)" onmouseout="funcOut(this)" src="data:image/jpg;base64,@Convert.ToBase64String(session.Film.Poster)" width="200" height="300"></a>
+        <a href="#">@session.Film.NameFilm</a>
+    </div>
+    <script>
+        function funcOver(el) {
+            el.style.opacity = 0.8;
+        }
+        function funcOut(el) {
+            el.style.opacity = 1;
+        }
+    </script>
+}
+

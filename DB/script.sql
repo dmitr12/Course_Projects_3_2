@@ -314,6 +314,15 @@ open resultSessions for select * from Sessions join Halls on Hall=IdHall where F
 return resultSessions;
 end;
 
+create or replace function GetSessionsByStartSession(startDate varchar2)
+return SYS_REFCURSOR
+is
+resultSessions SYS_REFCURSOR;
+begin
+open resultSessions for select * from Sessions join Films on Film=IdFilm where to_char(StartSession, 'DD.MM.YYYY')=startDate;
+return resultSessions;
+end;
+
 create or replace function GetCinemasByName(
 nmCnm MovieTheatres.NameCinema%type)
 return SYS_REFCURSOR
@@ -388,6 +397,7 @@ grant execute on get_file_name to c##Role_Admin;
 grant create any directory to c##Role_Admin;
 grant execute on GetSessionsByFilmId to c##Role_Admin;
 grant execute on GetFilmByName to c##Role_Admin;
+grant execute on GetSessionsByStartSession to c##Role_Admin;
 
 create user c##Admin identified by admin;
 grant c##Role_Admin to c##Admin;
@@ -423,6 +433,7 @@ grant execute on get_dir_name to c##Role_User;
 grant execute on get_file_name to c##Role_User;
 grant execute on GetFilmByName to c##Role_User;
 grant create any directory to c##Role_User;
+grant execute on GetSessionsByStartSession to c##Role_User;
 
 create user C##User identified by user;
 grant C##Role_User to C##User;

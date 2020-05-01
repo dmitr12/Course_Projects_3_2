@@ -1,35 +1,68 @@
 ﻿@model IEnumerable<TestApp.Models.Film>
 @using TestApp.Models
 @using TestApp.Utils
-<h2>Фильмы:</h2>
-<table class="table table-bordered">
-    <tr>
-        <td>Id</td>
-        <td>Название</td>
-        <td>Описание</td>
-        <td>Страна</td>
-        <td>Год выпуска</td>
-        <td>Длительность фильма</td>
-        <td>Постер</td>
-        @*<td>Трейлер</td>*@
-    </tr>
-    @foreach (Film film in Model)
-    {
-        string src1 = $"data:image/jpg;base64,{Convert.ToBase64String(@film.Poster)}";
-        //string src2 = $"data:video/mp4;base64,{Convert.ToBase64String(@film.Trailer)}";
-        <tr>
-            <td>@film.IdFilm</td>
-            <td>@film.NameFilm</td>
-            <td>@film.DescriptionFilm</td>
-            <td>@film.Country</td>
-            <td>@film.YearIssue</td>
-            <td>@TimerUtil.GetTimeString(film.DurationMinutesFilm)</td>
-            <td><img src=@src1 width="200" height="300"></td>
-            @*<td>
-                <video width="300" height="150" controls>
-                    <source type="video/mp4" src="@src2" />
-                </video>
-            </td>*@
-        </tr>
+<hr />
+<div class="row">
+    <div class="col-md-3">
+        <input id="DateField" class="form-control" min="@TimerUtil.GetDateFormat(DateTime.Now)" type="date" onchange="changedDate()"/>
+    </div>
+    <div class="col-md-9">
+        <div>
+            @using (Ajax.BeginForm("GetSessionsByStartSession", new AjaxOptions
+            {
+                UpdateTargetId = "result",
+                LoadingElementId = "loading",
+                LoadingElementDuration = 300
+            }))
+            {
+                <input id="InputDate" style="display:none" class="form-control" type="text" placeholder="Дата сеанса" name="startDate"/>
+                <input id="BtnSessions" style="display:none" type="submit" value="Поиск" class="btn btn-primary" />
+            }
+            <div id="loading" style="display:none; color:red; font-weight:bold;">
+                <p>Поиск...</p>
+            </div>
+            <div id="result"></div>
+        </div>
+    </div>
+</div>
+<script>
+    function changedDate() {
+        $("#InputDate").val(document.getElementById("DateField").value);
+        $("#BtnSessions").click();
     }
-</table>
+</script>
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+
+@*<h2>Фильмы:</h2>
+    <table class="table table-bordered">
+        <tr>
+            <td>Id</td>
+            <td>Название</td>
+            <td>Описание</td>
+            <td>Страна</td>
+            <td>Год выпуска</td>
+            <td>Длительность фильма</td>
+            <td>Постер</td>
+            <td>Трейлер</td>
+        </tr>
+        @foreach (Film film in Model)
+        {
+            string src1 = $"data:image/jpg;base64,{Convert.ToBase64String(@film.Poster)}";
+            //string src2 = $"data:video/mp4;base64,{Convert.ToBase64String(@film.Trailer)}";
+            <tr>
+                <td>@film.IdFilm</td>
+                <td>@film.NameFilm</td>
+                <td>@film.DescriptionFilm</td>
+                <td>@film.Country</td>
+                <td>@film.YearIssue</td>
+                <td>@TimerUtil.GetTimeString(film.DurationMinutesFilm)</td>
+                <td><img src=@src1 width="200" height="300"></td>
+                <td>
+                    <video width="300" height="150" controls>
+                        <source type="video/mp4" src="@src2" />
+                    </video>
+                </td>
+            </tr>
+        }
+    </table>*@

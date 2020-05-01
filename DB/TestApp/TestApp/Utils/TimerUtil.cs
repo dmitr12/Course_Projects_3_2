@@ -28,6 +28,20 @@ namespace TestApp.Utils
             return format;
         }
 
+        public static string GetDateFormat(DateTime dt)
+        {
+            string format = $"{dt.Year}-{GVPOD(dt.Month.ToString())}" +
+                $"-{GVPOD(dt.Day.ToString())}";
+            return format;
+        }
+
+        public static string GetDateFormatForOracle(string dateValueFromInput)
+        {
+            string[] arr = dateValueFromInput.Split('-');
+            string format = arr[arr.Length - 1] + "." + arr[arr.Length - 2] + "." + arr[arr.Length - 3];
+            return format;
+        }
+
         static string GVPOD(string part)
         {
             return part.Length == 1 ? "0" + part : part;

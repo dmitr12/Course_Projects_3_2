@@ -22,7 +22,7 @@
                     <div class="form-group">
                         @Html.Label("Зал", htmlAttributes: new { @class = "control-label col-md-2" })
                         <div class="col-md-10">
-                            <select class="search form-control" name="HallId">
+                            <select id="ListHalls" class="search form-control" name="HallId" onchange="changedHall()">
                                 <option hidden></option>
                                 @foreach (var hall in Model)
                                 {
@@ -72,14 +72,14 @@
                     }))
                     {
                         <label>Зал кинотеатра:</label>
-                        <select style="min-width:200px" class="search" required name="HallId">
+                        <select id="AjaxHalls" style="min-width:200px" required name="HallId">
                             <option hidden></option>
                             @foreach (var hall in Model)
                             {
                                 <option value="@hall.IdHall">@hall.NameHall</option>
                             }
                         </select>
-                        <input type="submit" value="Вывести сеансы" class="btn btn-primary" />
+                        <input id="BtnSessions" type="submit" value="Вывести сеансы" class="btn btn-primary" />
                     }
                     <div id="loading" style="display:none; color:red; font-weight:bold;">
                         <p>Поиск...</p>
@@ -88,6 +88,12 @@
                 </div>
             </div>
         </div>
+        <script>
+            function changedHall() {
+                $("#AjaxHalls").val(document.getElementById("ListHalls").value);
+                $("#BtnSessions").click();
+            }
+        </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.jquery.min.js"></script>
         <script>

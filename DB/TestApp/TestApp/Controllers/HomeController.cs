@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using TestApp.Models;
+using TestApp.Utils;
 
 namespace TestApp.Controllers
 {
@@ -146,6 +147,14 @@ namespace TestApp.Controllers
         {
             db.ConnectionString = User.Identity.Name;
             return PartialView(db.GetFilm(idFilm));
+        }
+
+        [HttpPost]
+        public ActionResult GetSessionsByStartSession(string startDate)
+        {
+            db.ConnectionString = User.Identity.Name;
+            startDate = TimerUtil.GetDateFormatForOracle(startDate);
+            return PartialView(db.GetSessionsByStartSession(startDate));
         }
     }
 }
