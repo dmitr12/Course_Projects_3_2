@@ -3,13 +3,48 @@
     <div>
         @foreach (var session in Model)
         {
-            <br />
-            <div>
-                кинотеатр: <span style="color:red">@session.Hall.Cinema.NameCinema</span>,
-                зал: <span style="color:green">@session.Hall.NameHall</span>,
-                начало показ: <span style="color:blue">@TimerUtil.GetDateTimeString(session.StartSession)</span>
-                <a class="btn btn-primary" href="~/Home/BuyTicketForFilm?idHall=@session.HallId&idFilm=@session.FilmId&idSession=@session.IdSession">Купить билет</a>
-            </div>
+            if (session.StartSession.ToShortDateString() == DateTime.Now.ToShortDateString()
+                && (session.StartSession.Hour - DateTime.Now.Hour == 1) && (session.StartSession.Minute - DateTime.Now.Minute < 0))
+            {
+                <br />
+                <div>
+                    кинотеатр: <span style="color:red">@session.Hall.Cinema.NameCinema</span>,
+                    зал: <span style="color:green">@session.Hall.NameHall</span>,
+                    билет нельзя купить, до показа фильма осталось меньше часа: <span style="color:blue">@TimerUtil.GetDateTimeString(session.StartSession)</span>
+                </div>
+            }
+            else if (session.StartSession > DateTime.Now)
+            {
+                if (!ViewBag.UserSessions.Contains(session.IdSession))
+                {
+                    <br />
+                    <div>
+                        кинотеатр: <span style="color:red">@session.Hall.Cinema.NameCinema</span>,
+                        зал: <span style="color:green">@session.Hall.NameHall</span>,
+                        начало показа: <span style="color:blue">@TimerUtil.GetDateTimeString(session.StartSession)</span>
+                        <a class="btn btn-primary" href="~/Home/BuyTicketForFilm?idHall=@session.HallId&idFilm=@session.FilmId&idSession=@session.IdSession">Купить билет</a>
+                    </div>
+                }
+                else
+                {
+                    <br />
+                    <div>
+                        кинотеатр: <span style="color:red">@session.Hall.Cinema.NameCinema</span>,
+                        зал: <span style="color:green">@session.Hall.NameHall</span>,
+                        начало показа: <span style="color:blue">@TimerUtil.GetDateTimeString(session.StartSession)</span>
+                        <a class="btn btn-danger">Вы уже купили билет на данный сеанс</a>
+                    </div>
+                }
+            }
+            else
+            {
+                <br />
+                <div>
+                    кинотеатр: <span style="color:red">@session.Hall.Cinema.NameCinema</span>,
+                    зал: <span style="color:green">@session.Hall.NameHall</span>,
+                    билет нельзя купить, показ фильма начался: <span style="color:blue">@TimerUtil.GetDateTimeString(session.StartSession)</span>
+                </div>
+            }
         }
     </div>
    

@@ -15,11 +15,11 @@ namespace TestApp.Models
         public DateTime StartSession { get; set; }
         [Required]
         [Display(Name ="Фильм")]
-        public int? FilmId {get;set;}
+        public int FilmId {get;set;}
         public Film Film { get; set; }
         [Required]
         [Display(Name ="Зал")]
-        public int? HallId { get; set; }
+        public int HallId { get; set; }
         public Hall Hall { get; set; }
     }
 }

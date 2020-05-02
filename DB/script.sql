@@ -242,7 +242,15 @@ begin
 insert into Tickets(Buyer, SessionId, SeatId) values(buyer, sessionid, seatid);
 commit;
 end;
---------------
+
+create or replace procedure DeleteTicket
+(tcktId number)
+as
+begin
+delete from Tickets where IdTicket=tcktId;
+commit;
+end;
+-----------------
 create or replace function GetCinema(cnm number)
 return SYS_REFCURSOR
 is
@@ -296,6 +304,16 @@ allCinemas SYS_REFCURSOR;
 begin
 open allCinemas for select * from MovieTheatres join CinemaAddresses on Address=IdAddress;
 return allCinemas;
+end;
+
+create or replace function GetCinemaBySectorId(stId number)
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select * from SectorsHall join (select * from Halls join MovieTheatres on Cinema=IdCinema) on Hall=IdHall
+where IdSector=stId;
+return res;
 end;
 
 create or replace function GetAllHallsCinema(cnm number)
@@ -396,6 +414,32 @@ open res for select * from Tickets;
 return res;
 end;
 
+create or replace function GetTicketsByUser(us number)
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select * from Tickets where Buyer=us;
+return res;
+end;
+
+create or replace function GetSessionById(sId number)
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select * from Sessions where IdSession=sId;
+return res;
+end;
+
+create or replace function GetSeatById(stId number)
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select * from Seats where IdSeat=stId;
+return res;
+end;
 --Проверка SELECTS
 select * from Sessions join Films on Film=IdFilm where Hall=4
 --Создание ролей
@@ -443,7 +487,10 @@ grant execute on GetSessionsByStartSession to c##Role_Admin;
 grant execute on GetFilmsNames to c##Role_Admin;
 grant execute on GetSeatsOfHall to c##Role_Admin;
 grant execute on GetAllTickets to c##Role_Admin;
-
+grant execute on GetTicketsByUser to c##Role_Admin;
+grant execute on GetSeatById to c##Role_Admin;
+grant execute on GetSessionById to c##Role_Admin;
+grant execute on GetCinemaBySectorId to c##Role_Admin;
 create user c##Admin identified by admin;
 grant c##Role_Admin to c##Admin;
 
@@ -483,6 +530,11 @@ grant execute on GetFilmsNames to c##Role_User;
 grant execute on GetSeatsOfHall to c##Role_User;
 grant execute on GetAllTickets to c##Role_User;
 grant execute on AddTicket to c##Role_User;
+grant execute on GetTicketsByUser to c##Role_User;
+grant execute on GetSeatById to c##Role_User;
+grant execute on GetSessionById to c##Role_User;
+grant execute on GetCinemaBySectorId to c##Role_User;
+grant execute on DeleteTicket to c##Role_User;
 
 create user C##User identified by user;
 grant C##Role_User to C##User;

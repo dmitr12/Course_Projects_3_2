@@ -222,6 +222,7 @@
     <Content Include="Views\Home\GetFilmForUser.cshtml" />
     <Content Include="Views\Home\GetSessionsForFilm.cshtml" />
     <Content Include="Views\Home\BuyTicketForFilm.cshtml" />
+    <Content Include="Views\Home\UserTicketsForFilms.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

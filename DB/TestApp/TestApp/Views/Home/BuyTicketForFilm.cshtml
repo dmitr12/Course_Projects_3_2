@@ -4,34 +4,48 @@
     ViewBag.Title = "BuyTicketForFilm";
 }
 
-    <h2>Чтобы купить билет, определитесь с сектором и выберите место:</h2>
-<div>
-    @foreach(Sector sector in Model)
-    {
-        double cost = Math.Round(sector.CostSeat * 0.01 * ViewBag.FilmDuration, 1);
-        <h3>Сектор "@sector.NameSector", стоимость одного билета @cost р."</h3>
-        <div class="row">
-            @foreach (Seat seat in sector.Seats)
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <h2>Чтобы купить билет, определитесь с сектором и выберите место:</h2>
+        <div>
+            @foreach (Sector sector in Model)
             {
-            <div class="col-md-1">
-                @if (!ViewBag.TicketsSeats.Contains(seat.IdSeat))
-                {
-                using (@Html.BeginForm())
-                {
-                <input type="number" style="display:none" name="sessionId" value="@ViewBag.IdSession" />
-                <input type="number" style="display:none" name="seatId" value="@seat.IdSeat" />
-                <input class="btn btn-success"style="margin-top:5px" type="submit" value="@seat.NumberSeat" />
-                }
-                }
-                else
-                {
-                <a class="btn btn-danger" style="margin-top:5px">@seat.NumberSeat</a>
-                }
-            </div>
+                double cost = Math.Round(sector.CostSeat * 0.01 * ViewBag.FilmDuration, 1);
+                <h3>Сектор "@sector.NameSector", стоимость одного билета @cost р."</h3>
+                <div class="row">
+                    @foreach (Seat seat in sector.Seats)
+                    {
+                        <div class="col-md-1">
+                            @if (!ViewBag.TicketsSeats.Contains(seat.IdSeat))
+                            {
+                                string id = "form" + seat.IdSeat.ToString();
+                                <form id="@id" action="BuyTicketForFilm" method="post">
+                                    <input type="number" style="display:none" name="sessionId" value="@ViewBag.IdSession" />
+                                    <input type="number" style="display:none" name="seatId" value="@seat.IdSeat" />
+                                    <input class="btn btn-success" style="margin-top:5px" type="button" value="@seat.NumberSeat" onclick="clickSubmit(@id)" />
+                                </form>
+
+                            }
+                            else
+                            {
+                                <a class="btn btn-danger" style="margin-top:5px">@seat.NumberSeat</a>
+                            }
+                        </div>
+                    }
+                </div>
             }
         </div>
-    }
-</div>
-<hr />
-<a class="btn btn-default" href="~/Home/GetFilmForUser?idFilm=@ViewBag.IdFilm">Назад</a>
-
+        <hr />
+        <a class="btn btn-default" href="~/Home/GetFilmForUser?idFilm=@ViewBag.IdFilm">Назад</a>
+        <script>
+            function clickSubmit(el) {
+                result = confirm("Подтвердите покупку билета");
+                if (result)
+                    el.submit();
+            }
+        </script>
+    </body>
+    </html>

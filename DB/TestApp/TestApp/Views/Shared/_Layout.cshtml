@@ -38,15 +38,31 @@
                         }
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li>
-                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
-                                @User.Identity.Name
-                                <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>@Html.ActionLink("Выйти","SignOut","Account")</li>
-                            </ul>
-                        </li>
+                        @if (User.Identity.Name == "Admin")
+                        {
+                            <li>
+                                <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                                    @User.Identity.Name
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>@Html.ActionLink("Выйти", "SignOut", "Account")</li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                                    @User.Identity.Name
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>@Html.ActionLink("Мои билеты в кино","UserTicketsForFilms","Home")</li>
+                                    <li>@Html.ActionLink("Выйти", "SignOut", "Account")</li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

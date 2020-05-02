@@ -505,6 +505,55 @@ namespace TestApp.Models
             return sessions;
         }
 
+        public Session GetSessionById(int idSession)
+        {
+            Session session = null;
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system.GetSessionById", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@sId", idSession);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    session = new Session
+                    {
+                        IdSession = reader.GetInt32(0),
+                        FilmId = reader.GetInt32(1),
+                        HallId = reader.GetInt32(2),
+                        StartSession = reader.GetDateTime(3)
+                    };
+                }
+            }
+            return session;
+        }
+
+        public Seat GetSeatById(int idSeat)
+        {
+            Seat seat = null;
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system.GetSeatById", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@stId", idSeat);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    seat = new Seat
+                    {
+                        IdSeat = reader.GetInt32(0),
+                        NumberSeat=reader.GetInt32(1),
+                        SectorId=reader.GetInt32(2)
+                    };
+                }
+            }
+            return seat;
+        }
+
         public List<Session> GetSessionsByStartSession(string startSession)
         {
             List<Session> sessions = new List<Session>();
@@ -629,6 +678,70 @@ namespace TestApp.Models
             return tickets;
         }
 
+        public List<Ticket> GetTicketsByUser(int idUser)
+        {
+            List<Ticket> tickets = new List<Ticket>();
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system.GetTicketsByUser", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@us", idUser);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    tickets.Add(new Ticket
+                    {
+                        IdTicket = reader.GetInt32(0),
+                        UserId = reader.GetInt32(1),
+                        SessionId = reader.GetInt32(2),
+                        SeatId = reader.GetInt32(3),
+                        Session = GetSessionById(reader.GetInt32(2)),
+                        Seat = GetSeatById(reader.GetInt32(3))
+                    });
+                }
+            }
+            
+            return tickets;
+        }
+
+        public Cinema GetCinemaBySectorId(int idSector)
+        {
+            Cinema cinema = null;
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system.GetCinemaBySectorId", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@stId", idSector);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    cinema = new Cinema
+                    {
+                        IdCinema = reader.GetInt32(10),
+                        NameCinema = reader.GetString(11),
+                        AddressId = reader.GetInt32(12),
+                    };
+                    cinema.Halls.Add(new Hall
+                    {
+                        IdHall = reader.GetInt32(7),
+                        NameHall = reader.GetString(8),
+                        CinemaId = reader.GetInt32(9)
+                    });
+                    cinema.Halls[0].Sectors.Add(new Sector
+                    {
+                        IdSector = reader.GetInt32(0),
+                        HallId = reader.GetInt32(1),
+                        NameSector = reader.GetString(2)
+                    });
+                }
+            }
+            return cinema;
+        }
+
         public void AddFilm(ModelAddFilm film)
         {  
             using(OracleConnection con=new OracleConnection(conString))
@@ -719,6 +832,18 @@ namespace TestApp.Models
                 cmd.Parameters.Add("@buyer", buyer);
                 cmd.Parameters.Add("@sessionid", sessionid);
                 cmd.Parameters.Add("@seatid", seatid);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void DeleteTicket(int ticketId)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.DeleteTicket", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@tcktId", ticketId);
                 cmd.ExecuteNonQuery();
             }
         }

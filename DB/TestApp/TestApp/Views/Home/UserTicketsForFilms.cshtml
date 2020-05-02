@@ -1,0 +1,51 @@
+﻿@model List<TestApp.Models.Ticket>
+    @using TestApp.Models
+@using TestApp.Utils
+@{
+    ViewBag.Title = "UserTicketsForFilms";
+}
+
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <div>
+            @{ int b = 1;}
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                if (Model[i].Session.StartSession > DateTime.Now.AddHours(1))
+                {
+                    string id = "form" + Model[0].IdTicket.ToString();
+                    <div>
+                        <h2>Билет №@b</h2>
+                        <form id="@id" action="DeleteTicket" method="post">
+                            <input type="number" name="idTicket" value="@Model[i].IdTicket" style="display:none" />
+                            <input type="button" class="btn btn-primary" value="Сдать билет" onclick="clickSubmit(@id)"/>
+                        </form>
+                        <p>Фильм: <span style="color:red">@ViewBag.Films[i].NameFilm</span></p>
+                        <p>
+                            Кинотеатр: <span style="color:darkorange">@ViewBag.Cinemas[i].NameCinema</span>, 
+                            зал:<span style="color:darkorange"> @ViewBag.Cinemas[i].Halls[0].NameHall</span>, 
+                            Сектор: <span style="color:darkorange"> @ViewBag.Cinemas[i].Halls[0].Sectors[0].NameSector</span>,
+                            <span style="color:red">Место: @Model[i].Seat.NumberSeat</span>
+                        </p>
+                        <p>Начало сеанса <span style="color:blue">@TimerUtil.GetDateTimeString(Model[i].Session.StartSession)</span></p>
+                        <hr />
+                        @{b++;}
+                    </div>
+                }
+
+            }
+        </div>
+        <script>
+            function clickSubmit(el) {
+                result = confirm("Подтвердите сдачу билета");
+                if (result)
+                    el.submit();
+            }
+        </script>
+    </body>
+    </html>
+    
+

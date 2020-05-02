@@ -22,6 +22,38 @@ namespace TestApp.Controllers
         }
 
         [Authorize(Roles ="User")]
+        public ActionResult UserTicketsForFilms()
+        {
+            db.ConnectionString = User.Identity.Name;
+            List<Ticket> tickets=db.GetTicketsByUser(db.GetUser(User.Identity.Name).IdUser);
+            List<Cinema> cinemas = new List<Cinema>();
+            List<Film> films = new List<Film>();
+            foreach(Ticket t in tickets)
+            {
+                cinemas.Add(db.GetCinemaBySectorId(t.Seat.SectorId));
+                films.Add(db.GetFilmWithoutTrailer(t.Session.FilmId));
+            }
+            ViewBag.Cinemas = cinemas;
+            ViewBag.Films = films;
+            return View(tickets);
+        }
+
+        [HttpPost]
+        public ActionResult DeleteTicket(int idTicket)
+        {
+            db.ConnectionString = User.Identity.Name;
+            try
+            {
+                db.DeleteTicket(idTicket);
+            }
+            catch(Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+            }
+            return RedirectToAction("UserTicketsForFilms");
+        }
+
+        [Authorize(Roles ="User")]
         public ActionResult BuyTicketForFilm(int idHall, int idFilm, int idSession)
         {
             db.ConnectionString = User.Identity.Name;
@@ -237,6 +269,11 @@ namespace TestApp.Controllers
         public ActionResult GetSessionsForFilm(int idFilm)
         {
             db.ConnectionString = User.Identity.Name;
+            List<Ticket> userTickets=db.GetTicketsByUser(db.GetUser(User.Identity.Name).IdUser);
+            List<int> userSessions = new List<int>();
+            foreach (Ticket t in userTickets)
+                userSessions.Add(t.Session.IdSession);
+            ViewBag.UserSessions = userSessions;
             return PartialView(db.GetSessionsByFilmId(idFilm));
         }
     }
