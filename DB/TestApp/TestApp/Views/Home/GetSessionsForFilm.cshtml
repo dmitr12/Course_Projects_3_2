@@ -1,0 +1,15 @@
+﻿@model List<TestApp.Models.Session>
+    @using TestApp.Utils
+    <div>
+        @foreach (var session in Model)
+        {
+            <br />
+            <div>
+                кинотеатр: <span style="color:red">@session.Hall.Cinema.NameCinema</span>,
+                зал: <span style="color:green">@session.Hall.NameHall</span>,
+                начало показ: <span style="color:blue">@TimerUtil.GetDateTimeString(session.StartSession)</span>
+                <a class="btn btn-primary" href="~/Home/BuyTicketForFilm?idHall=@session.HallId&idFilm=@session.FilmId&idSession=@session.IdSession">Купить билет</a>
+            </div>
+        }
+    </div>
+   

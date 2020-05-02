@@ -291,6 +291,33 @@ namespace TestApp.Models
             }
         }
 
+        public List<Film> GetFilmsNames()
+        {
+            List<Film> films = new List<Film>();
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system.GetFilmsNames", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@filmsNames", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    Film film = new Film
+                    {
+                        IdFilm = reader.GetInt32(0),
+                        NameFilm = reader.GetString(1),
+                        DescriptionFilm = "",
+                        Country = "",
+                        YearIssue = 2000,
+                        DurationMinutesFilm = 60,
+                    };
+                    films.Add(film);
+                }
+                return films;
+            }
+        }
+
         public List<Cinema> SelectAllCinemas()
         {
             List<Cinema> cinemas = new List<Cinema>();
@@ -437,18 +464,40 @@ namespace TestApp.Models
             using (OracleConnection con = new OracleConnection(conString))
             {
                 con.Open();
-                OracleCommand cmd = new OracleCommand("system.GetSessionsByFilmId", con);
+                OracleCommand cmd = new OracleCommand($"CREATE or REPLACE DIRECTORY TRAILERDIR as '{ConfigDirectory.VideoDirectory}'", con);
+                cmd.ExecuteNonQuery();
+                cmd = new OracleCommand("system.GetSessionsByFilmId", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@resultSessions", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
                 cmd.Parameters.Add("@filmId", filmId);
                 OracleDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
-                {
+                {                  
                     sessions.Add(new Session
                     {
                         IdSession = reader.GetInt32(0),
                         FilmId = reader.GetInt32(1),
+                        Film = new Film
+                        {
+                            IdFilm = reader.GetInt32(4),
+                            NameFilm = reader.GetString(5),
+                            DescriptionFilm = reader.GetString(6),
+                            Country = reader.GetString(7),
+                            YearIssue = reader.GetInt32(8),
+                            DurationMinutesFilm = reader.GetInt32(9),
+                            Poster = reader.GetOracleBlob(10).Value,
+                        },
                         HallId = reader.GetInt32(2),
+                        Hall=new Hall
+                        {
+                            IdHall=reader.GetInt32(15),
+                            NameHall=reader.GetString(16),
+                            Cinema=new Cinema
+                            {
+                                IdCinema=reader.GetInt32(12),
+                                NameCinema=reader.GetString(13)
+                            }
+                        },
                         StartSession = reader.GetDateTime(3)
                     });
                 }
@@ -519,6 +568,65 @@ namespace TestApp.Models
             }
             con.Close();
             return cinema;
+        }
+
+        public List<Seat> GetSeatsOfHall(int idHall)
+        {
+            List<Seat> seats = new List<Seat>();
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system.GetSeatsOfHall", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@idHl", idHall);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    seats.Add(new Seat
+                    {
+                        IdSeat=reader.GetInt32(0),
+                        NumberSeat=reader.GetInt32(1),
+                        SectorId=reader.GetInt32(2),
+                        Sector=new Sector
+                        {
+                            IdSector=reader.GetInt32(3),
+                            NameSector=reader.GetString(5),
+                            CostSeat=reader.GetInt32(9),
+                            HallOfSector=new Hall
+                            {
+                                IdHall=reader.GetInt32(10),
+                                NameHall=reader.GetString(11)
+                            }
+                        }
+                    });
+                }
+            }
+            return seats;
+        }
+
+        public List<Ticket> GetAllTickets()
+        {
+            List<Ticket> tickets= new List<Ticket>();
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system.GetAllTickets", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    tickets.Add(new Ticket
+                    {
+                        IdTicket=reader.GetInt32(0),
+                        UserId=reader.GetInt32(1),
+                        SessionId=reader.GetInt32(2),
+                        SeatId=reader.GetInt32(3)
+                    });
+                }
+            }
+            return tickets;
         }
 
         public void AddFilm(ModelAddFilm film)
@@ -597,6 +705,20 @@ namespace TestApp.Models
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@login", user.Login);
                 cmd.Parameters.Add("@password", user.Password);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void AddTicket(int buyer, int sessionid, int seatid)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.AddTicket", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@buyer", buyer);
+                cmd.Parameters.Add("@sessionid", sessionid);
+                cmd.Parameters.Add("@seatid", seatid);
                 cmd.ExecuteNonQuery();
             }
         }

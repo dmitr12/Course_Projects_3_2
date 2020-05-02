@@ -1,0 +1,22 @@
+﻿@model List<TestApp.Models.Session>
+
+@if (Model.Count != 0)
+{
+    <div class="col-md-3">
+        <a href="~/Home/GetFilmForUser?idFilm=@Model[0].Film.IdFilm"><img class="pict" onmouseover="funcOver(this)" onmouseout="funcOut(this)" src="data:image/jpg;base64,@Convert.ToBase64String(Model[0].Film.Poster)" width="200" height="300"></a>
+        <a href="~/Home/GetFilmForUser?idFilm=@Model[0].Film.IdFilm">@Model[0].Film.NameFilm</a>
+    </div>
+    <script>
+        function funcOver(el) {
+            el.style.opacity = 0.8;
+        }
+        function funcOut(el) {
+            el.style.opacity = 1;
+        }
+    </script>
+}
+else
+{
+    <div></div>
+}
+

@@ -231,6 +231,17 @@ begin
 update Users set Password=newPsw where Login=lg;
 commit;
 end;
+
+create or replace procedure AddTicket(
+buyer number,
+sessionid number,
+seatid number
+)
+as
+begin
+insert into Tickets(Buyer, SessionId, SeatId) values(buyer, sessionid, seatid);
+commit;
+end;
 --------------
 create or replace function GetCinema(cnm number)
 return SYS_REFCURSOR
@@ -267,6 +278,15 @@ begin
 open allFilms for select IdFilm, NameFilm, DescriptionFilm, Country,
 YearIssue, DurationMinutesFilm, Poster, Trailer, get_dir_name(Trailer), get_file_name(Trailer) from Films;
 return allFilms;
+end;
+
+create or replace function GetFilmsNames
+return SYS_REFCURSOR
+is
+filmsNames SYS_REFCURSOR;
+begin
+open filmsNames for select IdFilm, NameFilm from Films;
+return filmsNames;
 end;
 
 create or replace function GetAllCinemas
@@ -310,7 +330,9 @@ return SYS_REFCURSOR
 is
 resultSessions SYS_REFCURSOR;
 begin
-open resultSessions for select * from Sessions join Halls on Hall=IdHall where Film=filmId order by StartSession;
+open resultSessions for select * from Sessions join Films on Film=IdFilm 
+join (select * from MovieTheatres join Halls on IdCinema=Cinema) on Hall=IdHall 
+where Film=filmId order by StartSession;
 return resultSessions;
 end;
 
@@ -354,6 +376,26 @@ open res for select IdFilm, NameFilm, DescriptionFilm, Country, YearIssue, Durat
 Trailer, get_dir_name(Trailer), get_file_name(Trailer) from Films where NameFilm=nameFlm;
 return res;
 end;
+
+create or replace function GetSeatsOfHall(idHl number)
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select * from Seats join (select * from SectorsHall join Halls on Hall=IdHall) on SectorHall=IdSector
+where Hall=idHl order by SectorHall, NumberSeat;
+return res;
+end;
+
+create or replace function GetAllTickets
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select * from Tickets;
+return res;
+end;
+
 --Проверка SELECTS
 select * from Sessions join Films on Film=IdFilm where Hall=4
 --Создание ролей
@@ -398,6 +440,9 @@ grant create any directory to c##Role_Admin;
 grant execute on GetSessionsByFilmId to c##Role_Admin;
 grant execute on GetFilmByName to c##Role_Admin;
 grant execute on GetSessionsByStartSession to c##Role_Admin;
+grant execute on GetFilmsNames to c##Role_Admin;
+grant execute on GetSeatsOfHall to c##Role_Admin;
+grant execute on GetAllTickets to c##Role_Admin;
 
 create user c##Admin identified by admin;
 grant c##Role_Admin to c##Admin;
@@ -434,6 +479,10 @@ grant execute on get_file_name to c##Role_User;
 grant execute on GetFilmByName to c##Role_User;
 grant create any directory to c##Role_User;
 grant execute on GetSessionsByStartSession to c##Role_User;
+grant execute on GetFilmsNames to c##Role_User;
+grant execute on GetSeatsOfHall to c##Role_User;
+grant execute on GetAllTickets to c##Role_User;
+grant execute on AddTicket to c##Role_User;
 
 create user C##User identified by user;
 grant C##Role_User to C##User;

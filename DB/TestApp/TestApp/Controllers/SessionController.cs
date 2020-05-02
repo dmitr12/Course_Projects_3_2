@@ -40,7 +40,7 @@ namespace TestApp.Controllers
         {
             db.ConnectionString = User.Identity.Name;
             ViewBag.Cinema = db.GetCinema(idCinema);
-            ViewBag.Films = db.GetAllFilmsWithoutTrailers();
+            ViewBag.Films = db.GetFilmsNames();
             return View(db.SelectAllHallsCinema(idCinema));
         }
 
@@ -49,7 +49,7 @@ namespace TestApp.Controllers
         {
             db.ConnectionString = User.Identity.Name;
             ViewBag.Cinema = db.GetCinema(idCinema);
-            ViewBag.Films = db.GetAllFilmsWithoutTrailers();
+            ViewBag.Films = db.GetFilmsNames();
             try
             {
                 if (ModelState.IsValid)

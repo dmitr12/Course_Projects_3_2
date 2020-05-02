@@ -1,0 +1,44 @@
+﻿@model TestApp.Models.Film
+
+<div class="row">
+    <div class="col-md-3">
+        <h4>@Model.NameFilm</h4>
+        <img src="data:image/jpg;base64,@Convert.ToBase64String(Model.Poster)" width="200" height="300">
+    </div>
+    <br /><br />
+    <div class="col-md-6">
+        <p>Продолжительность: @Model.DurationMinutesFilm минут</p>
+        <p>Страна: @Model.Country</p>
+        <p>Год выпуска: @Model.YearIssue</p>
+        <br />
+        <p>@Model.DescriptionFilm</p>
+    </div>
+    <div class="col-md-3">
+        <br />
+        <video width="270" height="150" controls>
+            <source type="video/mp4" src="data:video/mp4;base64,@Convert.ToBase64String(@Model.Trailer)" />
+        </video>
+    </div>
+</div>
+<div>
+    <div>
+        @using (Ajax.BeginForm("GetSessionsForFilm", new AjaxOptions
+        {
+            UpdateTargetId = "result",
+            LoadingElementId = "loading",
+            LoadingElementDuration = 300
+        }))
+        {
+            <input style="display:none" class="form-control" type="number" name="idFilm" value="@Model.IdFilm" />
+            <input style="margin-top:5px" type="submit" value="Даты показа" class="btn btn-primary" />
+        }
+        <div id="loading" style="display:none; color:red; font-weight:bold;">
+            <p>Подождите...</p>
+        </div>
+        <div id="result"></div>
+    </div>
+</div>
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+
+

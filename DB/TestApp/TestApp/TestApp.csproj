@@ -150,8 +150,10 @@
     <Compile Include="Models\ModelAddFilm.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\RoleOfUser.cs" />
+    <Compile Include="Models\Seat.cs" />
     <Compile Include="Models\Sector.cs" />
     <Compile Include="Models\Session.cs" />
+    <Compile Include="Models\Ticket.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\CustomRoleProvider.cs" />
@@ -216,6 +218,10 @@
     <Content Include="Views\Home\DeleteFilm.cshtml" />
     <Content Include="Views\Home\EditFilm.cshtml" />
     <Content Include="Views\Home\GetSessionsByStartSession.cshtml" />
+    <Content Include="Views\Home\GetSessionsByFilm.cshtml" />
+    <Content Include="Views\Home\GetFilmForUser.cshtml" />
+    <Content Include="Views\Home\GetSessionsForFilm.cshtml" />
+    <Content Include="Views\Home\BuyTicketForFilm.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
