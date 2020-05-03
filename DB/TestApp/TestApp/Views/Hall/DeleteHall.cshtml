@@ -1,0 +1,17 @@
+﻿@model TestApp.Models.Hall
+
+@{
+    ViewBag.Title = "DeleteHall";
+}
+
+<h2>Вы действительно хотите удалить данный зал?</h2>
+<div>
+    @using (Html.BeginForm())
+    {
+        @Html.ValidationSummary(true)
+        <input type="number" style="display:none" name="idHall" value="@ViewBag.IdHall"/>
+        <input class="btn btn-primary" type="submit" value="Удалить"/>
+        <a class="btn btn-default" href="~/Hall/Index">Нет</a>
+    }
+</div>
+

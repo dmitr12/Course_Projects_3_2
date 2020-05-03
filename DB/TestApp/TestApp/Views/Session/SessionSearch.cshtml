@@ -9,6 +9,7 @@
             string endHour = end.Hour.ToString().Length > 1 ? end.Hour.ToString() : "0" + end.Hour.ToString();
             string endMin = end.Minute.ToString().Length > 1 ? end.Minute.ToString() : "0" + end.Minute.ToString();
             <li style="color:blue">@TimerUtil.GetDateTimeString(begin)-@endHour:@endMin
+            <a class="btn btn-primary" href="~/Session/DeleteSession?idSession=@session.IdSession&cinema=@ViewBag.Cinema">Удалить сеанс</a>
             <p style="color:black">@session.Film.NameFilm</p>
             </li>
         }

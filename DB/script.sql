@@ -1,4 +1,3 @@
-
 create table Films(
 IdFilm number generated always as identity primary key,
 NameFilm varchar(300) not null,
@@ -101,6 +100,14 @@ returning IdAddress into idAddr;
 commit;
 end; 
 
+create or replace procedure DeleteAddress(
+idAddr number)
+as
+begin
+delete from CinemaAddresses where IdAddress=idAddr;
+commit;
+end;
+
 create or replace procedure AddCinema(
 namecinema MovieTheatres.NameCinema%type,
 idAddr number
@@ -118,6 +125,14 @@ newName MovieTheatres.NameCinema%type
 as
 begin
 update MovieTheatres set NameCinema=newName where IdCinema=idEditCinema;
+commit;
+end;
+
+create or replace procedure DeleteCinema(
+idC number)
+as
+begin
+delete from MovieTheatres where IdCinema=idC;
 commit;
 end;
 
@@ -142,7 +157,15 @@ begin
 insert into Halls(NameHall, Cinema) values(namehall, cinema)
 returning IdHall into idHall;
 commit;
-end; 
+end;
+
+create or replace procedure DeleteHall(
+idHl number)
+as
+begin
+delete from Halls where IdHall=idHl;
+commit;
+end;
 
 create or replace procedure AddSector(
 hall number,
@@ -159,6 +182,14 @@ values(hall, namesector, startrow, endrow, countseatsrow, costseat);
 commit;
 end;
 
+create or replace procedure DeleteSector(
+idSc number)
+as
+begin
+delete from SectorsHall where IdSector=idSc;
+commit;
+end;
+
 create or replace procedure AddSession(
 film number,
 hall number,
@@ -167,6 +198,15 @@ startsession Sessions.StartSession%type
 as
 begin
 insert into Sessions(Film, Hall, StartSession) values(film, hall, startsession);
+commit;
+end;
+
+create or replace procedure DeleteSession(
+sId number
+)
+as
+begin
+delete from Sessions where IdSession=sId;
 commit;
 end;
 
@@ -440,6 +480,24 @@ begin
 open res for select * from Seats where IdSeat=stId;
 return res;
 end;
+
+create or replace function GetTicketBySessionId(sId number)
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select * from Tickets where SessionId=sId;
+return res;
+end;
+
+create or replace function GetSectorsByHallId(idHl number)
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select * from SectorsHall join Halls on Hall=IdHall where Hall=idHl;
+return res;
+end;
 --Проверка SELECTS
 select * from Sessions join Films on Film=IdFilm where Hall=4
 --Создание ролей
@@ -491,8 +549,18 @@ grant execute on GetTicketsByUser to c##Role_Admin;
 grant execute on GetSeatById to c##Role_Admin;
 grant execute on GetSessionById to c##Role_Admin;
 grant execute on GetCinemaBySectorId to c##Role_Admin;
+grant execute on DeleteSession to c##Role_Admin;
+grant execute on GetTicketBySessionId to c##Role_Admin;
+grant execute on DeleteHall to c##Role_Admin;
+grant execute on DeleteSector to c##Role_Admin;
+grant execute on GetSectorsByHallId to c##Role_Admin;
+grant execute on DeleteAddress to c##Role_Admin;
+grant execute on DeleteCinema to c##Role_Admin;
+
+
 create user c##Admin identified by admin;
 grant c##Role_Admin to c##Admin;
+
 
 create role C##Role_User;
 

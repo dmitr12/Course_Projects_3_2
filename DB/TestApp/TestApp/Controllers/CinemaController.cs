@@ -87,5 +87,36 @@ namespace TestApp.Controllers
             }
             return PartialView(cinemas);
         }
+
+        [Authorize(Roles ="Admin")]
+        public ActionResult DeleteCinema(int idCinema)
+        {
+            db.ConnectionString = User.Identity.Name;
+            return View(db.GetCinema(idCinema));
+        }
+
+        [HttpPost]
+        public ActionResult DeleteCinema(Cinema cinema)
+        {
+            db.ConnectionString = User.Identity.Name;
+            try
+            {
+                foreach(Hall hall in db.GetHallsByCinameName(cinema.NameCinema))
+                {
+                    if (db.GetSessionsByHallId(hall.IdHall).Count != 0)
+                    {
+                        ModelState.AddModelError("", "Кинотеатр нельзя удалить, в зале кинотеатра проходят сеансы");
+                        return View(cinema);
+                    }
+                }
+                db.DeleteCinema(cinema.IdCinema, cinema.AddressId, db.GetHallsByCinameName(cinema.NameCinema));
+                return RedirectToAction("Index");
+            }
+            catch(Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+            }
+            return View(cinema);
+        }
     }
 }

@@ -1,0 +1,17 @@
+﻿@model TestApp.Models.Session
+
+@{
+    ViewBag.Title = "DeleteSession";
+}
+
+<h3>Вы дествительно хотите удалить эту сессию?</h3>
+
+<div>
+    @using (Html.BeginForm()) {
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(m => m.IdSession)
+        <input type="number" style="display:none" name="cinema" value="@ViewBag.IdCinema"/>
+        <input class="btn btn-primary" type="submit" value="Удалить"/> 
+        <a class="btn btn-default" href="~/Session/AddSession?idCinema=@ViewBag.IdCinema">Нет</a>
+    }
+</div>

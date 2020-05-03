@@ -1,0 +1,25 @@
+﻿@model TestApp.Models.Cinema
+
+@{
+    ViewBag.Title = "DeleteCinema";
+}
+
+
+<h3>Вы действительно хотите удалить кинотеатр "@Model.NameCinema"?</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        @Html.HiddenFor(m=>m.IdCinema)
+
+        @Html.HiddenFor(m=>m.AddressId)
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.ValidationSummary(true)
+        <div>
+            <input type="submit" value="Удалить" class="btn btn-primary" /> |
+            @Html.ActionLink("Отмена", "Index")
+        </div>
+    }
+</div>

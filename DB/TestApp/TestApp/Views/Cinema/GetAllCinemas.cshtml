@@ -25,7 +25,8 @@
                     @Html.DisplayFor(modelItem => item.Address.NumberHouse)
                 </td>
                 <td>
-                    @Html.ActionLink("Изменить", "EditCinema", new { idCinema = item.IdCinema })
+                    @Html.ActionLink("Изменить", "EditCinema", new { idCinema = item.IdCinema }) | 
+                    @Html.ActionLink("Удалить", "DeleteCinema", new {idCinema=item.IdCinema})
                 </td>
             </tr>
         }

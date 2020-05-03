@@ -197,6 +197,34 @@ namespace TestApp.Models
             return user;
         }
 
+        public List<Sector> GetSectorsByHall(int idHall)
+        {
+            List<Sector> sectors = new List<Sector>();
+            using(OracleConnection con=new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system. GetSectorsByHallId", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@idHl", idHall);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    sectors.Add(new Sector
+                    {
+                        IdSector=reader.GetInt32(0),
+                        HallId=reader.GetInt32(1),
+                        NameSector=reader.GetString(2),
+                        StartRow=reader.GetInt32(3),
+                        EndRow=reader.GetInt32(4),
+                        CountSeatsRow=reader.GetInt32(5),
+                        CostSeat=reader.GetInt32(6)
+                    });
+                }
+            }
+            return sectors;
+        }
+
         public RoleOfUser GetRoleForUser(int idUser)
         {
             RoleOfUser role = null;
@@ -742,6 +770,31 @@ namespace TestApp.Models
             return cinema;
         }
 
+        public Ticket GetTicketBySession(int idSession)
+        {
+            Ticket ticket = null;
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand com = new OracleCommand("system.GetTicketBySessionId", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                com.Parameters.Add("@sId", idSession);
+                OracleDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    ticket = new Ticket
+                    {
+                        IdTicket = reader.GetInt32(0),
+                        UserId = reader.GetInt32(1),
+                        SessionId = reader.GetInt32(2),
+                        SeatId = reader.GetInt32(3)
+                    };
+                }
+            }
+            return ticket;
+        }
+
         public void AddFilm(ModelAddFilm film)
         {  
             using(OracleConnection con=new OracleConnection(conString))
@@ -809,6 +862,18 @@ namespace TestApp.Models
             }
         }
 
+        public void DeleteSession(int idSession)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.DeleteSession", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@sId", idSession);             
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public void AddUser(RegisterModel user)
         {
             using(OracleConnection con=new OracleConnection(conString))
@@ -868,6 +933,21 @@ namespace TestApp.Models
             }
         }
 
+        public void DeleteSector(int idSector)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.DeleteSector", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@idSc", idSector);
+                cmd.ExecuteNonQuery();
+                cmd = new OracleCommand("system.SaveTriggerChanges", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public void AddHall(int idCinema, Hall hall)
         {
             object idHall=null;
@@ -884,6 +964,20 @@ namespace TestApp.Models
             }
             foreach (Sector sector in hall.Sectors)
                 AddSector(idHall, sector);
+        }
+
+        public void DeleteHall(int idHall, List<Sector> sectors)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                foreach (Sector sector in sectors)
+                    DeleteSector(sector.IdSector);
+                OracleCommand cmd = new OracleCommand("system.DeleteHall", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@idHl", idHall);
+                cmd.ExecuteNonQuery();
+            }
         }
 
         public void AddCinema(Cinema cinema, Address address)
@@ -921,6 +1015,24 @@ namespace TestApp.Models
                 com.CommandType = CommandType.StoredProcedure;
                 com.Parameters.Add("@idEditCinema", cinema.IdCinema);
                 com.Parameters.Add("@newName", cinema.NameCinema);
+                com.ExecuteNonQuery();
+            }
+        }
+
+        public void DeleteCinema(int idCinema, int idAddress, List<Hall> halls)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                foreach (Hall hall in halls)
+                    DeleteHall(hall.IdHall, GetSectorsByHall(hall.IdHall));
+                OracleCommand com = new OracleCommand("SYSTEM.DeleteCinema", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@idC", idCinema);
+                com.ExecuteNonQuery();
+                com = new OracleCommand("SYSTEM.DeleteAddress", con);
+                com.CommandType = CommandType.StoredProcedure;
+                com.Parameters.Add("@idAddr", idAddress);
                 com.ExecuteNonQuery();
             }
         }

@@ -81,5 +81,38 @@ namespace TestApp.Controllers
             List<Hall> halls = db.SelectAllHallsCinema(idCinema);
             return PartialView(halls);
         }
+
+        [Authorize(Roles ="Admin")]
+        public ActionResult DeleteHall(int? idHall)
+        {
+            ViewBag.IdHall = idHall;
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult DeleteHall(int idHall)
+        {
+            db.ConnectionString = User.Identity.Name;
+            ViewBag.IdHall = idHall;
+            try
+            {
+                if (db.GetSessionsByHallId(idHall).Count == 0)
+                {
+                    db.DeleteHall(idHall, db.GetSectorsByHall(idHall));
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Зал нельзя удалить, в нем уже будет проходить сеанс");
+                    return View();
+                }
+
+            }
+            catch(Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View();
+            }
+        }
     }
 }

@@ -19,14 +19,14 @@
                 LoadingElementDuration = 300
             }))
             {
-                <select style="min-width:150px" class="search" required name="idCinema">
+                <select style="min-width:150px" class="search" required name="idCinema" onchange="changeCinema()">
                     <option hidden></option>
                     @foreach (var cinema in ViewBag.Cinemas)
                     {
                         <option value="@cinema.IdCinema">@cinema.NameCinema</option>
                     }
                 </select>
-                <input class="btn btn-primary" type="submit" value="Вывести залы кинотеатра" />
+                <input id="btnC" class="btn btn-primary" type="submit" value="Вывести залы кинотеатра" />
             }
             <div id="loading" style="display:none; color:red; font-weight:bold;">
                 <p>Выборка...</p>
@@ -38,6 +38,11 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.jquery.min.js"></script>
         <script>
             $(".search").chosen();
+        </script>
+        <script>
+            function changeCinema() {
+                $("#btnC").click();
+            }
         </script>
     </body>
     </html>

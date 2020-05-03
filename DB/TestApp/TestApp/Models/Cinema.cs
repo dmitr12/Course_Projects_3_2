@@ -14,7 +14,7 @@ namespace TestApp.Models
         [Display(Name ="Название кинотеатра")]
         public string NameCinema { get; set; }
 
-        public int? AddressId { get; set; }
+        public int AddressId { get; set; }
         public Address Address { get; set; }
         public List<Hall> Halls { get; set; }
 

@@ -105,11 +105,43 @@ namespace TestApp.Controllers
         }
 
         [HttpPost]
-        public ActionResult SessionSearch(int HallId)
+        public ActionResult SessionSearch(int HallId, int idCinema)
         {
             db.ConnectionString = User.Identity.Name;
             List<Session> sessions = db.GetSessionsByHallId(HallId);
+            ViewBag.Cinema = idCinema;
             return PartialView(sessions);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public ActionResult DeleteSession(int idSession, int cinema)
+        {
+            db.ConnectionString = User.Identity.Name;
+            ViewBag.IdCinema = cinema;
+            return View(db.GetSessionById(idSession));
+        }
+
+        [HttpPost]
+        public ActionResult DeleteSession(Session session, int cinema)
+        {
+            db.ConnectionString = User.Identity.Name;
+            ViewBag.IdCinema = cinema;
+            try
+            {
+                if (db.GetTicketBySession(session.IdSession) == null)
+                    db.DeleteSession(session.IdSession);
+                else
+                {
+                    ModelState.AddModelError("", "Сеанс нельзя удалить, на него уже есть билет");
+                    return View(session);
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(session);
+            }
+            return RedirectToAction("AddSession", "Session", new { idCinema = cinema });
         }
     }
 }

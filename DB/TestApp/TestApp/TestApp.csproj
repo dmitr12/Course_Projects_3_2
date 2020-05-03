@@ -223,6 +223,9 @@
     <Content Include="Views\Home\GetSessionsForFilm.cshtml" />
     <Content Include="Views\Home\BuyTicketForFilm.cshtml" />
     <Content Include="Views\Home\UserTicketsForFilms.cshtml" />
+    <Content Include="Views\Session\DeleteSession.cshtml" />
+    <Content Include="Views\Hall\DeleteHall.cshtml" />
+    <Content Include="Views\Cinema\DeleteCinema.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
