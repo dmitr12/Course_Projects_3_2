@@ -98,7 +98,7 @@ namespace TestApp.Controllers
             {
                 if (db.GetSessionsByHallId(idHall).Count == 0)
                 {
-                    db.DeleteHall(idHall, db.GetSectorsByHall(idHall));
+                    db.DeleteHall(idHall);
                     return RedirectToAction("Index");
                 }
                 else

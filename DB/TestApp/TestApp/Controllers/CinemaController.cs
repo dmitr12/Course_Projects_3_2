@@ -109,7 +109,7 @@ namespace TestApp.Controllers
                         return View(cinema);
                     }
                 }
-                db.DeleteCinema(cinema.IdCinema, cinema.AddressId, db.GetHallsByCinameName(cinema.NameCinema));
+                db.DeleteCinema(cinema.IdCinema);
                 return RedirectToAction("Index");
             }
             catch(Exception ex)

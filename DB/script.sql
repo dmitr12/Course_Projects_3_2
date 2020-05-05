@@ -643,7 +643,31 @@ begin
 dbms_job.isubmit(100, 'begin RemoveSessionsAndTickets; end;', TO_DATE('29.04.2020 01:05','DD.MM.YYYY HH24:MI'), 'TRUNC(SYSDATE+1)+(1+(5/60))/24');
 commit;
 end;
---Триггер на заполенение таблицы Seats и процедура, сохраняющая изменения триггера;
+--Триггеры для некоторых таблиц;
+
+-----Триггеры, связанные с кинотеатром
+create or replace trigger BeforeDeleteCinema
+before delete on MovieTheatres
+for each row
+begin
+delete from Halls where Cinema=:old.IdCinema;
+end;
+
+create or replace trigger AfterDeleteCinema
+after delete on MovieTheatres
+for each row
+begin
+delete from CinemaAddresses where IdAddress=:old.Address;
+end;
+
+---Тригерры, связанные с залом
+create or replace trigger BeforeDeleteHall
+before delete on Halls
+for each row
+begin
+delete from SectorsHall where Hall=:old.IdHall;
+end;
+-----Триггеры, связанный с сектором
 create or replace trigger AfterInsertUpdateRowSector
 after insert or update on SectorsHall
 for each row

@@ -966,13 +966,11 @@ namespace TestApp.Models
                 AddSector(idHall, sector);
         }
 
-        public void DeleteHall(int idHall, List<Sector> sectors)
+        public void DeleteHall(int idHall)
         {
             using (OracleConnection con = new OracleConnection(conString))
             {
                 con.Open();
-                foreach (Sector sector in sectors)
-                    DeleteSector(sector.IdSector);
                 OracleCommand cmd = new OracleCommand("system.DeleteHall", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@idHl", idHall);
@@ -1019,20 +1017,14 @@ namespace TestApp.Models
             }
         }
 
-        public void DeleteCinema(int idCinema, int idAddress, List<Hall> halls)
+        public void DeleteCinema(int idCinema)
         {
             using (OracleConnection con = new OracleConnection(conString))
             {
                 con.Open();
-                foreach (Hall hall in halls)
-                    DeleteHall(hall.IdHall, GetSectorsByHall(hall.IdHall));
                 OracleCommand com = new OracleCommand("SYSTEM.DeleteCinema", con);
                 com.CommandType = CommandType.StoredProcedure;
                 com.Parameters.Add("@idC", idCinema);
-                com.ExecuteNonQuery();
-                com = new OracleCommand("SYSTEM.DeleteAddress", con);
-                com.CommandType = CommandType.StoredProcedure;
-                com.Parameters.Add("@idAddr", idAddress);
                 com.ExecuteNonQuery();
             }
         }
