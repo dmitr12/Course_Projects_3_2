@@ -19,17 +19,7 @@
                         {
                             <li>@Html.ActionLink("Кинотеатры", "Index", "Cinema")</li>
                             <li>@Html.ActionLink("Залы", "Index", "Hall")</li>
-                            <li class="dropdown">
-                                <a href="#" data-toggle="dropdown" class="dropdown-toggle">
-                                    Сеансы
-                                    <b class="caret"></b>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        @Html.ActionLink("Добавить", "ChooseCinemaToAddSession", "Session")
-                                    </li>
-                                </ul>
-                            </li>
+                            <li>@Html.ActionLink("Сеансы", "ChooseCinemaToAddSession", "Session")</li>
                             <li>@Html.ActionLink("Фильмы", "Index", "Home")</li>
                         }
                         else

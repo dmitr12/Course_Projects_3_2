@@ -159,6 +159,17 @@ returning IdHall into idHall;
 commit;
 end;
 
+create or replace procedure EditHall(
+idHl number,
+nmHl Halls.NameHall%type,
+cnm number
+)
+as
+begin
+update Halls set NameHall=nmHl, Cinema=cnm where IdHall=idHl;
+commit;
+end;
+
 create or replace procedure DeleteHall(
 idHl number)
 as
@@ -182,6 +193,22 @@ values(hall, namesector, startrow, endrow, countseatsrow, costseat);
 commit;
 end;
 
+create or replace procedure EditSector(
+idS number,
+hl number,
+nmsector SectorsHall.NameSector%type,
+strow number,
+enrow number,
+countseatsr number,
+costs number
+)
+as
+begin
+update SectorsHall set Hall=hl, NameSector=nmsector, StartRow=strow, EndRow=enrow,
+CountSeatsRow=countseatsr, CostSeat=costs where IdSector=idS;
+commit;
+end;
+
 create or replace procedure DeleteSector(
 idSc number)
 as
@@ -198,6 +225,18 @@ startsession Sessions.StartSession%type
 as
 begin
 insert into Sessions(Film, Hall, StartSession) values(film, hall, startsession);
+commit;
+end;
+
+create or replace procedure EditSession(
+idS number,
+flm number,
+hl number,
+sts Sessions.StartSession%type
+)
+as
+begin
+update Sessions set Film=flm, Hall=hl, StartSession=sts where IdSession=idS;
 commit;
 end;
 
@@ -374,6 +413,15 @@ open hallsCinema for select * from Halls where Cinema=(select IdCinema from Movi
 return hallsCinema;
 end;
 
+create or replace function GetHallById(idHl number)
+return SYS_REFCURSOR
+is
+res SYS_REFCURSOR;
+begin
+open res for select * from Halls where IdHall=idHl;
+return res;
+end;
+
 create or replace function GetSessionsByHallId(hlId number)
 return SYS_REFCURSOR
 is
@@ -519,6 +567,7 @@ grant execute on AddCinemaAddress to c##Role_Admin;
 grant execute on AddHall to c##Role_Admin;
 grant execute on AddSector to c##Role_Admin;
 grant execute on AddSession to c##Role_Admin;
+grant execute on EditSession to c##Role_Admin;
 grant execute on GetCinema to c##Role_Admin;
 grant execute on GetAllCinemas to c##Role_Admin;
 grant execute on GetAllFilms to c##Role_Admin;
@@ -556,7 +605,9 @@ grant execute on DeleteSector to c##Role_Admin;
 grant execute on GetSectorsByHallId to c##Role_Admin;
 grant execute on DeleteAddress to c##Role_Admin;
 grant execute on DeleteCinema to c##Role_Admin;
-
+grant execute on EditHall to c##Role_Admin;
+grant execute on EditSector to c##Role_Admin;
+grant execute on GetHallById to c##Role_Admin;
 
 create user c##Admin identified by admin;
 grant c##Role_Admin to c##Admin;
@@ -603,6 +654,7 @@ grant execute on GetSeatById to c##Role_User;
 grant execute on GetSessionById to c##Role_User;
 grant execute on GetCinemaBySectorId to c##Role_User;
 grant execute on DeleteTicket to c##Role_User;
+grant execute on GetHallById to c##Role_User;
 
 create user C##User identified by user;
 grant C##Role_User to C##User;
@@ -628,7 +680,7 @@ values('Я-легенда','США','25.12.2007','фантастика',96,EMPTY_BLOB) returning Post
    COMMIT;
 END;
 
------DBMS_JOB!!!!!
+-----DBMS_JOB
 create or replace procedure RemoveSessionsAndTickets
 as
 begin

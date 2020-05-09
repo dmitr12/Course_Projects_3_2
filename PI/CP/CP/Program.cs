@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Numerics;
 using System.Text;
 using static System.Console;
 
@@ -32,6 +34,7 @@ namespace TestHC
 
         static void Main(string[] args)
         {
+            
             //example
             Console.InputEncoding = Encoding.Unicode;
             Console.OutputEncoding = Encoding.Unicode;
@@ -39,26 +42,44 @@ namespace TestHC
             HC256 pr = new HC256();
             uint[] key = new uint[8];
             uint[] iv = new uint[8];
-            for (int i = 0; i < key.Length; i++)
+            for (uint i = 0; i < key.Length; i++)
             {
-                key[i] = 0;
-                iv[i] = 0;
+                key[i] = 1846593+i+3;
+                iv[i] = 2759372+i+3;
             }
+            key[0] = 37593674;
+            key[1] = 46253648;
+            key[2] = uint.MaxValue - 1537482;
+            key[4] = 63528423;
+            WriteLine("Your key: ");
+            string ke = "";
+            for(int i = 0; i < 8; i++)
+            {
+                string str = Convert.ToString(key[i], 16);
+                while (str.Length != 8)
+                    str = '0' + str;
+                ke += str;
+                WriteLine(str);
+            }
+            WriteLine("Key: " + ke);
             pr.InitializationProcess(key, iv);
             while (true)
             {
                 WriteLine("Введите текст");
                 string s = ReadLine();
-                List<uint> keyStream = pr.GenerateKeyStream((uint)Math.Ceiling((decimal)(s.Length * 16) / 32));
+                byte[] bt = Encoding.Unicode.GetBytes(s);
+                List<uint> keyStream = pr.GenerateKeyStream(Encoding.Unicode.GetBytes(s));
                 WriteLine("KeyStream:");
                 foreach (var k in keyStream)
-                    WriteLine(k);
+                    WriteLine(Convert.ToString(k,16));
                 List<byte> word = new List<byte>();
                 word.AddRange(Encoding.Unicode.GetBytes(s));
                 List<byte> encrypted = pr.Encrypt(word, keyStream);
                 List<byte> decrypted = pr.Decrypt(encrypted, keyStream);
+                using (StreamWriter sw = new StreamWriter(@"test.txt", true, Encoding.Unicode))
+                    sw.WriteLine(Encoding.Unicode.GetString(encrypted.ToArray()));
             }
-            //byte[] bt=Encoding.Unicode.GetBytes("")
+            
         }
     }
 }

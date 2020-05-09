@@ -53,8 +53,10 @@
                             <br />
                         </div>
                     </div>
+                    <br />
                     <input type="button" value="Еще сектор" id="addSector" class="btn"/>
-                    <input type="submit" value="Добавить" class="btn"/>
+                    <input type="button" value="Убрать сектор" id="deleteSector" class="btn btn-danger"/>
+                    <input type="submit" value="Добавить" class="btn btn-success"/>
                     <a class="btn" href="~/Hall/Index">Отмена</a>
                 }
             </div>
@@ -124,6 +126,14 @@
                     "<br />" +
                     "</div>"
                 $('#sectors').append(htmlString);
+            });
+            $('#deleteSector').click(function () {
+                if (i != 0) {
+                    var sectors = document.getElementById("sectors");
+                    var elem = sectors.lastChild;
+                    sectors.removeChild(elem);
+                    i--;
+                }            
             });
         });
     </script>

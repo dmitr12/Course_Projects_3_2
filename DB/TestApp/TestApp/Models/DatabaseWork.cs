@@ -455,6 +455,31 @@ namespace TestApp.Models
             return halls;
         }
 
+        public Hall GetHallById(int idHall)
+        {
+            Hall hall = null;
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.GetHallById", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@res", OracleDbType.RefCursor, ParameterDirection.ReturnValue);
+                cmd.Parameters.Add("@idHl", idHall);
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    hall=new Hall()
+                    {
+                        IdHall = reader.GetInt32(0),
+                        NameHall = reader.GetString(1),
+                        CinemaId = reader.GetInt32(2)
+                    };
+                }
+
+            }
+            return hall;
+        }
+
         public List<Session> GetSessionsByHallId(int hallId)
         {
             List<Session> sessions = new List<Session>();
@@ -862,6 +887,21 @@ namespace TestApp.Models
             }
         }
 
+        public void EditSession(Session session)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.EditSession", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@idS", session.IdSession);
+                cmd.Parameters.Add("@flm", session.FilmId);
+                cmd.Parameters.Add("@hl", session.HallId);
+                cmd.Parameters.Add("@sts", session.StartSession);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public void DeleteSession(int idSession)
         {
             using (OracleConnection con = new OracleConnection(conString))
@@ -933,6 +973,27 @@ namespace TestApp.Models
             }
         }
 
+        public void EditSector(int idHall, Sector sector)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.EditSector", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@idS", sector.IdSector);
+                cmd.Parameters.Add("@hl", idHall);
+                cmd.Parameters.Add("@nmsector", sector.NameSector);
+                cmd.Parameters.Add("@strow", sector.StartRow);
+                cmd.Parameters.Add("@enrow", sector.EndRow);
+                cmd.Parameters.Add("@countseatsr", sector.CountSeatsRow);
+                cmd.Parameters.Add("@costs", sector.CostSeat);
+                cmd.ExecuteNonQuery();
+                cmd = new OracleCommand("system.SaveTriggerChanges", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public void DeleteSector(int idSector)
         {
             using (OracleConnection con = new OracleConnection(conString))
@@ -964,6 +1025,20 @@ namespace TestApp.Models
             }
             foreach (Sector sector in hall.Sectors)
                 AddSector(idHall, sector);
+        }
+
+        public void EditHall (Hall hall)
+        {
+            using (OracleConnection con = new OracleConnection(conString))
+            {
+                con.Open();
+                OracleCommand cmd = new OracleCommand("system.EditHall", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@idHl", hall.IdHall);
+                cmd.Parameters.Add("@nmHl", hall.NameHall);
+                cmd.Parameters.Add("@cnm", hall.CinemaId);
+                cmd.ExecuteNonQuery();
+            }
         }
 
         public void DeleteHall(int idHall)

@@ -1,0 +1,138 @@
+﻿@model TestApp.Models.Hall
+    @using TestApp.Models
+
+@{
+    ViewBag.Title = "Изменение зала";
+}
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.min.css" />
+</head>
+<body>
+    <h2>Добавление зала:</h2>
+    <div class="row">
+        <div class="col-md-6">
+            @using (Html.BeginForm())
+            {
+                @Html.ValidationSummary(true);
+                <br />
+                <label>Название зала:</label>
+                <br />
+                <input type="text" required name="NameHall" value="@Model.NameHall" />
+                <div id="sectors">
+                    <div>
+                        <p style="color:red">Сектор:</p>
+                        <input type="number" name="Sectors[0].IdSector" hidden value="@ViewBag.Sectors[0].IdSector" />
+                        <label>Название сектора:</label>
+                        <br />
+                        <input required type="text" name="Sectors[0].NameSector" value="@ViewBag.Sectors[0].NameSector" />
+                        <br />
+                        <label>Первый ряд:</label>
+                        <br />
+                        <input required type="number" min="1" max="1" name="Sectors[0].StartRow" value="@ViewBag.Sectors[0].StartRow" />
+                        <br />
+                        <label>Последний ряд:</label>
+                        <br />
+                        <input required type="number" name="Sectors[0].EndRow" value="@ViewBag.Sectors[0].EndRow" />
+                        <br />
+                        <label>Мест в одном ряде:</label>
+                        <br />
+                        <input required type="number" min="5" name="Sectors[0].CountSeatsRow" value="@ViewBag.Sectors[0].CountSeatsRow" />
+                        <br />
+                        <label>Стоимость одного места:</label>
+                        <br />
+                        <input required type="number" min="1" name="Sectors[0].CostSeat" value="@ViewBag.Sectors[0].CostSeat" />
+                        <br />
+                    </div>
+                    @for (int j = 1; j < ViewBag.Sectors.Count; j++)
+                    {
+                        <div>
+                            <p style="color:red">Сектор:</p>
+                            <input type="number" name="Sectors[@j].IdSector" hidden value="@ViewBag.Sectors[j].IdSector" />
+                            <label>Название сектора:</label>
+                            <br />
+                            <input required type="text" name="Sectors[@j].NameSector" value="@ViewBag.Sectors[j].NameSector" />
+                            <br />
+                            <label>Первый ряд:</label>
+                            <br />
+                            <input required type="number" name="Sectors[@j].StartRow" value="@ViewBag.Sectors[j].StartRow" />
+                            <br />
+                            <label>Последний ряд:</label>
+                            <br />
+                            <input required type="number" name="Sectors[@j].EndRow" value="@ViewBag.Sectors[j].EndRow" />
+                            <br />
+                            <label>Мест в одном ряде:</label>
+                            <br />
+                            <input required type="number" min="5" name="Sectors[@j].CountSeatsRow" value="@ViewBag.Sectors[j].CountSeatsRow" />
+                            <br />
+                            <label>Стоимость одного места:</label>
+                            <br />
+                            <input required type="number" min="1" name="Sectors[@j].CostSeat" value="@ViewBag.Sectors[j].CostSeat" />
+                            <br />
+                        </div>
+                    }
+                </div>
+                <br />
+                <input type="button" value="Еще сектор" id="addSector" class="btn" />
+                <input type="button" value="Убрать сектор" id="deleteSector" class="btn btn-danger"/>
+                <input type="submit" value="Изменить" class="btn btn-success" />
+                <a class="btn" href="~/Hall/Index">Отмена</a>
+            }
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.jquery.min.js"></script>
+    <script>
+            $(".search").chosen();
+    </script>
+</body>
+</html>
+
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+@section Scripts{
+    <script>
+        $(function () {
+            var i = 0 +@ViewBag.Sectors.Count-1;
+            $('#addSector').click(function () {
+                i++;
+                var htmlString = "<div>" +
+                    "<p style='color:red'>Сектор:</p>" +
+                    "<label>Название сектора:</label>" +
+                    "<br />" +
+                    "<input required type='text' name='Sectors[" + i + "].NameSector' />" +
+                    "<br />" +
+                    "<label>Первый ряд:</label>" +
+                    "<br />" +
+                    "<input required type='number' name='Sectors[" + i + "].StartRow' />" +
+                    "<br />" +
+                    "<label>Последний ряд:</label>" +
+                    "<br />" +
+                    "<input required type='number' name='Sectors[" + i + "].EndRow' />" +
+                    "<br />" +
+                    "<label>Мест в одном ряде:</label>" +
+                    "<br />" +
+                    "<input required type='number' name='Sectors[" + i + "].CountSeatsRow' />" +
+                    "<br />" +
+                    "<label>Стоимость одного места:</label>" +
+                    "<br />" +
+                    "<input required type='number' name='Sectors[" + i + "].CostSeat' />" +
+                    "<br />" +
+                    "</div>"
+                $('#sectors').append(htmlString);
+            });
+            $('#deleteSector').click(function () {
+                if (i != 0) {
+                    var sectors = document.getElementById("sectors");
+                    var elem = sectors.lastElementChild;
+                    elem.remove();
+                    i--;
+                }
+            });
+        });
+    </script>
+}
+

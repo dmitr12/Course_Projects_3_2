@@ -5,9 +5,10 @@
         <ul>
             @if (Model.ToList()[0] != null)
             {
+                <br />
                 foreach (Hall hall in Model)
                 {
-                    <li style="color:red">@hall.NameHall  <a class="btn btn-primary" href="~/Hall/DeleteHall?idHall=@hall.IdHall">Удалить зал</a></li>
+                    <li style="color:red">@hall.NameHall <a class="btn btn-primary" href="~/Hall/EditHall?idHall=@hall.IdHall">Изменить зал</a> <a class="btn btn-warning" href="~/Hall/DeleteHall?idHall=@hall.IdHall">Удалить зал</a></li>
                     foreach (Sector sector in hall.Sectors)
                     {
                         <li style="color:green">Название сектора: @sector.NameSector</li>

@@ -1,0 +1,129 @@
+﻿@model TestApp.Models.Session
+    @using TestApp.Utils
+
+@{
+    ViewBag.Title = "EditSession";
+}
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.min.css" />
+</head>
+<body>
+    <h2>Изменение сеанса для кинотеатра "@ViewBag.Cinema.NameCinema":</h2>
+    <div class="row">
+        <div class="col-md-6">
+            @using (Html.BeginForm())
+            {
+                @Html.ValidationSummary(true);
+                <input type="number" name="idCinema" hidden value="@ViewBag.Cinema.IdCinema" />
+                <input type="number" name="idOldFilm" hidden value="@Model.FilmId" />
+                <div class="form-group">
+                    @Html.Label("Зал", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <select id="ListHalls" class="search form-control" name="HallId" onchange="changedHall()">
+                            <option hidden></option>
+                            @foreach (var hall in ViewBag.Halls)
+                            {
+                                if (hall.IdHall == Model.HallId)
+                                {
+                                    <option value="@hall.IdHall" selected>@hall.NameHall</option>
+                                }
+                                else
+                                {
+                                    <option value="@hall.IdHall">@hall.NameHall</option>
+                                }
+                            }
+                        </select>
+                        @Html.ValidationMessage("HallId", "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.Label("Фильм", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <select class="search form-control" id="Film" name="FilmId">
+                            <option hidden></option>
+                            @foreach (var film in ViewBag.Films)
+                            {
+                                if (film.IdFilm == Model.FilmId)
+                                {
+                                    <option value="@film.IdFilm" selected>@film.NameFilm</option>
+                                }
+                                else
+                                {
+                                    <option value="@film.IdFilm">@film.NameFilm</option>
+                                }
+                            }
+                        </select>
+                        @Html.ValidationMessage("FilmId", "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.Label("Начало проведения сеанса", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @{ 
+                            DateTime dt = new DateTime(Model.StartSession.Year, Model.StartSession.Month, Model.StartSession.Day);
+                        }
+                        <input type="datetime-local" min="@TimerUtil.GetTimeFormat(dt)" value="@TimerUtil.GetTimeFormat(Model.StartSession)" class="form-control" name="StartSession" />
+                        @Html.ValidationMessage("StartSession", "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-1">
+                        <input type="submit" value="Изменить" class="btn btn-primary" />
+                    </div>
+                    <div class="col-md-offset-2 col-md-1">
+                        <a class="btn btn-default" href="~/Session/AddSession?idCinema=@ViewBag.Cinema.IdCinema">Отмена</a>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-md-6">
+            <div>
+                @using (Ajax.BeginForm("SessionSearch", new AjaxOptions
+                {
+                    UpdateTargetId = "result",
+                    LoadingElementId = "loading",
+                    LoadingElementDuration = 300
+                }))
+                {
+                    <label>Зал кинотеатра:</label>
+                    <select id="AjaxHalls" style="min-width:200px" required name="HallId">
+                        <option hidden></option>
+                        @foreach (var hall in ViewBag.Halls)
+                        {
+                            <option value="@hall.IdHall">@hall.NameHall</option>
+                        }
+                    </select>
+                    <input type="number" style="display:none" name="idCinema" value="@ViewBag.Cinema.IdCinema" />
+                    <input id="BtnSessions" type="submit" value="Вывести сеансы" class="btn btn-primary" />
+                }
+                <div id="loading" style="display:none; color:red; font-weight:bold;">
+                    <p>Поиск...</p>
+                </div>
+                <div id="result"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        window.onload = function () {
+            $("#AjaxHalls").val(@Model.HallId);
+            $("#BtnSessions").click();
+        }
+        function changedHall() {
+            $("#AjaxHalls").val(document.getElementById("ListHalls").value);
+            $("#BtnSessions").click();
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.jquery.min.js"></script>
+    <script>
+        $(".search").chosen();
+    </script>
+</body>
+</html>
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+
+

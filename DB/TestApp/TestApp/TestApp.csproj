@@ -226,6 +226,8 @@
     <Content Include="Views\Session\DeleteSession.cshtml" />
     <Content Include="Views\Hall\DeleteHall.cshtml" />
     <Content Include="Views\Cinema\DeleteCinema.cshtml" />
+    <Content Include="Views\Session\EditSession.cshtml" />
+    <Content Include="Views\Hall\EditHall.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
