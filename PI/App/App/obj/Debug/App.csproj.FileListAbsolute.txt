@@ -1,0 +1,9 @@
+D:\CourseProjects32\Repository\PI\App\App\bin\Debug\App.exe.config
+D:\CourseProjects32\Repository\PI\App\App\bin\Debug\App.exe
+D:\CourseProjects32\Repository\PI\App\App\bin\Debug\App.pdb
+D:\CourseProjects32\Repository\PI\App\App\obj\Debug\App.csprojAssemblyReference.cache
+D:\CourseProjects32\Repository\PI\App\App\obj\Debug\App.Form1.resources
+D:\CourseProjects32\Repository\PI\App\App\obj\Debug\App.Properties.Resources.resources
+D:\CourseProjects32\Repository\PI\App\App\obj\Debug\App.csproj.GenerateResource.cache
+D:\CourseProjects32\Repository\PI\App\App\obj\Debug\App.exe
+D:\CourseProjects32\Repository\PI\App\App\obj\Debug\App.pdb

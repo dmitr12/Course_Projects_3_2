@@ -32,36 +32,56 @@ namespace TestHC
             };
         }
 
+        public static uint FromBinToDec(string bin)
+        {
+            uint res = 0;
+            int ln = bin.Length - 1;
+            for (int i = ln; i >=0; i--)
+                if (bin[i] == '1')
+                    res += (uint)Math.Pow(2, ln-i); 
+            return res;
+        }
+
+        public static byte[] GetBt(BigInteger bi, int bitLength)
+        {
+            int counter = bitLength / 8;
+            byte[] bts = new byte[counter];
+            for(int i=1;i<=counter;i++)
+            {
+                bts[i - 1] = (byte)(bi >> (bitLength - 8 * i) & byte.MaxValue);
+            }
+            return bts;
+        }
+
+        public static uint[] GetArr32Bit(BigInteger bi, int bitLength)
+        {
+            int counter = bitLength / 32;
+            uint[] bts = new uint[counter];
+            for (int i = 1; i <= counter; i++)
+            {
+                bts[i - 1] = (uint)(bi >> (bitLength - 32 * i) & uint.MaxValue);
+            }
+            return bts;
+        }
+
         static void Main(string[] args)
         {
-            
-            //example
-            Console.InputEncoding = Encoding.Unicode;
-            Console.OutputEncoding = Encoding.Unicode;
-            WriteLine("\x89f4");
             HC256 pr = new HC256();
-            uint[] key = new uint[8];
-            uint[] iv = new uint[8];
-            for (uint i = 0; i < key.Length; i++)
+            BigInteger key256Bit = new BigInteger(0);
+            BigInteger vector256Bit = new BigInteger(0);
+            uint[] key = GetArr32Bit(key256Bit, 256);
+            uint[] iv = GetArr32Bit(vector256Bit,256);
+            WriteLine(uint.MaxValue);
+            WriteLine("Key:");
+            for(int i = 0; i < key.Length; i++)
             {
-                key[i] = 1846593+i+3;
-                iv[i] = 2759372+i+3;
+                WriteLine(key[i]);
             }
-            key[0] = 37593674;
-            key[1] = 46253648;
-            key[2] = uint.MaxValue - 1537482;
-            key[4] = 63528423;
-            WriteLine("Your key: ");
-            string ke = "";
-            for(int i = 0; i < 8; i++)
+            WriteLine("Vector:");
+            for (int i = 0; i < key.Length; i++)
             {
-                string str = Convert.ToString(key[i], 16);
-                while (str.Length != 8)
-                    str = '0' + str;
-                ke += str;
-                WriteLine(str);
+                WriteLine(iv[i]);
             }
-            WriteLine("Key: " + ke);
             pr.InitializationProcess(key, iv);
             while (true)
             {
@@ -76,10 +96,81 @@ namespace TestHC
                 word.AddRange(Encoding.Unicode.GetBytes(s));
                 List<byte> encrypted = pr.Encrypt(word, keyStream);
                 List<byte> decrypted = pr.Decrypt(encrypted, keyStream);
-                using (StreamWriter sw = new StreamWriter(@"test.txt", true, Encoding.Unicode))
-                    sw.WriteLine(Encoding.Unicode.GetString(encrypted.ToArray()));
+            }       
+        }
+    }
+    class RandomBigInteger : Random
+    {
+        public RandomBigInteger() : base()
+        {
+        }
+
+        public RandomBigInteger(int Seed) : base(Seed)
+        {
+        }
+
+        /// <summary>
+        /// Generates a random positive BigInteger between 0 and 2^bitLength (non-inclusive).
+        /// </summary>
+        /// <param name="bitLength">The number of random bits to generate.</param>
+        /// <returns>A random positive BigInteger between 0 and 2^bitLength (non-inclusive).</returns>
+        public BigInteger NextBigInteger(int bitLength)
+        {
+            if (bitLength < 1) return BigInteger.Zero;
+
+            int bytes = bitLength / 8;
+            int bits = bitLength % 8;
+
+            // Generates enough random bytes to cover our bits.
+            byte[] bs = new byte[bytes + 1];
+            NextBytes(bs);
+
+            // Mask out the unnecessary bits.
+            byte mask = (byte)(0xFF >> (8 - bits));
+            bs[bs.Length - 1] &= mask;
+
+            return new BigInteger(bs);
+        }
+
+        /// <summary>
+        /// Generates a random BigInteger between start and end (non-inclusive).
+        /// </summary>
+        /// <param name="start">The lower bound.</param>
+        /// <param name="end">The upper bound (non-inclusive).</param>
+        /// <returns>A random BigInteger between start and end (non-inclusive)</returns>
+        public BigInteger NextBigInteger(BigInteger start, BigInteger end)
+        {
+            if (start == end) return start;
+
+            BigInteger res = end;
+
+            // Swap start and end if given in reverse order.
+            if (start > end)
+            {
+                end = start;
+                start = res;
+                res = end - start;
             }
-            
+            else
+                // The distance between start and end to generate a random BigIntger between 0 and (end-start) (non-inclusive).
+                res -= start;
+
+            byte[] bs = res.ToByteArray();
+
+            // Count the number of bits necessary for res.
+            int bits = 8;
+            byte mask = 0x7F;
+            while ((bs[bs.Length - 1] & mask) == bs[bs.Length - 1])
+            {
+                bits--;
+                mask >>= 1;
+            }
+            bits += 8 * bs.Length;
+
+            // Generate a random BigInteger that is the first power of 2 larger than res, 
+            // then scale the range down to the size of res,
+            // finally add start back on to shift back to the desired range and return.
+            return ((NextBigInteger(bits + 1) * res) / BigInteger.Pow(2, bits + 1)) + start;
         }
     }
 }

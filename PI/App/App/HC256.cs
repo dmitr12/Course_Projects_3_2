@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace TestHC
+namespace App
 {
     class HC256
     {
-        uint[] P = new uint[1024];
+        public BigInteger Key { get; private set; }
+        public BigInteger Vector { get; private set; }
+
+        public BigInteger step = new BigInteger(0);
+
+        public uint[] P = new uint[1024];
         uint[] Q = new uint[1024];
         uint[] W = new uint[2560];
-        BigInteger step = new BigInteger(0);
 
         public uint CycleSdvigRight(uint x, int n) => ((x >> n) ^ (x << (32 - n)));
 
@@ -61,13 +66,46 @@ namespace TestHC
             u += b + (tem0 ^ tem1) + P[tem2];
         }
 
-        public BigInteger Generate256Bit()
+        public void GenerateKey()
         {
-            return new RandomBigInteger().NextBigInteger(256);
+            Key = Generate256Bit();
         }
 
-        public void InitializationProcess(uint[] key, uint[] iv)
+        public void GenerateVector()
         {
+            Vector = Generate256Bit();
+        }
+
+        public void SetKey(BigInteger bi)
+        {
+            Key = bi;
+        }
+
+        public void SetVector(BigInteger bi)
+        {
+            Vector = bi;
+        }
+
+        public BigInteger Generate256Bit()
+        {
+            return new RandBigInt().NextBigInteger(256);
+        }
+
+        public uint[] GetArr32Bit(BigInteger bi, int bitLength)
+        {
+            int counter = bitLength / 32;
+            uint[] bts = new uint[counter];
+            for (int i = 1; i <= counter; i++)
+            {
+                bts[i - 1] = (uint)(bi >> (bitLength - 32 * i) & uint.MaxValue);
+            }
+            return bts;
+        }
+
+        public void InitializationProcess()
+        {
+            uint[] key = GetArr32Bit(Key, 256);
+            uint[] iv = GetArr32Bit(Vector, 256);
             //1)
             for (int i = 0; i <= 2559; i++)
             {
@@ -99,14 +137,14 @@ namespace TestHC
                 feedback_2(ref Q[1023], Q[0], Q[1013], Q[1020]);
             }
         }
-        public List<uint> GenerateKeyStream(byte[] bytes)
+        public List<uint> GenerateKeyStream(byte[] bytesMsg)
         {
-            int counter= bytes.Length % 4 == 0 ? bytes.Length / 4 : (bytes.Length / 4) + 1;
+            int counter = bytesMsg.Length % 4 == 0 ? bytesMsg.Length / 4 : (bytesMsg.Length / 4) + 1;
             List<uint> keStream = new List<uint>();
             uint j;
             BigInteger p = step;
             BigInteger q = step + counter;
-            for (BigInteger i=p; i < q; i++)
+            for (BigInteger i = p; i < q; i++)
             {
                 j = (uint)(i % 1024);
                 if ((i % 2048) < 1024)
@@ -147,16 +185,13 @@ namespace TestHC
             return xoredBytes;
         }
 
-        public List<byte> Encrypt(List<byte> bytesTxt, List<uint> keyStream)
+        public List<byte> Encrypt(List<byte> bytesTxt)
         {
+            List<uint> keyStream = GenerateKeyStream(bytesTxt.ToArray());
             List<byte> xoredBytes = XorBytes(bytesTxt, GetBytesFromKeyStream(keyStream));
             string txt = Encoding.Unicode.GetString(xoredBytes.ToArray());
-            Console.WriteLine($"Текст: {txt}");
             return xoredBytes;
         }
-
-        public List<byte> Decrypt(List<byte> bytesTxt, List<uint> keyStream)
-            => Encrypt(bytesTxt, keyStream);
 
     }
 }
