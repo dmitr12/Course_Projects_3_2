@@ -20,24 +20,18 @@ namespace App
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
-        public void Connect()
+        private void Connect()
         {
-            try
-            {
-                socket.Connect(ip, port);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                Close();
-            }
+            socket.Connect(ip, port);
         }
 
         public void Send(byte[] bytesForSend)
         {
             try
             {
+                Connect();
                 socket.Send(bytesForSend);
+                Close();
             }
             catch (Exception ex)
             {
@@ -51,6 +45,7 @@ namespace App
             try
             {
                 socket.Close();
+                socket.Dispose();
             }
             catch (Exception ex)
             {

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -112,9 +113,7 @@ namespace App
             else
             {
                 client = new Client_(hostIp.Text);
-                client.Connect();
                 client.Send(Encoding.Unicode.GetBytes(sendMsgText.Text));
-                client.Close();
                 client = null;
             }
         }

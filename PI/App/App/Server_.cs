@@ -32,7 +32,13 @@ namespace App
 
         public void Stop()
         {
+            if (client != null)
+            {
+                client.Close();
+                client.Dispose();
+            }
             socket.Close();
+            socket.Dispose();
             serverThread.Abort();
         }
 
@@ -55,12 +61,21 @@ namespace App
                     }
                     while (client.Available > 0);
                     client.Close();
+                    client.Dispose();
                     socket.Close();
+                    socket.Dispose();
                 }
                 catch (ThreadAbortException) { }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
+                    if (client != null)
+                    {
+                        client.Close();
+                        client.Dispose();
+                    }
+                    socket.Close();
+                    socket.Dispose();
                 }
             }      
         }

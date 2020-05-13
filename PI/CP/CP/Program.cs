@@ -1,7 +1,9 @@
-﻿using System;
+﻿using CP;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using System.Security.Cryptography;
 using System.Text;
 using static System.Console;
 
@@ -66,37 +68,83 @@ namespace TestHC
 
         static void Main(string[] args)
         {
-            HC256 pr = new HC256();
-            BigInteger key256Bit = new BigInteger(0);
-            BigInteger vector256Bit = new BigInteger(0);
-            uint[] key = GetArr32Bit(key256Bit, 256);
-            uint[] iv = GetArr32Bit(vector256Bit,256);
-            WriteLine(uint.MaxValue);
-            WriteLine("Key:");
-            for(int i = 0; i < key.Length; i++)
+
+            string text = "Hell!";
+            string dc = null;
+            BigInteger secretKey256Bit = new RandomBigInteger().NextBigInteger(256);
+            WriteLine("Отправленный секретный ключ:\n " + secretKey256Bit);
+            byte[] secretKeyBytes = GetBt(secretKey256Bit, 256);
+            byte[] getedSecretKeyBytes = null;
+            using (var bob = new DH())
             {
-                WriteLine(key[i]);
+                using (var alice = new DH())
+                {
+                    // Bob uses Alice's public key to encrypt his message.
+                    byte[] secretMessage = bob.Encrypt(alice.PublicKey, secretKeyBytes);
+
+                    // Alice uses Bob's public key and IV to decrypt the secret message.
+                    getedSecretKeyBytes = alice.Decrypt(bob.PublicKey, secretMessage, bob.IV);
+                }
             }
-            WriteLine("Vector:");
-            for (int i = 0; i < key.Length; i++)
+            Array.Reverse(getedSecretKeyBytes);
+            BigInteger zz = new BigInteger(0);
+            for (int i = 0; i < getedSecretKeyBytes.Length; i++)
             {
-                WriteLine(iv[i]);
+                zz += new BigInteger(getedSecretKeyBytes[i]) << (8 * i);
             }
-            pr.InitializationProcess(key, iv);
-            while (true)
-            {
-                WriteLine("Введите текст");
-                string s = ReadLine();
-                byte[] bt = Encoding.Unicode.GetBytes(s);
-                List<uint> keyStream = pr.GenerateKeyStream(Encoding.Unicode.GetBytes(s));
-                WriteLine("KeyStream:");
-                foreach (var k in keyStream)
-                    WriteLine(Convert.ToString(k,16));
-                List<byte> word = new List<byte>();
-                word.AddRange(Encoding.Unicode.GetBytes(s));
-                List<byte> encrypted = pr.Encrypt(word, keyStream);
-                List<byte> decrypted = pr.Decrypt(encrypted, keyStream);
-            }       
+            WriteLine("Полученный секретный ключ:\n " + zz);
+            //BigInteger key = new RandomBigInteger().NextBigInteger(256);
+            //WriteLine(key);
+            //byte[] bts = GetBt(key, 256);
+
+            //for(int i=0;i<bts.Length;i++)
+            //{
+            //    WriteLine(bts[i]);
+            //}
+            //BigInteger zz = new BigInteger(0);
+            //Array.Reverse(bts);
+            //for (int i = 0; i < bts.Length; i++)
+            //{
+            //    zz += new BigInteger(bts[i]) << (8 * i);
+            //}
+            //WriteLine("Length array: " + bts.Length);
+            //WriteLine();
+            //WriteLine(zz);
+            //if (zz == key)
+            //    WriteLine("Okey))");
+            //else
+            //    WriteLine("Oh no((");
+            //HC256 pr = new HC256();
+            //WriteLine(key256Bit);
+            //BigInteger vector256Bit = new BigInteger(0);
+            //uint[] key = GetArr32Bit(key256Bit, 256);
+            //uint[] iv = GetArr32Bit(vector256Bit,256);
+            //WriteLine(uint.MaxValue);
+            //WriteLine("Key:");
+            //for(int i = 0; i < key.Length; i++)
+            //{
+            //    WriteLine(key[i]);
+            //}
+            //WriteLine("Vector:");
+            //for (int i = 0; i < key.Length; i++)
+            //{
+            //    WriteLine(iv[i]);
+            //}
+            //pr.InitializationProcess(key, iv);
+            //while (true)
+            //{
+            //    WriteLine("Введите текст");
+            //    string s = ReadLine();
+            //    byte[] bt = Encoding.Unicode.GetBytes(s);
+            //    List<uint> keyStream = pr.GenerateKeyStream(Encoding.Unicode.GetBytes(s));
+            //    WriteLine("KeyStream:");
+            //    foreach (var k in keyStream)
+            //        WriteLine(Convert.ToString(k,16));
+            //    List<byte> word = new List<byte>();
+            //    word.AddRange(Encoding.Unicode.GetBytes(s));
+            //    List<byte> encrypted = pr.Encrypt(word, keyStream);
+            //    List<byte> decrypted = pr.Decrypt(encrypted, keyStream);
+            //}       
         }
     }
     class RandomBigInteger : Random
