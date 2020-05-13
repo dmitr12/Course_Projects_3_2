@@ -1,0 +1,60 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace App
+{
+    class Client
+    {
+        Socket socket;
+        string ip;
+        int port = 10355;
+
+        public Client(string ip)
+        {
+            this.ip = ip;
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        }
+
+        public void Connect()
+        {
+            try
+            {
+                socket.Connect(ip, port);
+                MessageBox.Show("Клиент: Успешное подключение");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        
+        public void Send(byte[] bytesForSend)
+        {
+            try
+            {
+                socket.Send(bytesForSend);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        public void Close()
+        {
+            try
+            {
+                socket.Close();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+    }
+}

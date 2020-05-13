@@ -135,26 +135,29 @@ namespace TestApp.Controllers
         {
             try
             {
-                if (ModelState.IsValid && uploadImage != null)
+                if (!System.IO.File.Exists(film.DirectoryTrailer + "\\" + film.FileTrailer))
                 {
-                    if(!System.IO.File.Exists(film.DirectoryTrailer + "\\" + film.FileTrailer))
+                    ModelState.AddModelError("", "Файл с видео должен находиться в указанной папке");
+                    return View(film);
+                }
+                else
+                {
+                    if (ModelState.IsValid && uploadImage != null)
                     {
-                        ModelState.AddModelError("", "Указан неверный путь к файлу с видео");
-                        return View(film);
+                        db.ConnectionString = User.Identity.Name;
+                        Film checkFilm = db.GetFilmByName(film.NameFilm);
+                        if (checkFilm != null)
+                        {
+                            ModelState.AddModelError("", "Фильм уже есть в базе данных");
+                            return View(film);
+                        }
+                        using (var binaryReader = new BinaryReader(uploadImage.InputStream))
+                        {
+                            film.Poster = binaryReader.ReadBytes(uploadImage.ContentLength);
+                        }
+                        db.AddFilm(film);
+                        return RedirectToAction("Index");
                     }
-                    db.ConnectionString = User.Identity.Name;
-                    Film checkFilm = db.GetFilmByName(film.NameFilm);
-                    if(checkFilm!=null)
-                    {
-                        ModelState.AddModelError("", "Фильм уже есть в базе данных");
-                        return View(film);
-                    }
-                    using (var binaryReader = new BinaryReader(uploadImage.InputStream))
-                    {
-                        film.Poster = binaryReader.ReadBytes(uploadImage.ContentLength);
-                    }
-                    db.AddFilm(film);
-                    return RedirectToAction("Index");
                 }
             }
             catch(Exception ex)

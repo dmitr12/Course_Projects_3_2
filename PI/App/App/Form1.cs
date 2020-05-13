@@ -15,12 +15,12 @@ namespace App
 
     public partial class Form1 : Form
     {
-        delegate void Listen(TextBox txtB);
-
+        bool isS = true;
+        bool isR = false;
         HC256 serverhc256;
         HC256 clienthc256;
-        Client_ client;
-        Server_ server;
+        Server_ server=null;
+        Client_ client=null;
 
         public Form1()
         {
@@ -63,22 +63,171 @@ namespace App
             }
         }
 
-        private void sendTcpBtn_Click(object sender, EventArgs e)
+        private void radioGet_CheckedChanged(object sender, EventArgs e)
         {
-            if(ipTxt.Text.Length==0 || msgSendTcpTxt.Text.Length == 0)
+            sendMsgBtn.Enabled = false;
+            if (radioGet.Checked)
             {
-                MessageBox.Show("Заполните поля айпи хоста и введите сообщение");
+                if (client != null)
+                    client.Close();
+                if (server == null)
+                {
+                    server = new Server_(getMsgText);
+                    server.Start();
+                }
+               
             }
-            else
+        }
+
+        private void radioSend_CheckedChanged(object sender, EventArgs e)
+        {
+            sendMsgBtn.Enabled = true;
+            if (radioSend.Checked)
             {
-                client = new Client_(ipTxt.Text);
-                client.Send(msgSendTcpTxt.Text);
+                if (server != null)
+                {
+                    server.Stop();
+                    server = null;
+                }
+
             }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //server.Stop();
+            if (client != null)
+                client.Close();
+            if (server != null)
+            {
+                server.Stop();
+            }
         }
+
+        private void sendMsgBtn_Click(object sender, EventArgs e)
+        {
+            if (hostIp.Text.Length == 0 || sendMsgText.Text.Length == 0)
+            {
+                MessageBox.Show("Заполните поля хоста и сообщения");
+            }
+            else
+            {
+                client = new Client_(hostIp.Text);
+                client.Connect();
+                client.Send(Encoding.Unicode.GetBytes(sendMsgText.Text));
+                client.Close();
+                client = null;
+            }
+        }
+
+        //private void radioGet_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        sendMsgBtn.Enabled = false;
+        //        if (server != null)
+        //        {
+        //            server.CloseSocket();
+        //            server = null;
+        //        }
+        //        server = new Server(getMsgText);
+        //        Task.Factory.StartNew(() =>
+        //        {
+        //            while (server.isOkey) { }
+        //            server.CloseSocket();
+        //            server = new Server(getMsgText);
+        //        });
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }        
+        //}
+
+        //private void radioSend_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        sendMsgBtn.Enabled = true;
+        //        if (server != null)
+        //        {
+        //            server.CloseSocket();
+        //            server = null;
+        //        }
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }          
+        //}
+
+        //private void sendMsgBtn_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (server != null)
+        //        {
+        //            server.CloseSocket();
+        //            server = null;
+        //        }
+        //        if (client == null)
+        //        {
+        //            client = new Client(hostIp.Text);
+        //            client.Connect();
+        //        }
+        //        client.Send(Encoding.Unicode.GetBytes(sendMsgText.Text));
+        //        client.Close();
+        //        client = null;
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
+        //}
+
+        //private void radioSend_CheckedChanged(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        sendMsgBtn.Enabled = true;
+        //        if (server != null)
+        //        {
+        //            server.CloseSocket();
+        //            server = null;
+        //        }
+        //        isS = !isS;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
+        //}
+
+        //private void radioGet_CheckedChanged(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (radioGet.Checked)
+        //        {
+        //            sendMsgBtn.Enabled = false;
+        //            if (server != null)
+        //            {
+        //                server.CloseSocket();
+        //                server = null;
+        //            }
+        //            isR = !isR;
+        //            server = new Server(getMsgText);
+        //            Task.Factory.StartNew(() =>
+        //            {
+        //                while (server.isOkey) { }
+        //                server.CloseSocket();
+        //                server = new Server(getMsgText);
+        //            });
+        //        }           
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
+        //}
     }
 }

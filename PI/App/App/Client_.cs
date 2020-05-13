@@ -10,28 +10,51 @@ namespace App
 {
     class Client_
     {
-        Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        Socket socket;
         string ip;
-        int port = 10408;
+        int port = 10355;
+
         public Client_(string ip)
         {
             this.ip = ip;
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
-        public void Send(string text)
+        public void Connect()
         {
             try
             {
-                byte[] buff = Encoding.UTF8.GetBytes(text);
                 socket.Connect(ip, port);
-                socket.Send(buff);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                Close();
+            }
+        }
+
+        public void Send(byte[] bytesForSend)
+        {
+            try
+            {
+                socket.Send(bytesForSend);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                Close();
+            }
+        }
+
+        public void Close()
+        {
+            try
+            {
                 socket.Close();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка: " + ex.Message);
-                if (socket.Connected)
-                    socket.Close();
+                MessageBox.Show(ex.Message);
             }
         }
     }

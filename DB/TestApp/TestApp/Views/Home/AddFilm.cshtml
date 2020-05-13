@@ -14,7 +14,7 @@
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-    <div>
+    <div class="col-md-12">
         <h2>Добавление фильма</h2>
         @using (Html.BeginForm("AddFilm", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
@@ -26,7 +26,7 @@
                     @Html.ValidationMessageFor(m => m.NameFilm, "", new { @class = "text-danger" })
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-gro">
                 @Html.LabelFor(m => m.DescriptionFilm, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     @Html.TextAreaFor(m => m.DescriptionFilm, new { htmlAttributes = new { @class = "form-control" } })
@@ -54,11 +54,18 @@
                     @Html.ValidationMessageFor(m => m.DirectoryTrailer, "", new { @class = "text-danger" })
                 </div>
             </div>
+            <br />
+            <input id="flTr" hidden type="text" name="FileTrailer">
             <div class="form-group">
-                @Html.LabelFor(m => m.FileTrailer, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    <input class="form-control" type="text" name="FileTrailer">
-                    @Html.ValidationMessageFor(m => m.FileTrailer, "", new { @class = "text-danger" })
+                @Html.Label("Трейлер для фильма: ", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-offset-3">
+                    <input type="file" required onchange="methChange(this)" />
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.Label("Постер для фильма: ", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-offset-3">
+                    <input type="file" required name="uploadImage" />
                 </div>
             </div>
             <div class="form-group">
@@ -68,12 +75,8 @@
                     @Html.ValidationMessageFor(m => m.DurationMinutesFilm, "", new { @class = "text-danger" })
                 </div>
             </div>
-
             <div class="form-group">
-                <input type="file" required name="uploadImage" />          
-            </div>
-            <div class="form-group">
-                <div class="col-md-offset-2 col-md-1">
+                <div class="col-md-1">
                     <input type="submit" value="Добавить" class="btn btn-primary" />
                 </div>
                 <div class="col-md-1">
@@ -82,6 +85,11 @@
             </div>
         }
     </div>
+    <script>
+        function methChange(el) {
+            document.getElementById("flTr").value = el.files.item(0).name;
+        }
+    </script>
 </body>
 </html>
 @Scripts.Render("~/scripts/jquery-3.4.1.min.js")

@@ -14,57 +14,55 @@ namespace App
     {
         Socket socket;
         Socket client;
-        int port=10408;
-        TextBox text;
-        Thread listener;
+        int port = 10355;
+        TextBox txtB;
+        Thread serverThread;
+
         public Server_(TextBox text)
         {
-            this.text = text;
+            this.txtB = text;
+            
         }
 
         public void Start()
         {
-            listener = new Thread(Listen);
-            listener.Start();
+            serverThread = new Thread(Listen);
+            serverThread.Start();
         }
 
         public void Stop()
         {
             socket.Close();
-            listener.Abort();
+            serverThread.Abort();
         }
 
-        public void Listen()
+        private void Listen()
         {
             while (true)
             {
                 try
                 {
+                    client = null;
                     socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     socket.Bind(new IPEndPoint(IPAddress.Any, port));
                     socket.Listen(1);
                     client = socket.Accept();
                     byte[] buff = new byte[1024];
-                    text.Text += "New message: "+Environment.NewLine;
                     do
                     {
                         client.Receive(buff);
-                        text.AppendText(Encoding.UTF8.GetString(buff));
+                        txtB.AppendText(Encoding.Unicode.GetString(buff));
                     }
                     while (client.Available > 0);
-                    text.Text += Environment.NewLine+Environment.NewLine;
                     client.Close();
                     socket.Close();
                 }
-                catch (ThreadAbortException)
-                {
-
-                }
+                catch (ThreadAbortException) { }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка: " + ex.Message);
+                    MessageBox.Show(ex.Message);
                 }
-            }         
+            }      
         }
     }
 }
