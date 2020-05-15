@@ -68,31 +68,46 @@ namespace TestHC
 
         static void Main(string[] args)
         {
-
-            string text = "Hell!";
-            string dc = null;
+            DH dh = new DH();
+            DH dh2 = new DH();
             BigInteger secretKey256Bit = new RandomBigInteger().NextBigInteger(256);
-            WriteLine("Отправленный секретный ключ:\n " + secretKey256Bit);
+            WriteLine(secretKey256Bit);
             byte[] secretKeyBytes = GetBt(secretKey256Bit, 256);
-            byte[] getedSecretKeyBytes = null;
-            using (var bob = new DH())
-            {
-                using (var alice = new DH())
-                {
-                    // Bob uses Alice's public key to encrypt his message.
-                    byte[] secretMessage = bob.Encrypt(alice.PublicKey, secretKeyBytes);
+            WriteLine("Secret key: ");
+            for (int i = 0; i < secretKeyBytes.Length; i++)
+                WriteLine(secretKeyBytes[i]);
+            WriteLine("\n\nSecretBytes:");
+            byte[] secretMessage = dh.Encrypt(dh2.PublicKey, secretKeyBytes);
+            for (int i = 0; i < secretMessage.Length; i++)
+                WriteLine(secretMessage[i]);
+            WriteLine("\n\nDecryptionBytes:");
+            byte[] decryptBytes = dh2.Decrypt(dh.PublicKey, secretMessage, dh.IV);
+            for (int i = 0; i < decryptBytes.Length; i++)
+                WriteLine(decryptBytes[i]);
+            //string text = "Hell!";
+            //string dc = null;
+            //BigInteger secretKey256Bit = new RandomBigInteger().NextBigInteger(256);
+            //WriteLine("Отправленный секретный ключ:\n " + secretKey256Bit);
+            //byte[] secretKeyBytes = GetBt(secretKey256Bit, 256);
+            //byte[] getedSecretKeyBytes = null;
+            //using (var bob = new DH())
+            //{
+            //    using (var alice = new DH())
+            //    {
+            //        // Bob uses Alice's public key to encrypt his message.
+            //        byte[] secretMessage = bob.Encrypt(alice.PublicKey, secretKeyBytes);
 
-                    // Alice uses Bob's public key and IV to decrypt the secret message.
-                    getedSecretKeyBytes = alice.Decrypt(bob.PublicKey, secretMessage, bob.IV);
-                }
-            }
-            Array.Reverse(getedSecretKeyBytes);
-            BigInteger zz = new BigInteger(0);
-            for (int i = 0; i < getedSecretKeyBytes.Length; i++)
-            {
-                zz += new BigInteger(getedSecretKeyBytes[i]) << (8 * i);
-            }
-            WriteLine("Полученный секретный ключ:\n " + zz);
+            //        // Alice uses Bob's public key and IV to decrypt the secret message.
+            //        getedSecretKeyBytes = alice.Decrypt(bob.PublicKey, secretMessage, bob.IV);
+            //    }
+            //}
+            //Array.Reverse(getedSecretKeyBytes);
+            //BigInteger zz = new BigInteger(0);
+            //for (int i = 0; i < getedSecretKeyBytes.Length; i++)
+            //{
+            //    zz += new BigInteger(getedSecretKeyBytes[i]) << (8 * i);
+            //}
+            //WriteLine("Полученный секретный ключ:\n " + zz);
             //BigInteger key = new RandomBigInteger().NextBigInteger(256);
             //WriteLine(key);
             //byte[] bts = GetBt(key, 256);

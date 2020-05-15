@@ -12,11 +12,12 @@ namespace App
     {
         Socket socket;
         string ip;
-        int port = 10355;
+        int port;
 
-        public Client_(string ip)
+        public Client_(string ip, int port)
         {
             this.ip = ip;
+            this.port = port;
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
@@ -27,17 +28,9 @@ namespace App
 
         public void Send(byte[] bytesForSend)
         {
-            try
-            {
-                Connect();
-                socket.Send(bytesForSend);
-                Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                Close();
-            }
+            Connect();
+            socket.Send(bytesForSend);
+            Close();
         }
 
         public void Close()

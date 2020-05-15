@@ -15,16 +15,16 @@ namespace App
         [STAThread]
         static void Main()
         {
-            bool oneInstance;
-            Mutex mutex = new Mutex(true, "Application", out oneInstance);
-            if (oneInstance)
-            {
+            //bool oneInstance;
+            //Mutex mutex = new Mutex(true, "Application", out oneInstance);
+            //if (oneInstance)
+            //{
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new Form1());
-            }
-            else
-                MessageBox.Show("Приложение уже запущено!");
+            //}
+            //else
+            //    MessageBox.Show("Приложение уже запущено!");
         }
     }
 }
