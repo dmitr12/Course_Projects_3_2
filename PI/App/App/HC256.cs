@@ -89,7 +89,7 @@ namespace App
 
         public void SetKey(BigInteger Key)
         {
-            key = GetArr32Bit(Key, 32);
+            key = GetArr32Bit(Key, 256);
         }
 
         public void SetVector(BigInteger vector)

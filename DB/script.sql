@@ -51,6 +51,8 @@ constraint CheckNameRole_Roles check(NameRole in ('Admin','User')),
 constraint CheckNameConnection_Roles check(NameConnection in ('C##Admin', 'C##User'))
 );
 
+select * from RolesOfUsers
+
 create table Users(
 IdUser number generated always as identity primary key,
 Login varchar(100) unique not null,

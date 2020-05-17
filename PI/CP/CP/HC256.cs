@@ -19,7 +19,7 @@ namespace TestHC
         public BigInteger Key { get; private set; }
         public BigInteger Vector { get; private set; }
 
-        public BigInteger startEncrypt = new BigInteger(Math.Pow(2,1000)+787868);
+        public BigInteger startEncrypt = new BigInteger(4);
 
         public BigInteger step = new BigInteger(0);
 

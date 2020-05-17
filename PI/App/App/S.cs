@@ -22,6 +22,7 @@ namespace App
         Form form;
         HC256 other256;
         DH dh;
+        int bufSz;
 
         public S(TextBox txtB, Form form, ref HC256 other256, ref DH dh, byte[] otherPublicKey, byte[] otherIV)
         {
@@ -40,8 +41,8 @@ namespace App
                 try
                 {
                     socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    socket.Bind(new IPEndPoint(IPAddress.Any, 8889));
-                    socket.Listen(1);
+                    socket.Bind(new IPEndPoint(IPAddress.Any, 10431));
+                    socket.Listen(2);
                     socket.BeginAccept(new AsyncCallback(AcceptCallback), null);
                 }
                 catch (Exception ex)
@@ -61,7 +62,8 @@ namespace App
             try
             {
                 clientSocket = socket.EndAccept(ar);
-                buffer = new byte[clientSocket.ReceiveBufferSize];
+                bufSz = clientSocket.Available;
+                buffer = new byte[bufSz];
                 clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), null);
             }
             catch (ObjectDisposedException) { }
@@ -75,6 +77,14 @@ namespace App
         {
             try
             {
+                if(buffer.Length==0)
+                {
+                    buffer = new byte[bufSz];
+                    do
+                    {
+                        socket.Receive(buffer);
+                    } while (clientSocket.Available > 0);
+                }
                 byte[] checkBytes = new byte[3];
                 for (int i = 0; i < 3; i++)
                     checkBytes[i] = buffer[i];
@@ -83,25 +93,11 @@ namespace App
                 bytes.RemoveRange(0, 3);
                 if (Encoding.UTF8.GetString(checkBytes) == "msg")
                 {
-                    string str = Encoding.UTF8.GetString(bytes.ToArray());
-                    AppendTextBox(str);
+                    AppendTextBox(bytes);
                 }
-                else /*(Encoding.UTF8.GetString(checkBytes) == "key")*/
-                {
-                    List<byte> listB = new List<byte>();
-                    int ind = 80;
-                    listB.AddRange(buffer);
-                    while (true)
-                    {
-                        if (Check(ind, listB))
-                            break;
-                        ind += 16;
-                    }
-                    listB.RemoveRange(ind, listB.Count - ind);
-                    //byte[] bts = new byte[bytes.Count];
-                    //for (int i = 0; i < bts.Length; i++)
-                    //    bts[i] = bytes[i];
-                    GetOtherHC256Key(listB.ToArray());
+                if(Encoding.UTF8.GetString(checkBytes) == "key")
+                {                  
+                    GetOtherHC256Key(bytes.ToArray());
                 }
             }
             catch (Exception ex)
@@ -110,20 +106,12 @@ namespace App
             }
         }
 
-        bool Check(int ind,List<byte> lst)
+        private void AppendTextBox(List<byte> encryptedMsg)
         {
-            bool bl = true;
-            for (int i = 0; i < 8; i++)
-                if (lst[ind + i] != 0)
-                    bl = false;
-            return bl;
-        }
-
-        private void AppendTextBox(string text)
-        {
+            List<byte> listDecrypted = other256.Encrypt(encryptedMsg);
             MethodInvoker invoker = new MethodInvoker(delegate
               {
-                  txtB.Text +=Environment.NewLine+"New message: "+Environment.NewLine+text;
+                  txtB.Text +=Environment.NewLine+"New message: "+Environment.NewLine+Encoding.UTF8.GetString(listDecrypted.ToArray());
               });         
             form.Invoke(invoker);
             Dispose();
@@ -151,8 +139,12 @@ namespace App
                 vector += new BigInteger(checkVector[i]) << (8 * i);
             for (int i = 64; i < decrypted.Length; i++)
                 step += new BigInteger(decrypted[i]) << (8 * (i - 64));
-            other256.SetKey(key);
-            other256.SetVector(vector);
+            if(other256.key==null || other256.iv == null)
+            {
+                other256.SetKey(key);
+                other256.SetVector(vector);
+                other256.InitializationProcess();
+            }      
             other256.Synchronization(step);
             Dispose();
             StartServer();

@@ -109,23 +109,12 @@ namespace App
             }
             else
             {
-                client = new Client_(hostIp.Text, 8889);
-                //List<byte> sendBts = new List<byte>();
-                //sendBts.AddRange(Encoding.UTF8.GetBytes("key"));
-                //sendBts.AddRange(Encoding.UTF8.GetBytes(sendMsgText.Text));
-                //client.Send(sendBts.ToArray());
-                //List<byte> keyBytes = new List<byte>();
-                //List<byte> fBt = new List<byte>();
-                //fBt.AddRange(Encoding.UTF8.GetBytes("key"));
-                //keyBytes.AddRange(hc256.GetBt(hc256.Key, 256));
-                //keyBytes.AddRange(hc256.GetBt(hc256.Vector, 256));
-                //keyBytes.AddRange(hc256.Step.ToByteArray());
-                //byte[] encryptKeyBytes = dh.Encrypt(otherPublicKey, keyBytes.ToArray());
-                //fBt.AddRange(encryptKeyBytes);
-                //client.Send(fBt.ToArray());
+                client = new Client_(hostIp.Text, 10431);              
                 List<byte> sendBytes = new List<byte>();
                 sendBytes.AddRange(Encoding.UTF8.GetBytes("msg"));
-                sendBytes.AddRange(Encoding.UTF8.GetBytes(sendMsgText.Text));
+                List<byte> listBts = new List<byte>();
+                listBts.AddRange(Encoding.UTF8.GetBytes(sendMsgText.Text));
+                sendBytes.AddRange(hc256.Encrypt(listBts));
                 client.Send(sendBytes.ToArray());
                 client.Close();
             }
@@ -177,21 +166,16 @@ namespace App
         {
             try
             {
-                client = new Client_(hostIp.Text, 8889);
+                client = new Client_(hostIp.Text, 10431);
                 List<byte> keyBytes = new List<byte>();
-
-                //List<byte> fBt = new List<byte>();
-                //fBt.AddRange(Encoding.UTF8.GetBytes("key"));
+                List<byte> fBt = new List<byte>();
+                fBt.AddRange(Encoding.UTF8.GetBytes("key"));
                 keyBytes.AddRange(hc256.GetBt(hc256.Key, 256));
                 keyBytes.AddRange(hc256.GetBt(hc256.Vector, 256));
                 keyBytes.AddRange(hc256.startEncrypt.ToByteArray());
-
                 byte[] encryptKeyBytes = dh.Encrypt(otherPublicKey, keyBytes.ToArray());
-                MessageBox.Show(encryptKeyBytes.Length.ToString());
-
-
-                //fBt.AddRange(encryptKeyBytes);
-                client.Send(encryptKeyBytes/*fBt.ToArray()*/);
+                fBt.AddRange(encryptKeyBytes);
+                client.Send(fBt.ToArray());
                 client.Close();
             }      
             catch(Exception ex)
