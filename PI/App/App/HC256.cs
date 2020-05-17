@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace App
@@ -12,7 +13,13 @@ namespace App
         public BigInteger Key { get; private set; }
         public BigInteger Vector { get; private set; }
 
-        public BigInteger step = new BigInteger(0);
+        public BigInteger startEncrypt = new BigInteger(0);
+
+        private BigInteger step = new BigInteger(0);
+        public BigInteger Step { get { return step; } }
+
+        public uint[] key=null;
+        public uint[] iv=null;
 
         public uint[] P = new uint[1024];
         uint[] Q = new uint[1024];
@@ -68,29 +75,27 @@ namespace App
 
         public void GenerateKey()
         {
-            Key = Generate256Bit();
+            RandBigInt rbi = new RandBigInt();
+            Key = rbi.NextBigInteger(256);
+            key= GetArr32Bit(Key, 256);
         }
 
         public void GenerateVector()
-        {
-            Vector = Generate256Bit();
+        {           
+            RandBigInt rbi = new RandBigInt();
+            Vector = rbi.NextBigInteger(256);
+            iv = GetArr32Bit(Vector, 256);
         }
 
-        public void SetKey(BigInteger bi)
+        public void SetKey(BigInteger Key)
         {
-            Key = bi;
+            key = GetArr32Bit(Key, 32);
         }
 
-        public void SetVector(BigInteger bi)
+        public void SetVector(BigInteger vector)
         {
-            Vector = bi;
+            iv = GetArr32Bit(vector, 256);
         }
-
-        public BigInteger Generate256Bit()
-        {
-            return new RandBigInt().NextBigInteger(256);
-        }
-
         public uint[] GetArr32Bit(BigInteger bi, int bitLength)
         {
             int counter = bitLength / 32;
@@ -102,10 +107,19 @@ namespace App
             return bts;
         }
 
+        public byte[] GetBt(BigInteger bi, int bitLength)
+        {
+            int counter = bitLength / 8;
+            byte[] bts = new byte[counter];
+            for (int i = 1; i <= counter; i++)
+            {
+                bts[i - 1] = (byte)(bi >> (bitLength - 8 * i) & byte.MaxValue);
+            }
+            return bts;
+        }
+
         public void InitializationProcess()
         {
-            uint[] key = GetArr32Bit(Key, 256);
-            uint[] iv = GetArr32Bit(Vector, 256);
             //1)
             for (int i = 0; i <= 2559; i++)
             {
@@ -176,6 +190,52 @@ namespace App
             return bytes;
         }
 
+        public void Synchronization(BigInteger strt)
+        {
+            if (strt > step)
+            {
+                BigInteger counter = strt - step;
+                BigInteger p = step;
+                BigInteger q = step + counter;
+                uint j;
+                for (BigInteger i = p; i < q; i++)
+                {
+                    j = (uint)(i % 1024);
+                    if ((i % 2048) < 1024)
+                    {
+                        P[j] = P[j] + P[Minus(j, 10)] + g1(P[Minus(j, 3)], P[Minus(j, 1023)]);
+                    }
+                    else
+                    {
+                        Q[j] = Q[j] + Q[Minus(j, 10)] + g2(Q[Minus(j, 3)], Q[Minus(j, 1023)]);
+                    }
+                    step++;
+                }
+            }
+            if (strt < step)
+            {
+                step = 0;
+                uint j;
+                P = new uint[1024];
+                Q = new uint[1024];
+                W = new uint[2560];
+                InitializationProcess();
+                for (BigInteger i = 0; i < strt; i++)
+                {
+                    j = (uint)(i % 1024);
+                    if ((i % 2048) < 1024)
+                    {
+                        P[j] = P[j] + P[Minus(j, 10)] + g1(P[Minus(j, 3)], P[Minus(j, 1023)]);
+                    }
+                    else
+                    {
+                        Q[j] = Q[j] + Q[Minus(j, 10)] + g2(Q[Minus(j, 3)], Q[Minus(j, 1023)]);
+                    }
+                    step++;
+                }
+            }
+        }
+
         public List<byte> XorBytes(List<byte> bytes1, List<byte> bytes2)
         {
             List<byte> xoredBytes = new List<byte>();
@@ -187,9 +247,10 @@ namespace App
 
         public List<byte> Encrypt(List<byte> bytesTxt)
         {
+            startEncrypt = step;
             List<uint> keyStream = GenerateKeyStream(bytesTxt.ToArray());
             List<byte> xoredBytes = XorBytes(bytesTxt, GetBytesFromKeyStream(keyStream));
-            string txt = Encoding.Unicode.GetString(xoredBytes.ToArray());
+            string txt = Encoding.UTF8.GetString(xoredBytes.ToArray());
             return xoredBytes;
         }
 

@@ -41,6 +41,8 @@
             this.exchangeKeysTxtB = new System.Windows.Forms.TextBox();
             this.exchangeKeysBtn = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.btnSynch = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -81,15 +83,15 @@
             // 
             // hostIp
             // 
-            this.hostIp.Location = new System.Drawing.Point(509, 104);
+            this.hostIp.Location = new System.Drawing.Point(111, 32);
             this.hostIp.Name = "hostIp";
-            this.hostIp.Size = new System.Drawing.Size(202, 20);
+            this.hostIp.Size = new System.Drawing.Size(225, 20);
             this.hostIp.TabIndex = 8;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(423, 107);
+            this.label4.Location = new System.Drawing.Point(25, 35);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(80, 13);
             this.label4.TabIndex = 9;
@@ -97,7 +99,7 @@
             // 
             // sendMsgBtn
             // 
-            this.sendMsgBtn.Location = new System.Drawing.Point(547, 229);
+            this.sendMsgBtn.Location = new System.Drawing.Point(698, 196);
             this.sendMsgBtn.Name = "sendMsgBtn";
             this.sendMsgBtn.Size = new System.Drawing.Size(151, 23);
             this.sendMsgBtn.TabIndex = 10;
@@ -107,7 +109,7 @@
             // 
             // sendMsgText
             // 
-            this.sendMsgText.Location = new System.Drawing.Point(509, 133);
+            this.sendMsgText.Location = new System.Drawing.Point(509, 100);
             this.sendMsgText.Multiline = true;
             this.sendMsgText.Name = "sendMsgText";
             this.sendMsgText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -117,7 +119,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(364, 174);
+            this.label5.Location = new System.Drawing.Point(364, 141);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(139, 13);
             this.label5.TabIndex = 12;
@@ -125,18 +127,17 @@
             // 
             // getMsgText
             // 
-            this.getMsgText.Location = new System.Drawing.Point(509, 267);
+            this.getMsgText.Location = new System.Drawing.Point(509, 234);
             this.getMsgText.Multiline = true;
             this.getMsgText.Name = "getMsgText";
             this.getMsgText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.getMsgText.Size = new System.Drawing.Size(340, 116);
             this.getMsgText.TabIndex = 13;
-            this.getMsgText.TextChanged += new System.EventHandler(this.getMsgText_TextChanged);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(364, 319);
+            this.label6.Location = new System.Drawing.Point(364, 286);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(135, 13);
             this.label6.TabIndex = 14;
@@ -144,7 +145,7 @@
             // 
             // exchangeKeysTxtB
             // 
-            this.exchangeKeysTxtB.Location = new System.Drawing.Point(47, 32);
+            this.exchangeKeysTxtB.Location = new System.Drawing.Point(28, 100);
             this.exchangeKeysTxtB.Multiline = true;
             this.exchangeKeysTxtB.Name = "exchangeKeysTxtB";
             this.exchangeKeysTxtB.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -153,7 +154,7 @@
             // 
             // exchangeKeysBtn
             // 
-            this.exchangeKeysBtn.Location = new System.Drawing.Point(145, 100);
+            this.exchangeKeysBtn.Location = new System.Drawing.Point(126, 188);
             this.exchangeKeysBtn.Name = "exchangeKeysBtn";
             this.exchangeKeysBtn.Size = new System.Drawing.Size(119, 40);
             this.exchangeKeysBtn.TabIndex = 16;
@@ -163,7 +164,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(280, 199);
+            this.button1.Location = new System.Drawing.Point(309, 237);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 17;
@@ -171,11 +172,33 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // btnSynch
+            // 
+            this.btnSynch.Location = new System.Drawing.Point(509, 197);
+            this.btnSynch.Name = "btnSynch";
+            this.btnSynch.Size = new System.Drawing.Size(139, 23);
+            this.btnSynch.TabIndex = 18;
+            this.btnSynch.Text = "Синхронизация";
+            this.btnSynch.UseVisualStyleBackColor = true;
+            this.btnSynch.Click += new System.EventHandler(this.btnSynch_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(160, 298);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 19;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(910, 454);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.btnSynch);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.exchangeKeysBtn);
             this.Controls.Add(this.exchangeKeysTxtB);
@@ -211,6 +234,8 @@
         private System.Windows.Forms.TextBox exchangeKeysTxtB;
         private System.Windows.Forms.Button exchangeKeysBtn;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnSynch;
+        private System.Windows.Forms.Button button2;
     }
 }
 

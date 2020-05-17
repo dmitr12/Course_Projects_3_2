@@ -17,14 +17,12 @@ namespace App
         byte[] publicKey;
         byte[] iv;
         string ipClient = "";
-        int port;
         TextBox txtB;
         Task task;
         Form form;
 
-        public ListenerKeys(ref byte[] publicKey, ref byte[] iv,Form form, TextBox txtB, int port)
+        public ListenerKeys(ref byte[] publicKey, ref byte[] iv,Form form, TextBox txtB)
         {
-            this.port = port;
             this.publicKey = publicKey;
             this.iv = iv;
             this.form = form;
@@ -38,7 +36,7 @@ namespace App
                 try
                 {
                     socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    socket.Bind(new IPEndPoint(IPAddress.Any, port));
+                    socket.Bind(new IPEndPoint(IPAddress.Any, 8890));
                     socket.Listen(1);
                     socket.BeginAccept(new AsyncCallback(AcceptCallback), null);
                 }

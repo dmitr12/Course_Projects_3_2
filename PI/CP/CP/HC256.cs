@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CP;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
@@ -11,7 +12,18 @@ namespace TestHC
         uint[] P = new uint[1024];
         uint[] Q = new uint[1024];
         uint[] W = new uint[2560];
-        BigInteger step = new BigInteger(0);
+
+        public uint[] key = null;
+        
+        public uint[] iv = null;
+        public BigInteger Key { get; private set; }
+        public BigInteger Vector { get; private set; }
+
+        public BigInteger startEncrypt = new BigInteger(Math.Pow(2,1000)+787868);
+
+        public BigInteger step = new BigInteger(0);
+
+        public BigInteger Step { get { return step; } }
 
         public uint CycleSdvigRight(uint x, int n) => ((x >> n) ^ (x << (32 - n)));
 
@@ -24,6 +36,16 @@ namespace TestHC
         public uint g1(uint x, uint y) => ((CycleSdvigRight(x, 10) ^ CycleSdvigRight(y, 23)) + Q[(x ^ y) % 1024]);
 
         public uint g2(uint x, uint y) => ((CycleSdvigRight(x, 10) ^ CycleSdvigRight(y, 23)) + P[(x ^ y) % 1024]);
+
+        public void SetKey(uint[] key)
+        {
+            this.key = key;
+        }
+
+        public void SetVector(uint[] iv)
+        {
+            this.iv = iv;
+        }
 
         public uint h1(uint x)
         {
@@ -61,12 +83,20 @@ namespace TestHC
             u += b + (tem0 ^ tem1) + P[tem2];
         }
 
-        public BigInteger Generate256Bit()
+        public void GenerateKey()
         {
-            return new RandomBigInteger().NextBigInteger(256);
+            RandBigInt rbi = new RandBigInt();
+            Key = rbi.NextBigInteger(256);
         }
 
-        public void InitializationProcess(uint[] key, uint[] iv)
+        public void GenerateVector()
+        {
+            RandBigInt rbi = new RandBigInt();
+            Vector = rbi.NextBigInteger(256);
+        }
+
+
+        public void InitializationProcess()
         {
             //1)
             for (int i = 0; i <= 2559; i++)
@@ -138,6 +168,52 @@ namespace TestHC
             return bytes;
         }
 
+        public void Synchronization(BigInteger strt)
+        {
+            if (strt > step)
+            {
+                BigInteger counter = strt - step;
+                BigInteger p = step;
+                BigInteger q = step + counter;
+                uint j;
+                for (BigInteger i = p; i < q; i++)
+                {
+                    j = (uint)(i % 1024);
+                    if ((i % 2048) < 1024)
+                    {
+                        P[j] = P[j] + P[Minus(j, 10)] + g1(P[Minus(j, 3)], P[Minus(j, 1023)]);
+                    }
+                    else
+                    {
+                        Q[j] = Q[j] + Q[Minus(j, 10)] + g2(Q[Minus(j, 3)], Q[Minus(j, 1023)]);
+                    }
+                    step++;
+                }
+            }
+            if (strt < step)
+            {
+                step = 0;
+                uint j;
+                P = new uint[1024];
+                Q = new uint[1024];
+                W = new uint[2560];
+                InitializationProcess();
+                for (BigInteger i = 0; i < strt; i++)
+                {
+                    j = (uint)(i % 1024);
+                    if ((i % 2048) < 1024)
+                    {
+                        P[j] = P[j] + P[Minus(j, 10)] + g1(P[Minus(j, 3)], P[Minus(j, 1023)]);
+                    }
+                    else
+                    {
+                        Q[j] = Q[j] + Q[Minus(j, 10)] + g2(Q[Minus(j, 3)], Q[Minus(j, 1023)]);
+                    }
+                    step++;
+                }
+            }
+        }
+
         public List<byte> XorBytes(List<byte> bytes1, List<byte> bytes2)
         {
             List<byte> xoredBytes = new List<byte>();
@@ -147,16 +223,17 @@ namespace TestHC
             return xoredBytes;
         }
 
-        public List<byte> Encrypt(List<byte> bytesTxt, List<uint> keyStream)
+        public List<byte> Encrypt(List<byte> bytesTxt)
         {
+            startEncrypt = step;
+            List<uint> keyStream = GenerateKeyStream(bytesTxt.ToArray());
             List<byte> xoredBytes = XorBytes(bytesTxt, GetBytesFromKeyStream(keyStream));
-            string txt = Encoding.Unicode.GetString(xoredBytes.ToArray());
-            Console.WriteLine($"Текст: {txt}");
+            string txt = Encoding.UTF8.GetString(xoredBytes.ToArray());
             return xoredBytes;
         }
 
-        public List<byte> Decrypt(List<byte> bytesTxt, List<uint> keyStream)
-            => Encrypt(bytesTxt, keyStream);
+        public List<byte> Decrypt(List<byte> bytesTxt)
+            => Encrypt(bytesTxt);
 
     }
 }

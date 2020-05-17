@@ -15,11 +15,13 @@ namespace App
 {
 
     public partial class Form1 : Form
-    {    
-        HC256 serverhc256;
-        HC256 clienthc256;
+    {
+        HC256 hc256;
+        HC256 other256;
 
-        S serv=null;
+        CheckClass chCl = new CheckClass();
+
+        S serv = null;
         Client_ client = null;
         ListenerKeys lk;
         DH dh = new DH();
@@ -28,20 +30,18 @@ namespace App
 
         public Form1()
         {
-            serverhc256 = new HC256();
-            clienthc256 = new HC256();
-            serverhc256.GenerateKey();
-            serverhc256.GenerateVector();
-            serverhc256.InitializationProcess();
-            clienthc256.SetKey(serverhc256.Key);
-            clienthc256.SetVector(serverhc256.Vector);
-            clienthc256.InitializationProcess();
+            hc256 = new HC256();
+            other256 = new HC256();
+            hc256.GenerateKey();
+            Thread.Sleep(1000);
+            hc256.GenerateVector();
+            hc256.InitializationProcess();
             InitializeComponent();
             getMsgText.ReadOnly = true;
             exchangeKeysTxtB.ReadOnly = true;
-            lk = new ListenerKeys(ref otherPublicKey, ref otherIV, this, exchangeKeysTxtB, 8890);
+            lk = new ListenerKeys(ref otherPublicKey, ref otherIV, this, exchangeKeysTxtB);
             lk.StartServer();
-           
+
             //server = new Server_(msgTxtFromTcp);
             //server.Start();
         }
@@ -77,7 +77,7 @@ namespace App
             sendMsgBtn.Enabled = false;
             if (radioGet.Checked)
             {
-                serv = new S(getMsgText, this, 8889);
+                serv = new S(getMsgText, this, ref other256, ref dh, otherPublicKey, otherIV);
                 serv.StartServer();
             }
         }
@@ -103,27 +103,31 @@ namespace App
 
         private void sendMsgBtn_Click(object sender, EventArgs e)
         {
-            if(hostIp.Text.Length==0 && sendMsgText.Text.Length == 0)
+            if (hostIp.Text.Length == 0 && sendMsgText.Text.Length == 0)
             {
-                MessageBox.Show("Заполните поля хоста и сообщеия");
+                MessageBox.Show("Заполните поля хоста и сообщения");
             }
             else
             {
                 client = new Client_(hostIp.Text, 8889);
-                client.Send(Encoding.Unicode.GetBytes(sendMsgText.Text));
+                //List<byte> sendBts = new List<byte>();
+                //sendBts.AddRange(Encoding.UTF8.GetBytes("key"));
+                //sendBts.AddRange(Encoding.UTF8.GetBytes(sendMsgText.Text));
+                //client.Send(sendBts.ToArray());
+                //List<byte> keyBytes = new List<byte>();
+                //List<byte> fBt = new List<byte>();
+                //fBt.AddRange(Encoding.UTF8.GetBytes("key"));
+                //keyBytes.AddRange(hc256.GetBt(hc256.Key, 256));
+                //keyBytes.AddRange(hc256.GetBt(hc256.Vector, 256));
+                //keyBytes.AddRange(hc256.Step.ToByteArray());
+                //byte[] encryptKeyBytes = dh.Encrypt(otherPublicKey, keyBytes.ToArray());
+                //fBt.AddRange(encryptKeyBytes);
+                //client.Send(fBt.ToArray());
+                List<byte> sendBytes = new List<byte>();
+                sendBytes.AddRange(Encoding.UTF8.GetBytes("msg"));
+                sendBytes.AddRange(Encoding.UTF8.GetBytes(sendMsgText.Text));
+                client.Send(sendBytes.ToArray());
                 client.Close();
-            }     
-        }
-
-        private void getMsgText_TextChanged(object sender, EventArgs e)
-        {
-            if (radioGet.Checked)
-            {
-                if (serv != null)
-                {
-                    serv.Dispose();
-                    serv.StartServer();
-                }
             }
         }
 
@@ -140,33 +144,67 @@ namespace App
                     msg[i] = dh.IV[j];
                     j++;
                 }
+                exchangeKeysBtn.Enabled = false;
                 client = new Client_(hostIp.Text, 8890);
                 lk.Dispose();
                 lk = null;
                 client.Send(msg);
                 client.Close();
                 exchangeKeysTxtB.Text += Environment.NewLine + "Ключи успешно отосланы " + hostIp.Text + Environment.NewLine;
-                lk = new ListenerKeys(ref otherPublicKey, ref otherIV, this, exchangeKeysTxtB, 8890);
+                lk = new ListenerKeys(ref otherPublicKey, ref otherIV, this, exchangeKeysTxtB);
                 lk.StartServer();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                client.Close();
-                if(lk==null)
+                if (lk == null)
                 {
-                    lk = new ListenerKeys(ref otherPublicKey, ref otherIV, this, exchangeKeysTxtB, 8890);
+                    lk = new ListenerKeys(ref otherPublicKey, ref otherIV, this, exchangeKeysTxtB);
                     lk.StartServer();
                 }
+                exchangeKeysBtn.Enabled = true;
             }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("My publicKey: " + dh.PublicKey[139]);
-            MessageBox.Show("My Iv: " + dh.IV[15]);
-            MessageBox.Show("My otherPublicKey: " + otherPublicKey[139]);
-            MessageBox.Show("My otherIV: " + otherIV[15]);
+            MessageBox.Show("My hc256 key: "+hc256.key[5]);
+            MessageBox.Show("Other hc256key: " + other256.key[5]);
+           
+        }
+
+        private void btnSynch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                client = new Client_(hostIp.Text, 8889);
+                List<byte> keyBytes = new List<byte>();
+
+                //List<byte> fBt = new List<byte>();
+                //fBt.AddRange(Encoding.UTF8.GetBytes("key"));
+                keyBytes.AddRange(hc256.GetBt(hc256.Key, 256));
+                keyBytes.AddRange(hc256.GetBt(hc256.Vector, 256));
+                keyBytes.AddRange(hc256.startEncrypt.ToByteArray());
+
+                byte[] encryptKeyBytes = dh.Encrypt(otherPublicKey, keyBytes.ToArray());
+                MessageBox.Show(encryptKeyBytes.Length.ToString());
+
+
+                //fBt.AddRange(encryptKeyBytes);
+                client.Send(encryptKeyBytes/*fBt.ToArray()*/);
+                client.Close();
+            }      
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                client.Close();
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(hc256.Key.ToString());
+            MessageBox.Show(hc256.Vector.ToString());
         }
     }
 }

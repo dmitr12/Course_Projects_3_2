@@ -21,16 +21,24 @@ namespace App
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
-        private void Connect()
+        public void Connect()
         {
             socket.Connect(ip, port);
         }
 
         public void Send(byte[] bytesForSend)
         {
-            Connect();
-            socket.Send(bytesForSend);
-            Close();
+            try
+            {
+                Connect();
+                socket.Send(bytesForSend);
+                Close();
+            }
+            catch(Exception)
+            {
+                Close();
+                throw;
+            }
         }
 
         public void Close()
