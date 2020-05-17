@@ -1,0 +1,13 @@
+D:\zilabs\zikab1b\zikab1b\bin\Debug\zikab1b.exe.config
+D:\zilabs\zikab1b\zikab1b\bin\Debug\zikab1b.exe
+D:\zilabs\zikab1b\zikab1b\bin\Debug\zikab1b.pdb
+D:\zilabs\zikab1b\zikab1b\obj\Debug\zikab1b.csprojAssemblyReference.cache
+D:\zilabs\zikab1b\zikab1b\obj\Debug\zikab1b.csproj.CoreCompileInputs.cache
+D:\zilabs\zikab1b\zikab1b\obj\Debug\zikab1b.exe
+D:\zilabs\zikab1b\zikab1b\obj\Debug\zikab1b.pdb
+D:\PI_Labs\zikab1b\zikab1b\bin\Debug\zikab1b.exe.config
+D:\PI_Labs\zikab1b\zikab1b\bin\Debug\zikab1b.exe
+D:\PI_Labs\zikab1b\zikab1b\bin\Debug\zikab1b.pdb
+D:\PI_Labs\zikab1b\zikab1b\obj\Debug\zikab1b.csprojAssemblyReference.cache
+D:\PI_Labs\zikab1b\zikab1b\obj\Debug\zikab1b.exe
+D:\PI_Labs\zikab1b\zikab1b\obj\Debug\zikab1b.pdb

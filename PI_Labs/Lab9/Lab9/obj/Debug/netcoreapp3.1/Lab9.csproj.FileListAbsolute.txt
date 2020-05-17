@@ -1,0 +1,11 @@
+D:\PI_Labs\Lab9\Lab9\bin\Debug\netcoreapp3.1\Lab9.exe
+D:\PI_Labs\Lab9\Lab9\bin\Debug\netcoreapp3.1\Lab9.deps.json
+D:\PI_Labs\Lab9\Lab9\bin\Debug\netcoreapp3.1\Lab9.runtimeconfig.json
+D:\PI_Labs\Lab9\Lab9\bin\Debug\netcoreapp3.1\Lab9.runtimeconfig.dev.json
+D:\PI_Labs\Lab9\Lab9\bin\Debug\netcoreapp3.1\Lab9.dll
+D:\PI_Labs\Lab9\Lab9\bin\Debug\netcoreapp3.1\Lab9.pdb
+D:\PI_Labs\Lab9\Lab9\obj\Debug\netcoreapp3.1\Lab9.csprojAssemblyReference.cache
+D:\PI_Labs\Lab9\Lab9\obj\Debug\netcoreapp3.1\Lab9.AssemblyInfoInputs.cache
+D:\PI_Labs\Lab9\Lab9\obj\Debug\netcoreapp3.1\Lab9.AssemblyInfo.cs
+D:\PI_Labs\Lab9\Lab9\obj\Debug\netcoreapp3.1\Lab9.dll
+D:\PI_Labs\Lab9\Lab9\obj\Debug\netcoreapp3.1\Lab9.pdb
