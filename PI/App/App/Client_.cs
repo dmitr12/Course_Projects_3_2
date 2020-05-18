@@ -23,7 +23,15 @@ namespace App
 
         public void Connect()
         {
-            socket.Connect(ip, port);
+            try
+            {
+                socket.Connect(ip, port);
+            }
+            catch(Exception)
+            {
+                Close();
+                throw;
+            }
         }
 
         public void Send(byte[] bytesForSend)

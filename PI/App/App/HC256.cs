@@ -13,7 +13,7 @@ namespace App
         public BigInteger Key { get; private set; }
         public BigInteger Vector { get; private set; }
 
-        public BigInteger startEncrypt = new BigInteger(0);
+        //public BigInteger startEncrypt = new BigInteger(0);
 
         private BigInteger step = new BigInteger(0);
         public BigInteger Step { get { return step; } }
@@ -89,11 +89,13 @@ namespace App
 
         public void SetKey(BigInteger Key)
         {
+            this.Key = Key;
             key = GetArr32Bit(Key, 256);
         }
 
         public void SetVector(BigInteger vector)
         {
+            this.Vector = vector;
             iv = GetArr32Bit(vector, 256);
         }
         public uint[] GetArr32Bit(BigInteger bi, int bitLength)
@@ -247,7 +249,7 @@ namespace App
 
         public List<byte> Encrypt(List<byte> bytesTxt)
         {
-            startEncrypt = step;
+            //startEncrypt = step;
             List<uint> keyStream = GenerateKeyStream(bytesTxt.ToArray());
             List<byte> xoredBytes = XorBytes(bytesTxt, GetBytesFromKeyStream(keyStream));
             string txt = Encoding.UTF8.GetString(xoredBytes.ToArray());

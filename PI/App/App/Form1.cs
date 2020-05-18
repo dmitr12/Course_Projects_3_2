@@ -50,7 +50,7 @@ namespace App
             synch = new Synch(getMsgText, this, ref other256, ref dh, otherPublicKey, otherIV);
             //server = new Server_(msgTxtFromTcp);
             //server.Start();
-            testServ = new TestServ(this, getMsgText);
+            testServ = new TestServ(this, getMsgText, /*ref other256,*/ ref dh, ref otherPublicKey, ref otherIV);
             testServ.Start();
         }
 
@@ -83,25 +83,25 @@ namespace App
         private void radioGet_CheckedChanged(object sender, EventArgs e)
         {
             sendMsgBtn.Enabled = false;
-            if (radioGet.Checked)
-            {
-                //serv = new S(getMsgText, this, ref other256, ref dh, otherPublicKey, otherIV);
-                serv.StartServer();
-                //synch = new Synch(getMsgText, this, ref other256, ref dh, otherPublicKey, otherIV);
-                synch.StartServer();
-            }
+            //if (radioGet.Checked)
+            //{
+            //    //serv = new S(getMsgText, this, ref other256, ref dh, otherPublicKey, otherIV);
+            //    serv.StartServer();
+            //    //synch = new Synch(getMsgText, this, ref other256, ref dh, otherPublicKey, otherIV);
+            //    synch.StartServer();
+            //}
         }
 
         private void radioSend_CheckedChanged(object sender, EventArgs e)
         {
             sendMsgBtn.Enabled = true;
-            if (radioSend.Checked)
-            {
-                serv.Dispose();
-                //serv = null;
-                synch.Dispose();
-                //synch = null;
-            }
+            //if (radioSend.Checked)
+            //{
+            //    serv.Dispose();
+            //    //serv = null;
+            //    synch.Dispose();
+            //    //synch = null;
+            //}
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -123,7 +123,7 @@ namespace App
             }
             else
             {
-                Client_ client = new Client_(hostIp.Text, 10431);              
+                Client_ client = new Client_(hostIp.Text, 10001/*10431*/);              
                 List<byte> sendBytes = new List<byte>();
                 sendBytes.AddRange(Encoding.UTF8.GetBytes("msg"));
                 List<byte> listBts = new List<byte>();
@@ -131,6 +131,7 @@ namespace App
                 sendBytes.AddRange(hc256.Encrypt(listBts));
                 client.Send(sendBytes.ToArray());
                 client.Close();
+                Thread.Sleep(3000);
             }
         }
 
@@ -138,6 +139,7 @@ namespace App
         {
             try
             {
+               
                 byte[] msg = new byte[156];
                 int j = 0;
                 for (int i = 0; i < dh.PublicKey.Length; i++)
@@ -178,7 +180,7 @@ namespace App
 
         private void btnSynch_Click(object sender, EventArgs e)
         {
-            Client_ client = new Client_(hostIp.Text, 10333);
+            Client_ client = new Client_(hostIp.Text, 10001);
             try
             {
                 List<byte> keyBytes = new List<byte>();
@@ -186,11 +188,12 @@ namespace App
                 fBt.AddRange(Encoding.UTF8.GetBytes("key"));
                 keyBytes.AddRange(hc256.GetBt(hc256.Key, 256));
                 keyBytes.AddRange(hc256.GetBt(hc256.Vector, 256));
-                keyBytes.AddRange(hc256.startEncrypt.ToByteArray());
+                keyBytes.AddRange(hc256.Step/*startEncrypt*/.ToByteArray());
                 byte[] encryptKeyBytes = dh.Encrypt(otherPublicKey, keyBytes.ToArray());
                 fBt.AddRange(encryptKeyBytes);
                 client.Send(fBt.ToArray());
                 client.Close();
+                Thread.Sleep(3000);
             }      
             catch(Exception ex)
             {
@@ -227,6 +230,20 @@ namespace App
                     MessageBox.Show(ex.Message);
                 }
             }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Key: " + hc256.Key.ToString());
+            MessageBox.Show("Vector: " + hc256.Vector.ToString());
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("My dh.PublicKey "+dh.PublicKey[1]);
+            MessageBox.Show("My dh.IV " + dh.IV[5]);
+
         }
     }
 }

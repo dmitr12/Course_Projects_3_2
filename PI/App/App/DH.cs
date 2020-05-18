@@ -12,7 +12,7 @@ namespace App
     {
         private Aes aes = null;
         private ECDiffieHellmanCng df = null;
-        private readonly byte[] publicKey;
+        /*private readonly*/ byte[] publicKey;
 
         public DH()
         {
@@ -25,8 +25,8 @@ namespace App
             publicKey = df.PublicKey.ToByteArray();
         }
 
-        public byte[] PublicKey { get { return publicKey; } }
-        public byte[] IV { get { return aes.IV; } }
+        public byte[] PublicKey { get { return publicKey; } set { publicKey = value; } }
+        public byte[] IV { get { return aes.IV; } set { aes.IV = value; } }
 
         public byte[] Encrypt(byte[] publicKey, byte[] secretMessage)
         {
