@@ -1,0 +1,25 @@
+<project name="WebApp" default="copy">
+    <target name="path">
+        <property name="fromDir" value="D:\javaLabs\Lab11\WebApp"/>
+        <property name="toDir" value="D:\apache-tomcat-7.0.100\webapps\WebApp11"/>
+    </target>
+    <target name="init" depends="path">
+        <echo message="Building WebApp"/>
+    </target>
+    <target name="create" depends="init">
+        <delete dir="${toDir}"/>
+        <mkdir dir="${toDir}"/>
+        <mkdir dir="${toDir}\html"/>
+        <mkdir dir="${toDir}\js"/>
+        <mkdir dir="${toDir}\jsp"/>
+        <mkdir dir="${toDir}\images"/>
+        <mkdir dir="${toDir}\WEB-INF"/>
+    </target>
+    <target name="copy" depends="create">
+        <copy todir="${toDir}\html">
+            <fileset dir="${fromDir}\html"/>
+        </copy>
+        <copy file="${fromDir}\images\yaroshuk.jpg" todir="${toDir}\images"/>
+        <copy file="${fromDir}\WEB-INF\web.xml" todir="${toDir}\WEB-INF"/>
+    </target>
+</project>
