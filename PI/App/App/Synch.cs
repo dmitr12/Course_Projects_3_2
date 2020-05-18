@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace App
 {
-    class S:IDisposable
+    class Synch
     {
         Socket socket;
         Socket clientSocket;
@@ -24,7 +24,7 @@ namespace App
         DH dh;
         int bufSz;
 
-        public S(TextBox txtB, Form form, ref HC256 other256, ref DH dh, byte[] otherPublicKey, byte[] otherIV, string ip)
+        public Synch(TextBox txtB, Form form, ref HC256 other256, ref DH dh, byte[] otherPublicKey, byte[] otherIV)
         {
             this.txtB = txtB;
             this.form = form;
@@ -40,9 +40,8 @@ namespace App
             {
                 try
                 {
-
                     socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    socket.Bind(new IPEndPoint(IPAddress.Any, 10431));
+                    socket.Bind(new IPEndPoint(IPAddress.Any, 10333));
                     socket.Listen(1);
                     socket.BeginAccept(new AsyncCallback(AcceptCallback), null);
                 }
@@ -111,9 +110,9 @@ namespace App
         {
             List<byte> listDecrypted = other256.Encrypt(encryptedMsg);
             MethodInvoker invoker = new MethodInvoker(delegate
-              {
-                  txtB.Text += Environment.NewLine + "New message: " + Environment.NewLine + Encoding.UTF8.GetString(listDecrypted.ToArray());
-              });
+            {
+                txtB.Text += Environment.NewLine + "New message: " + Environment.NewLine + Encoding.UTF8.GetString(listDecrypted.ToArray());
+            });
             form.Invoke(invoker);
             Dispose();
             StartServer();

@@ -43,6 +43,8 @@
             this.button1 = new System.Windows.Forms.Button();
             this.btnSynch = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.testSendBtn = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -192,11 +194,32 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(0, 0);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 20;
+            this.button3.Text = "button3";
+            this.button3.UseVisualStyleBackColor = true;
+            // 
+            // testSendBtn
+            // 
+            this.testSendBtn.Location = new System.Drawing.Point(407, 70);
+            this.testSendBtn.Name = "testSendBtn";
+            this.testSendBtn.Size = new System.Drawing.Size(75, 23);
+            this.testSendBtn.TabIndex = 21;
+            this.testSendBtn.Text = "button4";
+            this.testSendBtn.UseVisualStyleBackColor = true;
+            this.testSendBtn.Click += new System.EventHandler(this.testSendBtn_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(910, 454);
+            this.Controls.Add(this.testSendBtn);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.btnSynch);
             this.Controls.Add(this.button1);
@@ -236,6 +259,8 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button btnSynch;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button testSendBtn;
     }
 }
 

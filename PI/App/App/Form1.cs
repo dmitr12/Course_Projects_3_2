@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,11 +23,15 @@ namespace App
         CheckClass chCl = new CheckClass();
 
         S serv = null;
-        Client_ client = null;
+        Synch synch = null;
         ListenerKeys lk;
         DH dh = new DH();
         byte[] otherPublicKey = new byte[140];
         byte[] otherIV = new byte[16];
+
+
+
+        TestServ testServ;
 
         public Form1()
         {
@@ -41,9 +46,12 @@ namespace App
             exchangeKeysTxtB.ReadOnly = true;
             lk = new ListenerKeys(ref otherPublicKey, ref otherIV, this, exchangeKeysTxtB);
             lk.StartServer();
-
+            serv = new S(getMsgText, this, ref other256, ref dh, otherPublicKey, otherIV, hostIp.Text);
+            synch = new Synch(getMsgText, this, ref other256, ref dh, otherPublicKey, otherIV);
             //server = new Server_(msgTxtFromTcp);
             //server.Start();
+            testServ = new TestServ(this, getMsgText);
+            testServ.Start();
         }
 
         //private void encryptBtn_Click(object sender, EventArgs e)
@@ -77,8 +85,10 @@ namespace App
             sendMsgBtn.Enabled = false;
             if (radioGet.Checked)
             {
-                serv = new S(getMsgText, this, ref other256, ref dh, otherPublicKey, otherIV);
+                //serv = new S(getMsgText, this, ref other256, ref dh, otherPublicKey, otherIV);
                 serv.StartServer();
+                //synch = new Synch(getMsgText, this, ref other256, ref dh, otherPublicKey, otherIV);
+                synch.StartServer();
             }
         }
 
@@ -88,7 +98,9 @@ namespace App
             if (radioSend.Checked)
             {
                 serv.Dispose();
-                serv = null;
+                //serv = null;
+                synch.Dispose();
+                //synch = null;
             }
         }
 
@@ -97,7 +109,9 @@ namespace App
             if (!radioSend.Checked)
             {
                 serv.Dispose();
-                serv = null;
+                //serv = null;
+                synch.Dispose();
+                //synch = null;
             }
         }
 
@@ -109,7 +123,7 @@ namespace App
             }
             else
             {
-                client = new Client_(hostIp.Text, 10431);              
+                Client_ client = new Client_(hostIp.Text, 10431);              
                 List<byte> sendBytes = new List<byte>();
                 sendBytes.AddRange(Encoding.UTF8.GetBytes("msg"));
                 List<byte> listBts = new List<byte>();
@@ -134,7 +148,7 @@ namespace App
                     j++;
                 }
                 exchangeKeysBtn.Enabled = false;
-                client = new Client_(hostIp.Text, 8890);
+                Client_ client = new Client_(hostIp.Text, 8890);
                 lk.Dispose();
                 lk = null;
                 client.Send(msg);
@@ -164,9 +178,9 @@ namespace App
 
         private void btnSynch_Click(object sender, EventArgs e)
         {
+            Client_ client = new Client_(hostIp.Text, 10333);
             try
             {
-                client = new Client_(hostIp.Text, 10431);
                 List<byte> keyBytes = new List<byte>();
                 List<byte> fBt = new List<byte>();
                 fBt.AddRange(Encoding.UTF8.GetBytes("key"));
@@ -189,6 +203,30 @@ namespace App
         {
             MessageBox.Show(hc256.Key.ToString());
             MessageBox.Show(hc256.Vector.ToString());
+        }
+
+        private void testSendBtn_Click(object sender, EventArgs e)
+        {
+            if (hostIp.Text.Length == 0 && sendMsgText.Text.Length == 0)
+            {
+                MessageBox.Show("Заполните поля хоста и сообщения");
+            }
+            else
+            {
+                Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                try
+                {
+                    clientSocket.Connect(hostIp.Text, 10001);
+                    byte[] bts = Encoding.UTF8.GetBytes(sendMsgText.Text);
+                    clientSocket.Send(bts);
+                    clientSocket.Close();
+                }
+                catch (Exception ex)
+                {
+                    clientSocket.Close();
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
     }
 }

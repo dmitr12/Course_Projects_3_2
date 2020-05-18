@@ -211,6 +211,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandBigInt.cs" />
     <Compile Include="S.cs" />
+    <Compile Include="Synch.cs" />
+    <Compile Include="TestServ.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
