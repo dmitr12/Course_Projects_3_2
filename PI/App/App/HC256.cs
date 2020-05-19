@@ -10,8 +10,8 @@ namespace App
 {
     class HC256
     {
-        public BigInteger Key { get; private set; }
-        public BigInteger Vector { get; private set; }
+        public BigInteger Key { get; set; }
+        public BigInteger Vector { get; set; }
 
         //public BigInteger startEncrypt = new BigInteger(0);
 
@@ -21,9 +21,9 @@ namespace App
         public uint[] key=null;
         public uint[] iv=null;
 
-        public uint[] P = new uint[1024];
-        uint[] Q = new uint[1024];
-        uint[] W = new uint[2560];
+        uint[] P;
+        uint[] Q;
+        uint[] W;
 
         public uint CycleSdvigRight(uint x, int n) => ((x >> n) ^ (x << (32 - n)));
 
@@ -122,6 +122,9 @@ namespace App
 
         public void InitializationProcess()
         {
+            P = new uint[1024];
+            Q = new uint[1024];
+            W = new uint[2560];
             //1)
             for (int i = 0; i <= 2559; i++)
             {
@@ -218,9 +221,6 @@ namespace App
             {
                 step = 0;
                 uint j;
-                P = new uint[1024];
-                Q = new uint[1024];
-                W = new uint[2560];
                 InitializationProcess();
                 for (BigInteger i = 0; i < strt; i++)
                 {
