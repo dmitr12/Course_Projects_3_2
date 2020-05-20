@@ -17,11 +17,11 @@ namespace TestApp.Utils
         }
 
         public string GetHash(string msg)
-            => Convert.ToBase64String(md5.ComputeHash(Encoding.Unicode.GetBytes(msg)));
+            => Convert.ToBase64String(md5.ComputeHash(Encoding.UTF8.GetBytes(msg)));
 
         public bool CheckHash(string stringForHash, string hash)
         {
-            if (Convert.ToBase64String(md5.ComputeHash(Encoding.Unicode.GetBytes(stringForHash))) == hash)
+            if (Convert.ToBase64String(md5.ComputeHash(Encoding.UTF8.GetBytes(stringForHash))) == hash)
                 return true;
             return false;
         }

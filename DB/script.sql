@@ -664,7 +664,7 @@ grant C##Role_User to C##User;
 insert into RolesOfUsers(IdRole, NameRole, NameConnection) values(1, 'Admin','C##Admin');
 insert into RolesOfUsers(IdRole, NameRole, NameConnection) values(2, 'User','C##User');
 
-insert into Users(Login, Password, RoleOfUser) values('Admin','GaKFQUS2Oo92F6byJQGbEg==',1); --Пароль: 'admin'
+insert into Users(Login, Password, RoleOfUser) values('Admin',Md5_b64('admin'),1); --Пароль: 'admin'
 --Тема курсового
 create or replace directory IMAGES as 'D:\CourseProjects32\Repository\DB';
 DECLARE
@@ -784,3 +784,24 @@ CREATE FUNCTION get_dir_name (bf BFILE) RETURN VARCHAR2 IS
      END IF;
    END;
    
+---100 000
+create or replace procedure InputOneHundredSousan
+as
+begin
+for i in 1..100000 loop
+insert into users(Login, Password, RoleOfUser) values('User'||i,Md5_b64('user'||i),2);
+end loop;
+commit;
+end;
+
+begin
+InputOneHundredSousan;
+end;
+
+create function Md5_b64(i_Inp varchar2) return varchar2 is
+  begin
+    return Utl_Raw.Cast_To_Varchar2(
+               Utl_Encode.Base64_Encode(
+                   Dbms_Obfuscation_Toolkit.Md5(Input => Utl_Raw.Cast_To_Raw(i_Inp)
+           )));
+  end;
