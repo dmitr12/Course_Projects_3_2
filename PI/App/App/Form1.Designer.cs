@@ -36,7 +36,6 @@
             this.getMsgText = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.exchangeKeysTxtB = new System.Windows.Forms.TextBox();
-            this.btnSynch = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.requestSecretKeyBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -59,7 +58,7 @@
             // 
             // sendMsgBtn
             // 
-            this.sendMsgBtn.Location = new System.Drawing.Point(692, 170);
+            this.sendMsgBtn.Location = new System.Drawing.Point(602, 170);
             this.sendMsgBtn.Name = "sendMsgBtn";
             this.sendMsgBtn.Size = new System.Drawing.Size(151, 23);
             this.sendMsgBtn.TabIndex = 10;
@@ -112,15 +111,6 @@
             this.exchangeKeysTxtB.Size = new System.Drawing.Size(346, 133);
             this.exchangeKeysTxtB.TabIndex = 15;
             // 
-            // btnSynch
-            // 
-            this.btnSynch.Location = new System.Drawing.Point(503, 171);
-            this.btnSynch.Name = "btnSynch";
-            this.btnSynch.Size = new System.Drawing.Size(139, 23);
-            this.btnSynch.TabIndex = 18;
-            this.btnSynch.Text = "Синхронизация";
-            this.btnSynch.UseVisualStyleBackColor = true;
-            // 
             // button4
             // 
             this.button4.Location = new System.Drawing.Point(243, 276);
@@ -148,7 +138,6 @@
             this.ClientSize = new System.Drawing.Size(910, 454);
             this.Controls.Add(this.requestSecretKeyBtn);
             this.Controls.Add(this.button4);
-            this.Controls.Add(this.btnSynch);
             this.Controls.Add(this.exchangeKeysTxtB);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.getMsgText);
@@ -173,7 +162,6 @@
         private System.Windows.Forms.TextBox getMsgText;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox exchangeKeysTxtB;
-        private System.Windows.Forms.Button btnSynch;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button requestSecretKeyBtn;
     }

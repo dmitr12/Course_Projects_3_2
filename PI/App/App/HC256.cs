@@ -13,10 +13,8 @@ namespace App
         public BigInteger Key { get; set; }
         public BigInteger Vector { get; set; }
 
-        //public BigInteger startEncrypt = new BigInteger(0);
-
         private BigInteger step = new BigInteger(0);
-        public BigInteger Step { get { return step; } }
+        public BigInteger Step { get { return step; } set { step = value; } }
 
         public uint[] key=null;
         public uint[] iv=null;

@@ -31,7 +31,7 @@ namespace TestApp.Models
         [Display(Name="Трейлер")]
         public byte[] Trailer { get; set; }
         
-        public ICollection<Session> Sessions { get; set; }
+        public List<Session> Sessions { get; set; }
         public Film()
         {
             Sessions = new List<Session>();

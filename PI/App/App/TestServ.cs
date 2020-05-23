@@ -26,7 +26,6 @@ namespace App
             this.form = form;
             this.txtB = txtB;
             this.hc256 = hc256;
-            //this.other256 = other256;
             other256 = new HC256();
             this.dh = dh;
             btn = requestKey;
@@ -145,6 +144,7 @@ namespace App
                 vector += new BigInteger(checkVector[i]) << (8 * i);
             if (other256.Key != key || other256.Vector != vector)
             {
+                other256.Step = 0;
                 other256.SetKey(key);
                 other256.SetVector(vector);
                 other256.InitializationProcess();
@@ -169,50 +169,10 @@ namespace App
                 List<byte> listDecrypted = other256.Encrypt(encryptedMsg);
                 MethodInvoker invoker = new MethodInvoker(delegate
                 {
-                    txtB.Text += Environment.NewLine + "New message: " + Environment.NewLine + Encoding.UTF8.GetString(listDecrypted.ToArray());
+                    txtB.Text += Environment.NewLine + $"New message from {ip} : " + Environment.NewLine + Encoding.UTF8.GetString(listDecrypted.ToArray());
                 });
                 form.Invoke(invoker);
             }     
         }
-
-        //public void GetOtherHC256Key(byte[] bt)
-        //{
-        //    BigInteger key = new BigInteger(0);
-        //    BigInteger vector = new BigInteger(0);
-        //    BigInteger step = new BigInteger(0);
-        //    //Добавляю
-        //    byte[] oldKey = dh.PublicKey;
-        //    byte[] oldIV = dh.IV;
-        //    //
-        //    byte[] decrypted = dh.Decrypt(otherPublicKey, bt, otherIV);
-        //    //Добавляю
-        //    dh.PublicKey=oldKey;
-        //    dh.IV=oldIV;
-        //    //
-        //    byte[] checkKey = new byte[32];
-        //    for (int i = 0; i < 32; i++)
-        //        checkKey[i] = decrypted[i];
-        //    Array.Reverse(checkKey);
-        //    for (int i = 0; i < checkKey.Length; i++)
-        //        key += new BigInteger(checkKey[i]) << (8 * i);
-        //    byte[] checkVector = new byte[32];
-        //    for (int i = 32; i < 64; i++)
-        //        checkVector[i - 32] = decrypted[i];
-        //    Array.Reverse(checkVector);
-        //    for (int i = 0; i < checkVector.Length; i++)
-        //        vector += new BigInteger(checkVector[i]) << (8 * i);
-        //    for (int i = 64; i < decrypted.Length; i++)
-        //        step += new BigInteger(decrypted[i]) << (8 * (i - 64));
-
-        //    //other256 = new HC256();
-
-        //    if (other256.key == null || other256.iv == null)
-        //    {
-        //        other256.SetKey(key);
-        //        other256.SetVector(vector);
-        //        other256.InitializationProcess();
-        //    }
-        //    other256.Synchronization(step);
-        //}
     }
 }

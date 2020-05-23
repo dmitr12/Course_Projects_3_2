@@ -195,7 +195,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CheckClass.cs" />
     <Compile Include="Client_.cs" />
     <Compile Include="DH.cs" />
     <Compile Include="Form1.cs">
@@ -205,13 +204,9 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="HC256.cs" />
-    <Compile Include="ListenerKeys.cs" />
-    <Compile Include="ListenerSinch.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandBigInt.cs" />
-    <Compile Include="S.cs" />
-    <Compile Include="Synch.cs" />
     <Compile Include="TestServ.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

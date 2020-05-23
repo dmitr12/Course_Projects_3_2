@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfCinema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Cinema>
+    <IdCinema>1</IdCinema>
+    <NameCinema>Звезда</NameCinema>
+    <AddressId>1</AddressId>
+    <Address>
+      <IdAddress>1</IdAddress>
+      <Street>Макаенка</Street>
+      <NumberHouse>34</NumberHouse>
+    </Address>
+    <Halls />
+  </Cinema>
+  <Cinema>
+    <IdCinema>100031</IdCinema>
+    <NameCinema>Корона</NameCinema>
+    <AddressId>100034</AddressId>
+    <Address>
+      <IdAddress>100034</IdAddress>
+      <Street>Павловская</Street>
+      <NumberHouse>56</NumberHouse>
+    </Address>
+    <Halls />
+  </Cinema>
+</ArrayOfCinema>

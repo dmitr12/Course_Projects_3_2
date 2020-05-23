@@ -21,7 +21,7 @@ namespace TestApp.Models
         public int CountSeatsRow { get; set; }
         [Required]
         public int CostSeat { get; set; }
-        public ICollection<Seat> Seats { get; set; }
+        public List<Seat> Seats { get; set; }
 
         public Sector()
         {

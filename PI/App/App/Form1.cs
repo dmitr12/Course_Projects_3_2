@@ -56,6 +56,7 @@ namespace App
                 client.Send(sendBytes.ToArray());
                 client.Close();
                 Thread.Sleep(2000);
+                sendMsgText.Text = "";
             }
         }
 
